@@ -1,0 +1,183 @@
+html,
+body {
+  background: var(--foundry-bg);
+  color: var(--foundry-text);
+  font-family: var(--foundry-font-body);
+  -webkit-font-smoothing: antialiased;
+}
+
+ion-content {
+  --background: var(--foundry-bg);
+}
+
+.foundry-display {
+  font-family: var(--foundry-font-display);
+  font-weight: 700;
+  letter-spacing: -0.015em;
+}
+
+.foundry-eyebrow {
+  font-family: var(--foundry-font-mono);
+  text-transform: uppercase;
+  font-size: 10px;
+  letter-spacing: 0.18em;
+  color: var(--foundry-text-dim);
+}
+
+.foundry-header {
+  padding: 28px 20px 12px;
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+}
+
+.foundry-header__title {
+  font-family: var(--foundry-font-display);
+  font-weight: 700;
+  font-size: 36px;
+  line-height: 1;
+  letter-spacing: -0.02em;
+  margin: 0;
+  color: var(--foundry-text);
+}
+
+.foundry-header__title em {
+  font-style: italic;
+  font-weight: 500;
+  color: var(--foundry-ember);
+}
+
+.foundry-header__subtitle {
+  font-family: var(--foundry-font-mono);
+  font-size: 11px;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--foundry-text-dim);
+  margin: 0;
+}
+
+.foundry-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 14px;
+  padding: 10px 16px 32px;
+}
+
+@media (min-width: 640px) {
+  .foundry-grid {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+}
+@media (min-width: 960px) {
+  .foundry-grid {
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    max-width: 1100px;
+    margin: 0 auto;
+  }
+}
+
+.foundry-tile {
+  position: relative;
+  background: linear-gradient(160deg, var(--foundry-bg-card) 0%, var(--foundry-bg-elevated) 100%);
+  border: 1px solid var(--foundry-border);
+  border-radius: var(--foundry-radius-lg);
+  padding: 20px 18px 18px;
+  min-height: 168px;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  overflow: hidden;
+  transition: transform 0.15s ease, border-color 0.15s ease, background 0.2s ease;
+  cursor: pointer;
+}
+
+.foundry-tile::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background:
+    radial-gradient(circle at top right, rgba(232, 116, 44, 0.08), transparent 55%),
+    repeating-linear-gradient(45deg, rgba(255, 255, 255, 0.012) 0 1px, transparent 1px 8px);
+  pointer-events: none;
+}
+
+.foundry-tile:active {
+  transform: scale(0.985);
+  border-color: var(--foundry-border-strong);
+}
+
+.foundry-tile__icon {
+  font-size: 36px;
+  line-height: 1;
+}
+
+.foundry-tile__meta {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.foundry-tile__name {
+  font-family: var(--foundry-font-display);
+  font-size: 18px;
+  font-weight: 700;
+  letter-spacing: -0.01em;
+  margin: 0;
+  color: var(--foundry-text);
+}
+
+.foundry-tile__desc {
+  font-size: 12.5px;
+  line-height: 1.35;
+  color: var(--foundry-text-muted);
+  margin: 0;
+}
+
+.foundry-tile__status {
+  position: absolute;
+  top: 14px;
+  right: 14px;
+  width: 6px;
+  height: 6px;
+  border-radius: 999px;
+  background: var(--foundry-ember);
+  box-shadow: 0 0 12px var(--foundry-ember);
+}
+
+.foundry-empty {
+  margin: 48px 20px;
+  border: 1px dashed var(--foundry-border-strong);
+  border-radius: var(--foundry-radius-lg);
+  padding: 40px 28px;
+  text-align: center;
+  background: rgba(28, 23, 20, 0.4);
+}
+
+.foundry-empty__title {
+  font-family: var(--foundry-font-display);
+  font-size: 22px;
+  font-weight: 700;
+  margin: 0 0 8px;
+  color: var(--foundry-text);
+  letter-spacing: -0.01em;
+}
+
+.foundry-empty__body {
+  margin: 0;
+  font-size: 14px;
+  color: var(--foundry-text-muted);
+  line-height: 1.5;
+}
+
+.foundry-app-toolbar-title {
+  font-family: var(--foundry-font-display);
+  font-weight: 700;
+  letter-spacing: -0.01em;
+}
+
+/* Tile pulse — subtle */
+@keyframes ember-pulse {
+  0%, 100% { opacity: 0.7; }
+  50% { opacity: 1; }
+}
+.foundry-tile__status { animation: ember-pulse 2.4s ease-in-out infinite; }
