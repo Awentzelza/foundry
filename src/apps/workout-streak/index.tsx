@@ -1,244 +1,260 @@
-import { useState, useCallback } from 'react';
-import { IonButton, IonRippleEffect } from '@ionic/react';
+/**
+ * Workout Streak — tap to mark today done.
+ * Tracks current streak and longest streak. Resets when you miss a day.
+ */
+import { useCallback, useMemo } from 'react';
+import { IonButton } from '@ionic/react';
+
 import { useAppData } from '@/hooks/useAppData';
 
 interface StreakData {
-  completedDates: string[];
-  longestStreak: number;
+  completedDates: string[]; // ISO YYYY-MM-DD, ascending or any order
 }
 
-function toDateStr(d: Date): string {
-  return d.toISOString().split('T')[0];
+function todayKey(): string {
+  return new Date().toISOString().slice(0, 10);
 }
 
-function calcCurrentStreak(dates: string[]): number {
-  if (dates.length === 0) return 0;
-  const sorted = [...dates].sort().reverse();
-  const today = toDateStr(new Date());
-  const yesterday = toDateStr(new Date(Date.now() - 86400000));
-  if (sorted[0] !== today && sorted[0] !== yesterday) return 0;
-  let streak = 1;
-  for (let i = 1; i < sorted.length; i++) {
-    const prev = new Date(sorted[i - 1] + 'T12:00:00');
-    const curr = new Date(sorted[i] + 'T12:00:00');
-    const diff = (prev.getTime() - curr.getTime()) / 86400000;
-    if (Math.round(diff) === 1) streak++;
-    else break;
+function dayOffset(iso: string, daysBack: number): string {
+  const d = new Date(iso + 'T00:00:00Z');
+  d.setUTCDate(d.getUTCDate() - daysBack);
+  return d.toISOString().slice(0, 10);
+}
+
+function calcCurrent(dates: Set<string>): number {
+  let streak = 0;
+  const today = todayKey();
+  // If today isn't done, start from yesterday so we still credit an active streak.
+  let cursor = dates.has(today) ? today : dayOffset(today, 1);
+  while (dates.has(cursor)) {
+    streak += 1;
+    cursor = dayOffset(cursor, 1);
   }
   return streak;
 }
 
-function calcLongest(dates: string[], currentBest: number): number {
-  if (dates.length === 0) return currentBest;
-  const sorted = [...dates].sort();
-  let best = 1;
-  let run = 1;
-  for (let i = 1; i < sorted.length; i++) {
-    const prev = new Date(sorted[i - 1] + 'T12:00:00');
-    const curr = new Date(sorted[i] + 'T12:00:00');
-    const diff = (curr.getTime() - prev.getTime()) / 86400000;
-    if (Math.round(diff) === 1) { run++; best = Math.max(best, run); }
-    else run = 1;
+function calcLongest(dates: string[]): number {
+  if (dates.length === 0) return 0;
+  const set = new Set(dates);
+  let longest = 0;
+  for (const d of dates) {
+    // Only start counting from a "streak start" (no previous day in set).
+    const prev = dayOffset(d, 1);
+    if (set.has(prev)) continue;
+    let len = 0;
+    let cursor = d;
+    while (set.has(cursor)) {
+      len += 1;
+      const next = new Date(cursor + 'T00:00:00Z');
+      next.setUTCDate(next.getUTCDate() + 1);
+      cursor = next.toISOString().slice(0, 10);
+    }
+    if (len > longest) longest = len;
   }
-  return Math.max(best, currentBest);
+  return longest;
 }
 
-export default function WorkoutStreak() {
-  const [data, setData] = useAppData<StreakData>('workout-streak', 'streakData', {
-    completedDates: [],
-    longestStreak: 0,
-  });
+export default function WorkoutStreakApp() {
+  const { value: data, setValue, ready } = useAppData<StreakData>(
+    'workout-streak',
+    'data',
+    { completedDates: [] },
+  );
 
-  const today = toDateStr(new Date());
-  const doneToday = data.completedDates.includes(today);
-  const currentStreak = calcCurrentStreak(data.completedDates);
-  const longestStreak = Math.max(data.longestStreak, currentStreak);
+  const today = todayKey();
+  const completedToday = useMemo(
+    () => data.completedDates.includes(today),
+    [data.completedDates, today],
+  );
 
-  const [pulse, setPulse] = useState(false);
+  const currentStreak = useMemo(
+    () => calcCurrent(new Set(data.completedDates)),
+    [data.completedDates],
+  );
+  const longestStreak = useMemo(
+    () => Math.max(calcLongest(data.completedDates), currentStreak),
+    [data.completedDates, currentStreak],
+  );
 
-  const handleTap = useCallback(() => {
-    setPulse(true);
-    setTimeout(() => setPulse(false), 600);
-    if (doneToday) {
-      const next = data.completedDates.filter(d => d !== today);
-      setData({ completedDates: next, longestStreak: data.longestStreak });
-    } else {
-      const next = [...data.completedDates, today];
-      const newLongest = calcLongest(next, data.longestStreak);
-      setData({ completedDates: next, longestStreak: newLongest });
+  const last7 = useMemo(() => {
+    const days: { iso: string; done: boolean; isToday: boolean }[] = [];
+    const set = new Set(data.completedDates);
+    for (let i = 6; i >= 0; i--) {
+      const iso = dayOffset(today, i);
+      days.push({ iso, done: set.has(iso), isToday: iso === today });
     }
-  }, [doneToday, data, today, setData]);
+    return days;
+  }, [data.completedDates, today]);
 
-  // Last 7 days for the mini calendar
-  const last7 = Array.from({ length: 7 }, (_, i) => {
-    const d = new Date(Date.now() - (6 - i) * 86400000);
-    return toDateStr(d);
-  });
+  const toggleToday = useCallback(async () => {
+    const set = new Set(data.completedDates);
+    if (set.has(today)) set.delete(today);
+    else set.add(today);
+    await setValue({ completedDates: Array.from(set).sort() });
+  }, [data.completedDates, today, setValue]);
 
-  const dayLabels = ['S', 'M', 'T', 'W', 'T', 'F', 'S'];
+  if (!ready) return null;
+
+  const accent = completedToday ? 'var(--foundry-ember)' : 'var(--foundry-text-dim)';
+  const glow = completedToday
+    ? '0 0 40px rgba(232, 116, 44, 0.35), inset 0 0 0 1px rgba(232, 116, 44, 0.6)'
+    : 'inset 0 0 0 1px var(--foundry-border)';
 
   return (
-    <div style={{
-      display: 'flex',
-      flexDirection: 'column',
-      alignItems: 'center',
-      padding: '28px 20px 32px',
-      gap: '28px',
-      maxWidth: '400px',
-      margin: '0 auto',
-    }}>
-
-      {/* Big tap button */}
+    <div
+      style={{
+        display: 'flex',
+        flexDirection: 'column',
+        alignItems: 'center',
+        gap: 28,
+        padding: '32px 20px 40px',
+      }}
+    >
       <div
-        onClick={handleTap}
-        className="ion-activatable"
         style={{
-          position: 'relative',
-          overflow: 'hidden',
-          width: '180px',
-          height: '180px',
-          borderRadius: '50%',
-          background: doneToday
-            ? 'radial-gradient(circle at 40% 35%, #f0923a, var(--foundry-ember) 60%, #b85510)'
-            : 'var(--foundry-bg-elevated)',
-          border: `2px solid ${doneToday ? 'var(--foundry-ember-bright)' : 'var(--foundry-border-strong)'}`,
-          display: 'flex',
-          flexDirection: 'column',
-          alignItems: 'center',
-          justifyContent: 'center',
-          cursor: 'pointer',
-          transition: 'all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1)',
-          boxShadow: doneToday
-            ? '0 0 40px rgba(232,116,44,0.35), 0 8px 32px rgba(0,0,0,0.4)'
-            : '0 4px 20px rgba(0,0,0,0.3)',
-          transform: pulse ? 'scale(0.94)' : 'scale(1)',
+          fontFamily: 'var(--foundry-font-mono)',
+          textTransform: 'uppercase',
+          letterSpacing: '0.18em',
+          fontSize: 11,
+          color: 'var(--foundry-text-dim)',
         }}
       >
-        <IonRippleEffect />
-        <span style={{ fontSize: '52px', lineHeight: 1, marginBottom: '6px' }}>
-          {doneToday ? '🔥' : '💪'}
-        </span>
-        <span style={{
-          fontFamily: 'var(--foundry-font-mono)',
-          fontSize: '10px',
-          letterSpacing: '0.16em',
-          color: doneToday ? 'rgba(255,255,255,0.85)' : 'var(--foundry-text-dim)',
-          textTransform: 'uppercase',
-        }}>
-          {doneToday ? 'Done!' : 'Tap to log'}
-        </span>
+        {completedToday ? "Today's logged" : 'Tap when done'}
       </div>
 
-      {/* Streak numbers */}
-      <div style={{
-        display: 'grid',
-        gridTemplateColumns: '1fr 1fr',
-        gap: '12px',
-        width: '100%',
-      }}>
-        {[
-          { label: 'Current Streak', value: currentStreak, unit: currentStreak === 1 ? 'day' : 'days' },
-          { label: 'Longest Streak', value: longestStreak, unit: longestStreak === 1 ? 'day' : 'days' },
-        ].map(({ label, value, unit }) => (
-          <div key={label} style={{
-            background: 'var(--foundry-bg-card)',
-            border: '1px solid var(--foundry-border)',
-            borderRadius: 'var(--foundry-radius-md)',
-            padding: '18px 16px',
-            textAlign: 'center',
-          }}>
-            <div style={{
-              fontFamily: 'var(--foundry-font-mono)',
-              fontSize: '10px',
-              letterSpacing: '0.16em',
-              color: 'var(--foundry-text-dim)',
-              textTransform: 'uppercase',
-              marginBottom: '8px',
-            }}>{label}</div>
-            <div style={{
-              fontFamily: 'var(--foundry-font-display)',
-              fontSize: '48px',
-              fontWeight: 700,
-              lineHeight: 1,
-              color: value > 0 ? 'var(--foundry-ember)' : 'var(--foundry-text-muted)',
-              letterSpacing: '-0.02em',
-            }}>{value}</div>
-            <div style={{
-              fontFamily: 'var(--foundry-font-mono)',
-              fontSize: '10px',
-              letterSpacing: '0.12em',
-              color: 'var(--foundry-text-dim)',
-              marginTop: '4px',
-              textTransform: 'uppercase',
-            }}>{unit}</div>
-          </div>
+      <button
+        type="button"
+        onClick={() => void toggleToday()}
+        aria-label={completedToday ? 'Undo today' : 'Mark today done'}
+        style={{
+          width: 220,
+          height: 220,
+          borderRadius: '50%',
+          background: completedToday
+            ? 'radial-gradient(circle, #2a1a10 0%, var(--foundry-bg-card) 70%)'
+            : 'var(--foundry-bg-card)',
+          border: 'none',
+          color: accent,
+          fontSize: 88,
+          lineHeight: 1,
+          boxShadow: glow,
+          cursor: 'pointer',
+          transition: 'transform 0.15s ease, box-shadow 0.25s ease',
+          touchAction: 'manipulation',
+        }}
+        onMouseDown={(e) => (e.currentTarget.style.transform = 'scale(0.97)')}
+        onMouseUp={(e) => (e.currentTarget.style.transform = 'scale(1)')}
+        onMouseLeave={(e) => (e.currentTarget.style.transform = 'scale(1)')}
+      >
+        <span aria-hidden>{completedToday ? '🔥' : '💪'}</span>
+      </button>
+
+      <div
+        style={{
+          display: 'grid',
+          gridTemplateColumns: '1fr 1fr',
+          gap: 12,
+          width: 'min(100%, 360px)',
+        }}
+      >
+        <StatCard label="Current" value={currentStreak} hot={currentStreak > 0} />
+        <StatCard label="Longest" value={longestStreak} hot={longestStreak > 0} />
+      </div>
+
+      <div
+        style={{
+          display: 'flex',
+          gap: 8,
+          alignItems: 'flex-end',
+        }}
+        aria-label="Last 7 days"
+      >
+        {last7.map((d) => (
+          <div
+            key={d.iso}
+            title={d.iso}
+            style={{
+              width: 28,
+              height: 28,
+              borderRadius: 6,
+              background: d.done ? 'var(--foundry-ember)' : 'var(--foundry-bg-card)',
+              border: d.isToday
+                ? '1.5px solid var(--foundry-text)'
+                : '1px solid var(--foundry-border)',
+              opacity: d.done ? 1 : 0.85,
+            }}
+          />
         ))}
       </div>
 
-      {/* Last 7 days */}
-      <div style={{
-        background: 'var(--foundry-bg-card)',
-        border: '1px solid var(--foundry-border)',
-        borderRadius: 'var(--foundry-radius-md)',
-        padding: '16px',
-        width: '100%',
-      }}>
-        <div style={{
-          fontFamily: 'var(--foundry-font-mono)',
-          fontSize: '10px',
-          letterSpacing: '0.18em',
-          color: 'var(--foundry-text-dim)',
-          textTransform: 'uppercase',
-          marginBottom: '14px',
-        }}>Last 7 Days</div>
-        <div style={{
-          display: 'grid',
-          gridTemplateColumns: 'repeat(7, 1fr)',
-          gap: '6px',
-        }}>
-          {last7.map((dateStr, i) => {
-            const done = data.completedDates.includes(dateStr);
-            const isToday = dateStr === today;
-            const d = new Date(dateStr + 'T12:00:00');
-            const dayIdx = d.getDay();
-            return (
-              <div key={dateStr} style={{ textAlign: 'center' }}>
-                <div style={{
-                  fontFamily: 'var(--foundry-font-mono)',
-                  fontSize: '9px',
-                  letterSpacing: '0.1em',
-                  color: 'var(--foundry-text-dim)',
-                  marginBottom: '5px',
-                  textTransform: 'uppercase',
-                }}>{dayLabels[dayIdx]}</div>
-                <div style={{
-                  width: '100%',
-                  aspectRatio: '1',
-                  borderRadius: 'var(--foundry-radius-sm)',
-                  background: done ? 'var(--foundry-ember)' : 'var(--foundry-bg-elevated)',
-                  border: isToday
-                    ? `2px solid ${done ? 'var(--foundry-ember-bright)' : 'var(--foundry-border-strong)'}`
-                    : '1px solid var(--foundry-border)',
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                  fontSize: '12px',
-                  transition: 'background 0.2s',
-                }}>
-                  {done ? '✓' : ''}
-                </div>
-              </div>
-            );
-          })}
-        </div>
-      </div>
-
-      {/* Undo / clear today */}
-      {doneToday && (
-        <IonButton fill="clear" size="small" onClick={handleTap} style={{ color: 'var(--foundry-text-dim)' }}>
+      {completedToday && (
+        <IonButton
+          fill="clear"
+          color="medium"
+          size="small"
+          onClick={() => void toggleToday()}
+        >
           Undo today
         </IonButton>
       )}
+    </div>
+  );
+}
+
+function StatCard({
+  label,
+  value,
+  hot,
+}: {
+  label: string;
+  value: number;
+  hot: boolean;
+}) {
+  return (
+    <div
+      style={{
+        padding: '14px 16px',
+        border: '1px solid var(--foundry-border)',
+        borderRadius: 'var(--foundry-radius-md)',
+        background: 'var(--foundry-bg-card)',
+        textAlign: 'center',
+      }}
+    >
+      <div
+        style={{
+          fontFamily: 'var(--foundry-font-mono)',
+          fontSize: 10,
+          letterSpacing: '0.18em',
+          textTransform: 'uppercase',
+          color: 'var(--foundry-text-dim)',
+        }}
+      >
+        {label}
+      </div>
+      <div
+        style={{
+          fontFamily: 'var(--foundry-font-display)',
+          fontSize: 32,
+          fontWeight: 700,
+          color: hot ? 'var(--foundry-ember)' : 'var(--foundry-text)',
+          marginTop: 4,
+          lineHeight: 1,
+          letterSpacing: '-0.02em',
+          fontVariantNumeric: 'tabular-nums',
+        }}
+      >
+        {value}
+        <span
+          style={{
+            fontSize: 14,
+            fontWeight: 500,
+            color: 'var(--foundry-text-dim)',
+            marginLeft: 4,
+          }}
+        >
+          day{value === 1 ? '' : 's'}
+        </span>
+      </div>
     </div>
   );
 }
