@@ -26,6 +26,18 @@ export const APP_REGISTRY: RegisteredApp[] = [
     },
     load: () => import("./pomodoro"),
   },
+  {
+    meta: {
+      id: "workout-streak",
+      name: "Workout Streak",
+      description: "Track your daily workout streak — tap to mark today done.",
+      icon: "🔥",
+      route: "workout-streak",
+      needsPersistence: true,
+      status: "active",
+    },
+    load: () => import("./workout-streak"),
+  },
 ];
 
 export function findApp(id: string): RegisteredApp | undefined {
