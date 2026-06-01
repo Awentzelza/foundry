@@ -36,7 +36,9 @@ export default async function handler(req: Request): Promise<Response> {
 
   const result = await pushApp(body, e);
   if (!result.success) {
-    return json({ error: result.error }, { status: result.status });
+    // Pass through the full structured error (issues / build log) so callers
+    // can act on it.
+    return json(result, { status: result.status });
   }
   return json(result);
 }

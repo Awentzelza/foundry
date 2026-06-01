@@ -6,6 +6,8 @@
  * what it means to "push an app" or "archive an app."
  */
 import { commitFileToGitHub, type Env, isValidId, sb } from './_lib';
+import { validatePushCode, type ValidationIssue } from './_validate';
+import { waitForDeploy, type DeployVerdict } from './_vercel';
 
 export interface PushAppInput {
   id: string;
@@ -15,6 +17,13 @@ export interface PushAppInput {
   route?: string;
   componentCode: string;
   needsPersistence?: boolean;
+  /**
+   * If true (default), wait for Vercel to finish building and return the
+   * deploy verdict inline. If the build fails, the component is automatically
+   * reverted (status set to archived) and the error log is returned.
+   * Pass false to skip the wait — useful for CI or when you'll poll yourself.
+   */
+  waitForDeploy?: boolean;
 }
 
 export interface PushAppResult {
@@ -23,6 +32,25 @@ export interface PushAppResult {
   route: string;
   commit: { sha?: string; skipped?: string };
   supabase: { ok: true } | { error: string };
+  deploy?: DeployVerdict;
+}
+
+export interface PushAppValidationError {
+  success: false;
+  status: 400;
+  error: string;
+  issues: ValidationIssue[];
+  phase: 'validation';
+}
+
+export interface PushAppBuildError {
+  success: false;
+  status: 422;
+  error: string;
+  phase: 'build';
+  commit: { sha?: string };
+  deployErrorLog?: string;
+  deploymentUid?: string;
 }
 
 export interface OperationError {
@@ -43,7 +71,7 @@ export type AppRow = {
   updated_at?: string;
 };
 
-function validatePushInput(input: PushAppInput): OperationError | null {
+function validateMetadata(input: PushAppInput): OperationError | null {
   if (!input.id || !isValidId(input.id)) {
     return {
       success: false,
@@ -58,25 +86,35 @@ function validatePushInput(input: PushAppInput): OperationError | null {
       error: 'Missing required fields: name, icon, componentCode.',
     };
   }
-  if (!/export\s+default/.test(input.componentCode)) {
-    return {
-      success: false,
-      status: 400,
-      error: 'componentCode must contain `export default` for the component.',
-    };
-  }
   return null;
 }
 
 export async function pushApp(
   input: PushAppInput,
   env: Env,
-): Promise<PushAppResult | OperationError> {
-  const validationError = validatePushInput(input);
-  if (validationError) return validationError;
+): Promise<
+  PushAppResult | OperationError | PushAppValidationError | PushAppBuildError
+> {
+  // --- Phase 1: metadata + heuristic code validation (instant) ---
+  const metaError = validateMetadata(input);
+  if (metaError) return metaError;
+
+  const codeCheck = validatePushCode(input.componentCode);
+  if (!codeCheck.ok) {
+    return {
+      success: false,
+      status: 400,
+      phase: 'validation',
+      error:
+        `componentCode failed ${codeCheck.issues.length} pre-flight check(s). ` +
+        'Fix the issues below and retry. No commit was made.',
+      issues: codeCheck.issues,
+    };
+  }
 
   const { id, name, description = '', icon, componentCode, needsPersistence = false } = input;
   const route = input.route ?? id;
+  const shouldWait = input.waitForDeploy !== false;
 
   const client = sb(env);
   const upsert = client
@@ -94,6 +132,7 @@ export async function pushApp(
       )
     : { error: { message: 'Supabase not configured' } };
 
+  // --- Phase 2: commit to GitHub ---
   let commit: { sha?: string; skipped?: string } = {};
   if (env.GITHUB_TOKEN) {
     const filePath = `src/apps/${id}/index.tsx`;
@@ -113,12 +152,41 @@ export async function pushApp(
     commit = { skipped: 'GITHUB_TOKEN not set; only metadata persisted to Supabase' };
   }
 
+  // --- Phase 3: wait for Vercel build verdict ---
+  let deploy: DeployVerdict | undefined;
+  if (shouldWait && commit.sha) {
+    deploy = await waitForDeploy(env, commit.sha);
+
+    if (deploy.status === 'error') {
+      // Build broke. Auto-archive so the dashboard isn't pointing at a broken
+      // tile that never builds. The component file stays in the repo for diff.
+      if (client) {
+        await client
+          .from('foundry_apps')
+          .update({ status: 'archived' })
+          .eq('id', id);
+      }
+      return {
+        success: false,
+        status: 422,
+        phase: 'build',
+        error:
+          `App "${id}" failed to build on Vercel. The metadata has been auto-archived. ` +
+          'Inspect the deployErrorLog, fix the component, and call push_app again with the same id.',
+        commit,
+        deployErrorLog: deploy.errorLog,
+        deploymentUid: deploy.deploymentUid,
+      };
+    }
+  }
+
   return {
     success: true,
     id,
     route: `/app/${route}`,
     commit,
     supabase: upsert.error ? { error: upsert.error.message } : { ok: true },
+    deploy,
   };
 }
 

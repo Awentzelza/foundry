@@ -12,6 +12,9 @@ export interface Env {
   GITHUB_OWNER?: string;
   GITHUB_REPO?: string;
   GITHUB_DEFAULT_BRANCH?: string;
+  VERCEL_TOKEN?: string;
+  VERCEL_PROJECT_ID?: string;
+  VERCEL_TEAM_ID?: string;
 }
 
 export function env(): Env {
@@ -29,6 +32,9 @@ export function env(): Env {
     GITHUB_OWNER: process.env.GITHUB_OWNER || 'Awentzelza',
     GITHUB_REPO: process.env.GITHUB_REPO || 'foundry',
     GITHUB_DEFAULT_BRANCH: process.env.GITHUB_DEFAULT_BRANCH || 'main',
+    VERCEL_TOKEN: process.env.VERCEL_TOKEN,
+    VERCEL_PROJECT_ID: process.env.VERCEL_PROJECT_ID,
+    VERCEL_TEAM_ID: process.env.VERCEL_TEAM_ID,
   };
 }
 

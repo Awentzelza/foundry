@@ -63,12 +63,36 @@ const TOOLS = [
   {
     name: 'push_app',
     description:
-      'Create or update a Foundry app. Commits a TypeScript module to ' +
-      'src/apps/<id>/index.tsx and upserts metadata in Supabase. Vercel ' +
-      'auto-deploys ~30-60s after the commit. The componentCode MUST be a ' +
-      'self-contained Ionic React component (default-exported, no top-level ' +
-      "<IonPage>, <IonContent>, or <IonHeader>) that uses useAppData('<id>', " +
-      "'<key>', initial) for any persistence. See CLAUDE.md for the contract.",
+      'Create or update a Foundry app. The componentCode is committed to ' +
+      'src/apps/<id>/index.tsx, the registry is regenerated, and Vercel ' +
+      'auto-builds. By default this call WAITS for the build (~30-90s) and ' +
+      'returns the verdict. On build failure the metadata is auto-archived ' +
+      'and the tsc/Vite error log is returned so you can fix and retry.\n\n' +
+      'HARD RULES for componentCode (these are validated before commit):\n' +
+      '  1. Must contain `export default` for the function component.\n' +
+      '  2. Allowed imports ONLY: `react`, `@ionic/react`, `ionicons/icons`, ' +
+      '`@/hooks/useAppData`, `@/types/app`. Anything else is rejected.\n' +
+      '  3. Do NOT import or render `IonPage`, `IonContent`, `IonHeader`, ' +
+      '`IonToolbar` — the Foundry shell (AppHost) provides them.\n' +
+      '  4. `useAppData` returns an OBJECT, NOT a tuple. Destructure as:\n' +
+      "       const { value, setValue, ready } = useAppData<T>('<id>', '<key>', initial);\n" +
+      '     NEVER as `const [data, setData] = useAppData(...)` — that will fail.\n' +
+      '     Available fields: { value, setValue, loading, ready, persistent, archive }.\n' +
+      '  5. No `any`, no `@ts-ignore`, no `localStorage`/`sessionStorage`.\n\n' +
+      'Minimal example of a valid Foundry app:\n' +
+      "  import { useCallback } from 'react';\n" +
+      "  import { IonButton } from '@ionic/react';\n" +
+      "  import { useAppData } from '@/hooks/useAppData';\n" +
+      '  interface Counter { n: number }\n' +
+      '  export default function CounterApp() {\n' +
+      "    const { value, setValue, ready } = useAppData<Counter>('counter', 'state', { n: 0 });\n" +
+      '    const inc = useCallback(() => setValue({ n: value.n + 1 }), [value, setValue]);\n' +
+      '    if (!ready) return null;\n' +
+      '    return <div style={{ padding: 32, textAlign: "center" }}>\n' +
+      "      <div style={{ fontFamily: 'var(--foundry-font-display)', fontSize: 64 }}>{value.n}</div>\n" +
+      '      <IonButton onClick={inc}>+1</IonButton>\n' +
+      '    </div>;\n' +
+      '  }',
     inputSchema: {
       type: 'object',
       required: ['id', 'name', 'icon', 'componentCode'],
@@ -80,7 +104,7 @@ const TOOLS = [
         },
         name: { type: 'string', description: 'Display name (Title Case).' },
         description: { type: 'string', description: 'One-line tile description.' },
-        icon: { type: 'string', description: 'Emoji or short SVG string for the tile.' },
+        icon: { type: 'string', description: 'A single emoji.' },
         route: {
           type: 'string',
           description: 'Path under /app/. Defaults to id.',
@@ -88,14 +112,21 @@ const TOOLS = [
         componentCode: {
           type: 'string',
           description:
-            'Full .tsx module source. MUST contain `export default` for the ' +
-            'function component. Imports allowed: react hooks, @ionic/react, ' +
-            "ionicons/icons, and the @/hooks/useAppData persistence hook.",
+            'Full .tsx module source. See the hard rules and example in the ' +
+            'tool description. The code is validated before commit and the ' +
+            'build verdict is returned to you.',
         },
         needsPersistence: {
           type: 'boolean',
           default: false,
-          description: 'True if the app reads/writes foundry_app_data.',
+          description: 'True if the app uses useAppData.',
+        },
+        waitForDeploy: {
+          type: 'boolean',
+          default: true,
+          description:
+            'Wait up to ~90s for Vercel to finish building and return the ' +
+            'verdict inline. Set false to push fire-and-forget.',
         },
       },
     },
