@@ -47,22 +47,18 @@ function fmt(secs: number): string {
   return `${String(m).padStart(2, '0')}:${String(s).padStart(2, '0')}`;
 }
 
-// Returns a label + a CSS variable string for the badge
-function goalBadge(secs: number): { label: string; colorVar: string } {
-  if (!secs) return { label: '—', colorVar: 'var(--foundry-text-dim)' };
-  if (secs <= 5100) return { label: 'SUB 1:25', colorVar: 'var(--foundry-ember-bright)' };
-  if (secs <= 5400) return { label: '~1:30 PACE', colorVar: 'var(--foundry-ember)' };
-  return { label: 'OVER 1:30', colorVar: 'var(--foundry-text-muted)' };
+function goalBadge(secs: number): { label: string; color: string } {
+  if (!secs) return { label: '—', color: 'var(--foundry-text-dim)' };
+  if (secs <= 5100) return { label: 'SUB 1:25', color: 'var(--foundry-ember-bright)' };
+  if (secs <= 5400) return { label: '~1:30 PACE', color: 'var(--foundry-ember)' };
+  return { label: 'OVER 1:30', color: 'var(--foundry-text-muted)' };
 }
-
-const RUN_COLOR = 'var(--foundry-ember)';
-const STATION_COLOR = 'var(--foundry-text-muted)';
 
 function segColor(type: 'run' | 'station'): string {
-  return type === 'run' ? RUN_COLOR : STATION_COLOR;
+  return type === 'run' ? 'var(--foundry-ember)' : 'var(--foundry-text-muted)';
 }
 
-const monoLabel: React.CSSProperties = {
+const mono: React.CSSProperties = {
   fontFamily: 'var(--foundry-font-mono)',
   fontSize: 10,
   letterSpacing: '0.18em',
@@ -80,8 +76,18 @@ const inputStyle: React.CSSProperties = {
   fontSize: 15,
   outline: 'none',
   boxSizing: 'border-box',
-  fontFamily: 'var(--foundry-font-body)',
 };
+
+// Vintage ornamental divider
+function Divider({ label }: { label: string }) {
+  return (
+    <div style={{ display: 'flex', alignItems: 'center', gap: 10, justifyContent: 'center', marginBottom: 14 }}>
+      <div style={{ flex: 1, height: 1, background: 'var(--foundry-border)' }} />
+      <div style={{ ...mono, fontSize: 9, letterSpacing: '0.26em', color: 'var(--foundry-text-dim)' }}>{label}</div>
+      <div style={{ flex: 1, height: 1, background: 'var(--foundry-border)' }} />
+    </div>
+  );
+}
 
 export default function HyroxTracker() {
   const [phase, setPhase] = useState<'setup' | 'active' | 'done'>('setup');
@@ -160,11 +166,8 @@ export default function HyroxTracker() {
   const handleNext = () => {
     const seg = activeSegments[currentIdx];
     const newSplits: Split[] = [...splits, {
-      label: seg.label,
-      detail: seg.detail,
-      type: seg.type,
-      seconds: segRef.current,
-      speed: seg.type === 'run' ? speed : null,
+      label: seg.label, detail: seg.detail, type: seg.type,
+      seconds: segRef.current, speed: seg.type === 'run' ? speed : null,
     }];
     setSplits(newSplits);
     setFlash(true);
@@ -207,25 +210,33 @@ export default function HyroxTracker() {
   if (phase === 'setup') {
     return (
       <div style={{ background: 'var(--foundry-bg)', color: 'var(--foundry-text)', minHeight: '100%' }}>
-        <div style={{ padding: '24px 20px 0', maxWidth: 460, margin: '0 auto' }}>
-          <div style={{ ...monoLabel, color: 'var(--foundry-ember)', marginBottom: 4 }}>RACE DAY PREP</div>
-          <div style={{
-            fontFamily: 'var(--foundry-font-display)',
-            fontSize: 52, fontWeight: 700, lineHeight: 1, letterSpacing: '-0.02em',
-            color: 'var(--foundry-text)',
-          }}>Hyrox</div>
-          <div style={{ ...monoLabel, marginTop: 4, marginBottom: 24 }}>SIM TRACKER</div>
+        <div style={{ padding: '28px 20px 0', maxWidth: 460, margin: '0 auto' }}>
+
+          {/* Heritage header */}
+          <div style={{ marginBottom: 24, paddingBottom: 20, borderBottom: '1px solid var(--foundry-border)' }}>
+            <div style={{ ...mono, color: 'var(--foundry-ember-dim)', marginBottom: 8, letterSpacing: '0.26em' }}>
+              ✦ RACE DAY PREP ✦
+            </div>
+            <div style={{
+              fontFamily: 'var(--foundry-font-display)',
+              fontSize: 58, fontWeight: 700, lineHeight: 1, letterSpacing: '-0.02em',
+              color: 'var(--foundry-text)',
+            }}>Hyrox</div>
+            <div style={{ ...mono, marginTop: 8, color: 'var(--foundry-text-muted)', fontSize: 10, letterSpacing: '0.24em' }}>
+              SIM TRACKER · OPEN FORMAT
+            </div>
+          </div>
 
           {/* Mode toggle */}
           <div style={{ display: 'flex', gap: 8, marginBottom: 20 }}>
             {(['full', 'custom'] as const).map(m => (
               <button key={m} onClick={() => setSimMode(m)} style={{
                 flex: 1, padding: '11px 0',
-                background: simMode === m ? 'var(--foundry-ember)' : 'var(--foundry-bg-card)',
+                background: simMode === m ? 'var(--foundry-text)' : 'var(--foundry-bg-card)',
                 color: simMode === m ? 'var(--foundry-bg)' : 'var(--foundry-text-muted)',
-                border: `1px solid ${simMode === m ? 'var(--foundry-ember)' : 'var(--foundry-border)'}`,
+                border: `1px solid ${simMode === m ? 'var(--foundry-text)' : 'var(--foundry-border)'}`,
                 borderRadius: 'var(--foundry-radius-sm)',
-                fontSize: 13, fontWeight: 700, letterSpacing: '0.14em',
+                fontSize: 10, fontWeight: 700, letterSpacing: '0.18em',
                 cursor: 'pointer', fontFamily: 'var(--foundry-font-mono)',
                 transition: 'all 0.15s',
               }}>
@@ -235,17 +246,17 @@ export default function HyroxTracker() {
           </div>
 
           {simMode === 'full' && (
-            <div style={{ ...monoLabel, marginBottom: 12, fontSize: 11 }}>
+            <div style={{ ...mono, marginBottom: 14, fontSize: 10 }}>
               Standard Open · 8 runs + 8 stations
             </div>
           )}
           {simMode === 'custom' && (
-            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 12 }}>
-              <div style={{ ...monoLabel, fontSize: 11 }}>{activeSegments.length} segments selected</div>
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 14 }}>
+              <div style={{ ...mono }}>{activeSegments.length} segments selected</div>
               <button onClick={resetToDefault} style={{
-                background: 'none', border: 'none', color: 'var(--foundry-text-dim)',
-                fontSize: 11, cursor: 'pointer', fontFamily: 'var(--foundry-font-mono)',
-                letterSpacing: '0.12em', padding: '4px 0',
+                background: 'none', border: 'none', color: 'var(--foundry-ember-dim)',
+                fontSize: 10, cursor: 'pointer', fontFamily: 'var(--foundry-font-mono)',
+                letterSpacing: '0.14em', padding: '4px 0',
               }}>RESET</button>
             </div>
           )}
@@ -266,59 +277,55 @@ export default function HyroxTracker() {
                 transition: 'opacity 0.15s',
                 overflow: 'hidden',
               }}>
-                <div style={{ display: 'flex', alignItems: 'center', padding: '10px 12px', gap: 10 }}>
+                <div style={{ display: 'flex', alignItems: 'center', padding: '11px 14px', gap: 10 }}>
                   {simMode === 'custom' && (
                     <button onClick={() => toggleEnabled(seg.id)} style={{
                       width: 22, height: 22, borderRadius: 4,
                       border: `1.5px solid ${seg.enabled ? ac : 'var(--foundry-border-strong)'}`,
-                      background: 'transparent',
+                      background: seg.enabled ? ac : 'transparent',
                       flexShrink: 0, cursor: 'pointer',
                       display: 'flex', alignItems: 'center', justifyContent: 'center',
-                      fontSize: 11, color: ac, fontWeight: 700,
+                      fontSize: 10, color: 'var(--foundry-bg)', fontWeight: 700,
                       fontFamily: 'var(--foundry-font-mono)',
                     }}>
-                      {seg.enabled ? 'x' : ''}
+                      {seg.enabled ? '✓' : ''}
                     </button>
                   )}
                   {simMode === 'full' && (
-                    <div style={{ width: 6, height: 6, borderRadius: '50%', background: ac, flexShrink: 0 }} />
+                    <div style={{ width: 5, height: 5, borderRadius: '50%', background: ac, flexShrink: 0 }} />
                   )}
                   <div style={{ flex: 1 }}>
-                    <div style={{ fontSize: 15, fontWeight: 600, color: 'var(--foundry-text)', fontFamily: 'var(--foundry-font-body)' }}>{seg.label}</div>
-                    <div style={{ ...monoLabel, fontSize: 11, marginTop: 2 }}>{seg.detail}</div>
+                    <div style={{ fontSize: 15, fontWeight: 600, color: 'var(--foundry-text)', fontFamily: 'var(--foundry-font-display)' }}>{seg.label}</div>
+                    <div style={{ ...mono, fontSize: 10, marginTop: 2 }}>{seg.detail}</div>
                   </div>
                   {simMode === 'custom' && (
                     <div style={{ display: 'flex', alignItems: 'center', gap: 2, flexShrink: 0 }}>
                       <button onClick={() => moveUp(idx)} disabled={idx === 0} style={{
                         background: 'none', border: 'none',
                         color: idx === 0 ? 'var(--foundry-border-strong)' : 'var(--foundry-text-dim)',
-                        fontSize: 15, cursor: idx === 0 ? 'default' : 'pointer', padding: '4px 6px',
-                        fontFamily: 'var(--foundry-font-mono)',
-                      }}>^</button>
+                        fontSize: 14, cursor: idx === 0 ? 'default' : 'pointer', padding: '4px 6px',
+                      }}>↑</button>
                       <button onClick={() => moveDown(idx)} disabled={idx === segments.length - 1} style={{
                         background: 'none', border: 'none',
                         color: idx === segments.length - 1 ? 'var(--foundry-border-strong)' : 'var(--foundry-text-dim)',
-                        fontSize: 15, cursor: idx === segments.length - 1 ? 'default' : 'pointer', padding: '4px 6px',
-                        fontFamily: 'var(--foundry-font-mono)',
-                      }}>v</button>
+                        fontSize: 14, cursor: idx === segments.length - 1 ? 'default' : 'pointer', padding: '4px 6px',
+                      }}>↓</button>
                       <button onClick={() => setEditingId(isEditing ? null : seg.id)} style={{
                         background: 'none', border: 'none',
                         color: isEditing ? 'var(--foundry-ember)' : 'var(--foundry-text-dim)',
-                        fontSize: 12, cursor: 'pointer', padding: '4px 8px',
-                        borderRadius: 4, fontFamily: 'var(--foundry-font-mono)', letterSpacing: '0.05em',
-                      }}>edit</button>
+                        fontSize: 10, cursor: 'pointer', padding: '4px 8px',
+                        fontFamily: 'var(--foundry-font-mono)', letterSpacing: '0.08em',
+                      }}>EDIT</button>
                       <button onClick={() => removeSegment(seg.id)} style={{
                         background: 'none', border: 'none',
                         color: 'var(--foundry-text-dim)', fontSize: 14, cursor: 'pointer', padding: '4px 6px',
-                        fontFamily: 'var(--foundry-font-mono)',
-                      }}>x</button>
+                      }}>×</button>
                     </div>
                   )}
                 </div>
                 {isEditing && simMode === 'custom' && (
                   <div style={{
-                    padding: '0 12px 14px',
-                    display: 'flex', flexDirection: 'column', gap: 8,
+                    padding: '0 14px 14px', display: 'flex', flexDirection: 'column', gap: 8,
                     borderTop: '1px solid var(--foundry-border)',
                   }}>
                     <div style={{ display: 'flex', gap: 8, marginTop: 12 }}>
@@ -328,8 +335,8 @@ export default function HyroxTracker() {
                           background: seg.type === t ? 'var(--foundry-bg-elevated)' : 'transparent',
                           border: `1.5px solid ${seg.type === t ? 'var(--foundry-ember)' : 'var(--foundry-border-strong)'}`,
                           color: seg.type === t ? 'var(--foundry-ember)' : 'var(--foundry-text-muted)',
-                          borderRadius: 'var(--foundry-radius-sm)', fontSize: 12, fontWeight: 700,
-                          letterSpacing: '0.12em', cursor: 'pointer',
+                          borderRadius: 'var(--foundry-radius-sm)', fontSize: 10, fontWeight: 700,
+                          letterSpacing: '0.14em', cursor: 'pointer',
                           fontFamily: 'var(--foundry-font-mono)',
                         }}>{t.toUpperCase()}</button>
                       ))}
@@ -341,11 +348,10 @@ export default function HyroxTracker() {
                       onChange={e => updateSegmentField(seg.id, 'detail', e.target.value)}
                       placeholder="Detail (e.g. 0.62 mi)" style={inputStyle} />
                     <button onClick={() => setEditingId(null)} style={{
-                      background: 'var(--foundry-bg-elevated)',
-                      border: '1px solid var(--foundry-border)',
+                      background: 'var(--foundry-bg-elevated)', border: '1px solid var(--foundry-border)',
                       color: 'var(--foundry-text)',
-                      padding: '8px 0', borderRadius: 'var(--foundry-radius-sm)',
-                      fontSize: 12, fontWeight: 700, letterSpacing: '0.1em',
+                      padding: '9px 0', borderRadius: 'var(--foundry-radius-sm)',
+                      fontSize: 10, fontWeight: 700, letterSpacing: '0.14em',
                       cursor: 'pointer', fontFamily: 'var(--foundry-font-mono)',
                     }}>DONE</button>
                   </div>
@@ -362,19 +368,17 @@ export default function HyroxTracker() {
                   background: 'transparent',
                   border: '1px dashed var(--foundry-border-strong)',
                   borderRadius: 'var(--foundry-radius-sm)',
-                  color: 'var(--foundry-text-dim)', fontSize: 13, fontWeight: 700,
-                  letterSpacing: '0.14em', cursor: 'pointer',
+                  color: 'var(--foundry-text-dim)', fontSize: 10, fontWeight: 700,
+                  letterSpacing: '0.18em', cursor: 'pointer',
                   fontFamily: 'var(--foundry-font-mono)',
                 }}>+ ADD SEGMENT</button>
               ) : (
                 <div style={{
-                  background: 'var(--foundry-bg-card)',
-                  borderRadius: 'var(--foundry-radius-sm)',
-                  padding: '14px 12px',
-                  border: '1px solid var(--foundry-border-strong)',
+                  background: 'var(--foundry-bg-card)', borderRadius: 'var(--foundry-radius-sm)',
+                  padding: '14px 14px', border: '1px solid var(--foundry-border-strong)',
                   display: 'flex', flexDirection: 'column', gap: 8,
                 }}>
-                  <div style={{ ...monoLabel, marginBottom: 2 }}>NEW SEGMENT</div>
+                  <div style={{ ...mono, marginBottom: 2 }}>NEW SEGMENT</div>
                   <div style={{ display: 'flex', gap: 8 }}>
                     {(['run', 'station'] as const).map(t => (
                       <button key={t} onClick={() => setNewSeg(n => ({ ...n, type: t }))} style={{
@@ -382,8 +386,8 @@ export default function HyroxTracker() {
                         background: newSeg.type === t ? 'var(--foundry-bg-elevated)' : 'transparent',
                         border: `1.5px solid ${newSeg.type === t ? 'var(--foundry-ember)' : 'var(--foundry-border-strong)'}`,
                         color: newSeg.type === t ? 'var(--foundry-ember)' : 'var(--foundry-text-muted)',
-                        borderRadius: 'var(--foundry-radius-sm)', fontSize: 12, fontWeight: 700,
-                        letterSpacing: '0.12em', cursor: 'pointer',
+                        borderRadius: 'var(--foundry-radius-sm)', fontSize: 10, fontWeight: 700,
+                        letterSpacing: '0.14em', cursor: 'pointer',
                         fontFamily: 'var(--foundry-font-mono)',
                       }}>{t.toUpperCase()}</button>
                     ))}
@@ -399,14 +403,13 @@ export default function HyroxTracker() {
                       flex: 2, padding: '10px 0',
                       background: 'var(--foundry-ember)', color: 'var(--foundry-bg)',
                       border: 'none', borderRadius: 'var(--foundry-radius-sm)',
-                      fontSize: 13, fontWeight: 800, letterSpacing: '0.12em',
+                      fontSize: 10, fontWeight: 800, letterSpacing: '0.16em',
                       cursor: 'pointer', fontFamily: 'var(--foundry-font-mono)',
                     }}>ADD</button>
                     <button onClick={() => setAddPanel(false)} style={{
                       flex: 1, padding: '10px 0', background: 'transparent',
-                      color: 'var(--foundry-text-muted)',
-                      border: '1px solid var(--foundry-border)',
-                      borderRadius: 'var(--foundry-radius-sm)', fontSize: 13, fontWeight: 700,
+                      color: 'var(--foundry-text-muted)', border: '1px solid var(--foundry-border)',
+                      borderRadius: 'var(--foundry-radius-sm)', fontSize: 10, fontWeight: 700,
                       cursor: 'pointer', fontFamily: 'var(--foundry-font-mono)',
                     }}>CANCEL</button>
                   </div>
@@ -416,7 +419,7 @@ export default function HyroxTracker() {
           )}
         </div>
 
-        {/* Sticky start — flat, no gradient */}
+        {/* Sticky start */}
         <div style={{
           position: 'fixed', bottom: 0, left: 0, right: 0,
           background: 'var(--foundry-bg)',
@@ -429,10 +432,10 @@ export default function HyroxTracker() {
               disabled={activeSegments.length === 0}
               onClick={startSim}
               style={{
-                '--background': activeSegments.length === 0 ? 'var(--foundry-bg-elevated)' : 'var(--foundry-ember)',
+                '--background': activeSegments.length === 0 ? 'var(--foundry-bg-elevated)' : 'var(--foundry-text)',
                 '--color': activeSegments.length === 0 ? 'var(--foundry-text-dim)' : 'var(--foundry-bg)',
                 '--border-radius': 'var(--foundry-radius-md)',
-                height: '56px', fontSize: '15px', fontWeight: '700', letterSpacing: '0.14em',
+                height: '56px', fontSize: '12px', fontWeight: '700', letterSpacing: '0.2em',
               } as React.CSSProperties}
             >
               {activeSegments.length === 0 ? 'SELECT SEGMENTS' : `START SIM · ${activeSegments.length} SEGMENTS`}
@@ -453,36 +456,40 @@ export default function HyroxTracker() {
 
     return (
       <div style={{ background: 'var(--foundry-bg)', color: 'var(--foundry-text)', minHeight: '100%', display: 'flex', flexDirection: 'column' }}>
-        {/* Sticky timer bar */}
+        {/* Timer bar */}
         <div style={{
           position: 'sticky', top: 0, zIndex: 100,
           background: 'var(--foundry-bg)',
           borderBottom: '1px solid var(--foundry-border)',
           display: 'flex', alignItems: 'center', justifyContent: 'space-between',
-          padding: '10px 20px', boxSizing: 'border-box',
+          padding: '12px 20px',
         }}>
           <div>
-            <div style={monoLabel}>TOTAL</div>
+            <div style={mono}>TOTAL</div>
             <div style={{
               fontFamily: 'var(--foundry-font-mono)',
               fontSize: 30, fontWeight: 700, color: 'var(--foundry-text)', lineHeight: 1, marginTop: 2,
             }}>{fmt(totalSec)}</div>
           </div>
+          <div style={{ textAlign: 'center' }}>
+            <div style={{ ...mono, fontSize: 9 }}>HYROX</div>
+            <div style={{ fontFamily: 'var(--foundry-font-display)', fontSize: 18, fontWeight: 700, color: 'var(--foundry-text)' }}>
+              {currentIdx + 1} / {activeSegments.length}
+            </div>
+          </div>
           <div style={{ textAlign: 'right' }}>
-            <div style={monoLabel}>SEGMENT</div>
-            <div style={{
-              fontFamily: 'var(--foundry-font-mono)',
-              fontSize: 13, color: ac, fontWeight: 700, marginTop: 2,
-            }}>{currentIdx + 1}/{activeSegments.length}</div>
+            <div style={mono}>SEGMENT</div>
+            <div style={{ fontFamily: 'var(--foundry-font-mono)', fontSize: 13, color: ac, fontWeight: 700, marginTop: 2, letterSpacing: '0.08em' }}>
+              {isRun ? 'RUN' : 'STATION'}
+            </div>
           </div>
         </div>
 
         {/* Progress bar */}
-        <div style={{ width: '100%', height: 2, background: 'var(--foundry-border)', flexShrink: 0 }}>
-          <div style={{ height: '100%', width: `${progress}%`, background: ac, transition: 'width 0.4s ease' }} />
+        <div style={{ width: '100%', height: 3, background: 'var(--foundry-border)', flexShrink: 0 }}>
+          <div style={{ height: '100%', width: `${progress}%`, background: 'var(--foundry-ember)', transition: 'width 0.4s ease' }} />
         </div>
 
-        {/* Body */}
         <div style={{
           flex: 1, display: 'flex', flexDirection: 'column',
           padding: '20px 20px 28px', maxWidth: 460, width: '100%',
@@ -495,44 +502,44 @@ export default function HyroxTracker() {
             background: flash ? 'var(--foundry-bg-elevated)' : 'var(--foundry-bg-card)',
             border: `1px solid ${flash ? 'var(--foundry-border-strong)' : 'var(--foundry-border)'}`,
             borderRadius: 'var(--foundry-radius-lg)',
-            padding: '32px 20px', marginBottom: 18, transition: 'background 0.15s, border-color 0.15s',
+            padding: '36px 20px', marginBottom: 18, transition: 'background 0.15s, border-color 0.15s',
           }}>
-            <div style={{ ...monoLabel, color: ac, marginBottom: 12 }}>
-              {isRun ? 'RUN' : 'STATION'}
-            </div>
+            <Divider label={isRun ? '✦ RUN ✦' : '✦ STATION ✦'} />
+
             <div style={{
               fontFamily: 'var(--foundry-font-display)',
-              fontSize: 38, fontWeight: 700, textAlign: 'center', lineHeight: 1.1, marginBottom: 6,
+              fontSize: 42, fontWeight: 700, textAlign: 'center', lineHeight: 1.1, marginBottom: 6,
+              color: 'var(--foundry-text)',
             }}>
               {seg.label}
             </div>
-            <div style={{ ...monoLabel, marginBottom: 28 }}>{seg.detail}</div>
+            <div style={{ ...mono, marginBottom: 32 }}>{seg.detail}</div>
 
             <div style={{
               fontFamily: 'var(--foundry-font-mono)',
-              fontSize: 64, fontWeight: 700, color: ac, lineHeight: 1, letterSpacing: '-0.02em',
+              fontSize: 68, fontWeight: 700, color: ac, lineHeight: 1, letterSpacing: '-0.02em',
             }}>
               {fmt(segSec)}
             </div>
 
             {isRun && (
-              <div style={{ marginTop: 24, display: 'flex', alignItems: 'center', gap: 10 }}>
+              <div style={{ marginTop: 28, display: 'flex', alignItems: 'center', gap: 10 }}>
                 <input
                   type="number" step="0.1" min="4" max="12" placeholder="—"
                   value={speed}
                   onChange={e => setSpeed(e.target.value)}
                   style={{
-                    width: 78, padding: '10px',
+                    width: 80, padding: '10px',
                     background: 'var(--foundry-bg)',
                     border: '1px solid var(--foundry-border-strong)',
                     borderRadius: 'var(--foundry-radius-sm)',
                     color: 'var(--foundry-text)',
-                    fontSize: 22, fontWeight: 700,
+                    fontSize: 24, fontWeight: 700,
                     fontFamily: 'var(--foundry-font-mono)',
                     textAlign: 'center', outline: 'none',
                   }}
                 />
-                <span style={{ ...monoLabel, fontSize: 12 }}>MPH</span>
+                <span style={{ ...mono, fontSize: 11 }}>MPH</span>
               </div>
             )}
           </div>
@@ -544,15 +551,15 @@ export default function HyroxTracker() {
               '--background': 'var(--foundry-ember)',
               '--color': 'var(--foundry-bg)',
               '--border-radius': 'var(--foundry-radius-md)',
-              height: '62px', fontSize: '18px', fontWeight: '700',
-              letterSpacing: '0.12em', marginBottom: '14px',
+              height: '62px', fontSize: '14px', fontWeight: '700',
+              letterSpacing: '0.2em', marginBottom: '14px',
             } as React.CSSProperties}
           >
             {currentIdx >= activeSegments.length - 1 ? 'FINISH' : 'DONE'}
           </IonButton>
 
           {nextSeg && (
-            <div style={{ textAlign: 'center', ...monoLabel, fontSize: 11, marginTop: 4 }}>
+            <div style={{ textAlign: 'center', ...mono, fontSize: 10, marginTop: 4 }}>
               NEXT:{' '}
               <span style={{ color: segColor(nextSeg.type), fontWeight: 700 }}>{nextSeg.label}</span>
               {' · '}
@@ -562,9 +569,9 @@ export default function HyroxTracker() {
 
           <button onClick={reset} style={{
             background: 'none', border: 'none',
-            color: 'var(--foundry-border-strong)', fontSize: 11, cursor: 'pointer',
+            color: 'var(--foundry-border-strong)', fontSize: 10, cursor: 'pointer',
             marginTop: 20, fontFamily: 'var(--foundry-font-mono)',
-            letterSpacing: '0.14em', padding: '8px 0', display: 'block', width: '100%',
+            letterSpacing: '0.18em', padding: '8px 0', display: 'block', width: '100%',
           }}>ABORT</button>
         </div>
       </div>
@@ -584,38 +591,39 @@ export default function HyroxTracker() {
 
     return (
       <div style={{ background: 'var(--foundry-bg)', color: 'var(--foundry-text)', minHeight: '100%' }}>
-        <div style={{ maxWidth: 460, margin: '0 auto', padding: '28px 20px 80px' }}>
+        <div style={{ maxWidth: 460, margin: '0 auto', padding: '32px 20px 80px' }}>
 
           {/* Result hero */}
-          <div style={{ textAlign: 'center', marginBottom: 28, paddingBottom: 24, borderBottom: '1px solid var(--foundry-border)' }}>
-            <div style={monoLabel}>SIM COMPLETE</div>
+          <div style={{ textAlign: 'center', marginBottom: 28, paddingBottom: 28, borderBottom: '1px solid var(--foundry-border)' }}>
+            <Divider label="SIM COMPLETE" />
             <div style={{
               fontFamily: 'var(--foundry-font-display)',
-              fontSize: 72, fontWeight: 700, lineHeight: 1, marginTop: 8,
+              fontSize: 76, fontWeight: 700, lineHeight: 1, color: 'var(--foundry-text)',
             }}>{fmt(totalSec)}</div>
+
             <div style={{
-              display: 'inline-block', marginTop: 14, padding: '5px 16px', borderRadius: 999,
-              border: `1px solid var(--foundry-border-strong)`,
-              ...monoLabel, fontSize: 12, color: badge.colorVar,
+              display: 'inline-block', marginTop: 16, padding: '6px 20px', borderRadius: 999,
+              border: `1px solid ${badge.color}`,
+              ...mono, fontSize: 11, color: badge.color, letterSpacing: '0.2em',
             }}>{badge.label}</div>
 
             {(avgSpd || fastestRun) && (
-              <div style={{ marginTop: 20, display: 'flex', justifyContent: 'center', gap: 28 }}>
+              <div style={{ marginTop: 24, display: 'flex', justifyContent: 'center', gap: 32 }}>
                 {avgSpd && (
                   <div style={{ textAlign: 'center' }}>
-                    <div style={monoLabel}>AVG RUN</div>
-                    <div style={{ fontFamily: 'var(--foundry-font-mono)', fontSize: 20, fontWeight: 700, color: 'var(--foundry-ember)', marginTop: 4 }}>{avgSpd} mph</div>
+                    <div style={mono}>AVG RUN</div>
+                    <div style={{ fontFamily: 'var(--foundry-font-display)', fontSize: 22, fontWeight: 700, color: 'var(--foundry-ember)', marginTop: 4 }}>{avgSpd} mph</div>
                   </div>
                 )}
                 {fastestRun && (
                   <div style={{ textAlign: 'center' }}>
-                    <div style={monoLabel}>FASTEST</div>
-                    <div style={{ fontFamily: 'var(--foundry-font-mono)', fontSize: 20, fontWeight: 700, color: 'var(--foundry-ember)', marginTop: 4 }}>{fastestRun} mph</div>
+                    <div style={mono}>FASTEST</div>
+                    <div style={{ fontFamily: 'var(--foundry-font-display)', fontSize: 22, fontWeight: 700, color: 'var(--foundry-ember)', marginTop: 4 }}>{fastestRun} mph</div>
                   </div>
                 )}
                 <div style={{ textAlign: 'center' }}>
-                  <div style={monoLabel}>TARGET</div>
-                  <div style={{ fontFamily: 'var(--foundry-font-mono)', fontSize: 20, fontWeight: 700, color: 'var(--foundry-text-dim)', marginTop: 4 }}>6.5–7.0</div>
+                  <div style={mono}>TARGET</div>
+                  <div style={{ fontFamily: 'var(--foundry-font-display)', fontSize: 22, fontWeight: 700, color: 'var(--foundry-text-dim)', marginTop: 4 }}>6.5–7.0</div>
                 </div>
               </div>
             )}
@@ -623,26 +631,24 @@ export default function HyroxTracker() {
 
           {/* Splits */}
           <div style={{ marginBottom: 24 }}>
-            <div style={{ ...monoLabel, marginBottom: 10 }}>SPLITS</div>
+            <div style={{ ...mono, marginBottom: 12 }}>SPLITS</div>
             {splits.map((s, i) => {
               const ac = segColor(s.type);
               return (
                 <div key={i} style={{
                   display: 'flex', alignItems: 'center',
-                  padding: '10px 12px',
-                  borderRadius: 'var(--foundry-radius-sm)',
-                  background: 'var(--foundry-bg-card)',
-                  border: '1px solid var(--foundry-border)',
+                  padding: '11px 14px', borderRadius: 'var(--foundry-radius-sm)',
+                  background: 'var(--foundry-bg-card)', border: '1px solid var(--foundry-border)',
                   gap: 10, marginBottom: 3,
                 }}>
-                  <div style={{ width: 6, height: 6, borderRadius: '50%', background: ac, flexShrink: 0 }} />
-                  <div style={{ flex: 1, fontSize: 15, fontWeight: 600, fontFamily: 'var(--foundry-font-body)' }}>{s.label}</div>
+                  <div style={{ width: 5, height: 5, borderRadius: '50%', background: ac, flexShrink: 0 }} />
+                  <div style={{ flex: 1, fontSize: 14, fontWeight: 600, fontFamily: 'var(--foundry-font-display)', color: 'var(--foundry-text)' }}>{s.label}</div>
                   {s.speed && (
-                    <div style={{ fontFamily: 'var(--foundry-font-mono)', fontSize: 12, color: 'var(--foundry-ember)' }}>
+                    <div style={{ fontFamily: 'var(--foundry-font-mono)', fontSize: 11, color: 'var(--foundry-ember-dim)', letterSpacing: '0.06em' }}>
                       {s.speed} mph
                     </div>
                   )}
-                  <div style={{ fontFamily: 'var(--foundry-font-mono)', fontSize: 15, fontWeight: 700, color: ac }}>{fmt(s.seconds)}</div>
+                  <div style={{ fontFamily: 'var(--foundry-font-mono)', fontSize: 14, fontWeight: 700, color: ac }}>{fmt(s.seconds)}</div>
                 </div>
               );
             })}
@@ -650,20 +656,19 @@ export default function HyroxTracker() {
 
           {/* Copy */}
           <button onClick={handleCopy} style={{
-            width: '100%', padding: '16px 0',
+            width: '100%', padding: '14px 0',
             background: 'var(--foundry-bg-card)',
             color: copied ? 'var(--foundry-ember-bright)' : 'var(--foundry-text)',
             border: `1px solid ${copied ? 'var(--foundry-ember)' : 'var(--foundry-border)'}`,
             borderRadius: 'var(--foundry-radius-sm)',
-            ...monoLabel, fontSize: 13,
+            ...mono, fontSize: 11, letterSpacing: '0.18em',
             cursor: 'pointer', marginBottom: 12, transition: 'all 0.2s',
           }}>
-            {copied ? 'COPIED' : 'COPY FOR CLAUDE'}
+            {copied ? 'COPIED ✓' : 'COPY FOR CLAUDE'}
           </button>
 
           <div style={{
-            background: 'var(--foundry-bg-card)',
-            border: '1px solid var(--foundry-border)',
+            background: 'var(--foundry-bg-card)', border: '1px solid var(--foundry-border)',
             borderRadius: 'var(--foundry-radius-sm)',
             padding: '14px 16px', marginBottom: 20,
             fontFamily: 'var(--foundry-font-mono)', fontSize: 11,
@@ -676,10 +681,10 @@ export default function HyroxTracker() {
             expand="block"
             onClick={reset}
             style={{
-              '--background': 'var(--foundry-ember)',
+              '--background': 'var(--foundry-text)',
               '--color': 'var(--foundry-bg)',
               '--border-radius': 'var(--foundry-radius-md)',
-              height: '56px', fontSize: '16px', fontWeight: '700', letterSpacing: '0.12em',
+              height: '56px', fontSize: '13px', fontWeight: '700', letterSpacing: '0.2em',
             } as React.CSSProperties}
           >
             NEW SIM
