@@ -283,3 +283,38 @@ continuous animation. Surfaces are flat; the mark stays still.
 Card anatomy: a hallmark label (mono, uppercase) → a primary value (Fraunces)
 → a supporting line (EB Garamond). No celebration, no badges, no streaks, no
 gamification. Call `get_component_example` for a compliant starting point.
+
+### Available `--foundry-*` tokens (use these exact names)
+
+All of the following are defined in `src/theme/variables.css` and are valid.
+A past session wrongly "corrected" some of these away — don't. Use tokens;
+never raw hex.
+
+Colour (canonical, and the back-compat aliases also work):
+
+- `--foundry-bg` · `--foundry-card` (alias `--foundry-bg-card`) ·
+  `--foundry-elevated` (alias `--foundry-bg-elevated`)
+- `--foundry-border` · `--foundry-border-strong`
+- `--foundry-text` · `--foundry-text-muted` · `--foundry-text-subtle`
+  (alias `--foundry-text-dim`)
+- `--foundry-ember` (the only accent) · `--foundry-ember-bright` ·
+  `--foundry-ember-dim`
+- `--foundry-mark-gold` — signet/wordmark ONLY, never UI
+
+Type (three fonts — there IS a body token):
+
+- `--foundry-font-display` (Fraunces) — headlines, hero numbers
+- `--foundry-font-mono` (JetBrains Mono) — labels, uppercase + tracked
+- `--foundry-font-body` (EB Garamond) — body copy
+
+Radius: `--foundry-radius-sm | -md | -lg`.
+
+## Deploys are async
+
+`push_app` returns immediately after the commit with a `deploymentUid` and
+`deploy.status: "building"`. The build runs on Vercel for 30-90s. Poll
+`get_deploy_status({ deploymentUid, appId })` (most reliable) or
+`verify_deploy({ commitSha, appId })` until you get `ready` (live) or `error`
+(with `errorLog`). Passing `appId` auto-archives the app if its build errored.
+A failed build never goes live — the last good build keeps serving — so a
+broken push never shows a broken tile.

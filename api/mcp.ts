@@ -27,6 +27,7 @@
 import { env, type Env, requireAuth } from './_lib';
 import {
   archiveApp,
+  checkDeployByUid,
   checkDeployStatus,
   getApp,
   getAppSource,
@@ -115,9 +116,12 @@ const TOOLS = [
     description:
       'Create or update a Foundry app. The componentCode is committed to ' +
       'src/apps/<id>/index.tsx, the registry is regenerated, and Vercel ' +
-      'auto-builds. By default this call WAITS for the build (~30-90s) and ' +
-      'returns the verdict. On build failure the metadata is auto-archived ' +
-      'and the tsc/Vite error log is returned so you can fix and retry.\n\n' +
+      'auto-builds. By DEFAULT this returns immediately after the commit ' +
+      'with the deploymentUid and a `building` status — the build runs ' +
+      'async (30-90s). Poll `get_deploy_status` with that deploymentUid (or ' +
+      '`verify_deploy` with the commit SHA) to get the `ready`/`error` ' +
+      'verdict. A failed build never goes live, so nothing breaks on the ' +
+      'dashboard. Pass waitForDeploy:true to block on the verdict instead.\n\n' +
       'HARD RULES for componentCode (these are validated before commit):\n' +
       '  1. Must contain `export default` for the function component.\n' +
       '  2. Allowed imports ONLY: `react`, `@ionic/react`, `ionicons/icons`, ' +
@@ -165,10 +169,12 @@ const TOOLS = [
         },
         waitForDeploy: {
           type: 'boolean',
-          default: true,
+          default: false,
           description:
-            'Wait up to ~90s for Vercel to finish building and return the ' +
-            'verdict inline. Set false to push fire-and-forget.',
+            'Default false: return immediately with the deploymentUid to ' +
+            'poll. Set true to block on the build verdict within the Edge ' +
+            'budget (auto-archives on build failure); real builds may still ' +
+            'come back as `building`.',
         },
       },
     },
@@ -233,17 +239,37 @@ const TOOLS = [
   {
     name: 'verify_deploy',
     description:
-      'Check the Vercel deployment status for a specific commit. Use this ' +
-      'when push_app returned `deploy.status === "timeout"` because the ' +
-      "build took longer than push_app's internal wait window. Returns " +
-      "`ready` (live), `error` (with errorLog), or `timeout` (still building).",
+      'Check Vercel deployment status for a commit SHA. Returns `ready` ' +
+      '(live, with url), `error` (with errorLog), or `building` (still in ' +
+      'progress — poll again). Prefer get_deploy_status when you have the ' +
+      'deploymentUid. Pass appId to auto-archive the app if the build errored.',
     inputSchema: {
       type: 'object',
       required: ['commitSha'],
       properties: {
-        commitSha: {
+        commitSha: { type: 'string', description: 'The commit SHA returned by push_app.' },
+        appId: {
           type: 'string',
-          description: 'The commit SHA returned by push_app.',
+          description: 'Optional. If the build errored, archive this app id.',
+        },
+      },
+    },
+  },
+  {
+    name: 'get_deploy_status',
+    description:
+      'Check Vercel deployment status by deploymentUid (returned by push_app) ' +
+      '\u2014 the most reliable check. Returns `ready` (live, with url), ' +
+      '`error` (with errorLog), or `building`. Pass appId to auto-archive the ' +
+      'app if the build errored.',
+    inputSchema: {
+      type: 'object',
+      required: ['deploymentUid'],
+      properties: {
+        deploymentUid: { type: 'string', description: 'The deploymentUid returned by push_app.' },
+        appId: {
+          type: 'string',
+          description: 'Optional. If the build errored, archive this app id.',
         },
       },
     },
@@ -305,6 +331,20 @@ async function handleToolCall(name: string, args: Record<string, unknown>, e: En
         return toolContent({ error: 'Missing `commitSha`' }, true);
       }
       const result = await checkDeployStatus(e, commitSha);
+      if (result.status === 'error' && args.appId) {
+        await archiveApp(String(args.appId), e);
+      }
+      return toolContent(result, result.status === 'error');
+    }
+    case 'get_deploy_status': {
+      const deploymentUid = String(args.deploymentUid ?? '');
+      if (!deploymentUid) {
+        return toolContent({ error: 'Missing `deploymentUid`' }, true);
+      }
+      const result = await checkDeployByUid(e, deploymentUid);
+      if (result.status === 'error' && args.appId) {
+        await archiveApp(String(args.appId), e);
+      }
       return toolContent(result, result.status === 'error');
     }
     default:

@@ -7,9 +7,15 @@
  */
 import { commitFileToGitHub, getFileFromGitHub, type Env, isValidId, sb } from './_lib';
 import { validatePushCode, type ValidationIssue } from './_validate';
-import { checkDeployStatus, waitForDeploy, type DeployVerdict } from './_vercel';
+import {
+  checkDeployByUid,
+  checkDeployStatus,
+  discoverDeployment,
+  waitForDeploy,
+  type DeployVerdict,
+} from './_vercel';
 
-export { checkDeployStatus };
+export { checkDeployStatus, checkDeployByUid };
 
 export interface PushAppInput {
   id: string;
@@ -20,10 +26,10 @@ export interface PushAppInput {
   componentCode: string;
   needsPersistence?: boolean;
   /**
-   * If true (default), wait for Vercel to finish building and return the
-   * deploy verdict inline. If the build fails, the component is automatically
-   * reverted (status set to archived) and the error log is returned.
-   * Pass false to skip the wait — useful for CI or when you'll poll yourself.
+   * Default false: return immediately after the commit with the deploymentUid
+   * to poll (the build runs async on Vercel). Pass true to block on the build
+   * verdict within the Edge budget and auto-archive on a build failure — note
+   * real builds often exceed that budget and come back as `building`.
    */
   waitForDeploy?: boolean;
 }
@@ -120,7 +126,7 @@ export async function pushApp(
 
   const { id, name, description = '', icon, componentCode, needsPersistence = false } = input;
   const route = input.route ?? id;
-  const shouldWait = input.waitForDeploy !== false;
+  const shouldWait = input.waitForDeploy === true;
 
   const client = sb(env);
   const upsert = client
@@ -158,8 +164,17 @@ export async function pushApp(
     commit = { skipped: 'GITHUB_TOKEN not set; only metadata persisted to Supabase' };
   }
 
-  // --- Phase 3: wait for Vercel build verdict ---
+  // --- Phase 3: deploy verdict ---
+  // Default is fire-and-forget: the Edge budget (~25s) can't outlast a 30-90s
+  // build, so we return the deploymentUid immediately and let the caller poll
+  // get_deploy_status / verify_deploy. A failed build never goes live (the
+  // previous successful build keeps serving), so there is no broken tile to
+  // auto-archive in this mode. Pass waitForDeploy: true to block and have a
+  // build failure auto-archived inline.
   let deploy: DeployVerdict | undefined;
+  if (commit.sha && !shouldWait) {
+    deploy = await discoverDeployment(env, commit.sha);
+  }
   if (shouldWait && commit.sha) {
     deploy = await waitForDeploy(env, commit.sha);
 
