@@ -18,9 +18,9 @@ export default defineConfig({
       manifest: {
         name: 'Foundry',
         short_name: 'Foundry',
-        description: "Andre's personal toolbelt — forged tools, on demand.",
-        theme_color: '#0d0a08',
-        background_color: '#0d0a08',
+        description: "Andre's private workshop of forged tools.",
+        theme_color: '#111010',
+        background_color: '#111010',
         display: 'standalone',
         orientation: 'portrait',
         start_url: '/',
