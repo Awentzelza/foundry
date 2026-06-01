@@ -4,6 +4,18 @@ import type { RegisteredApp } from '@/types/app';
 export const APP_REGISTRY: RegisteredApp[] = [
   {
     meta: {
+      id: "counter",
+      name: "Counter",
+      description: "Simple +1 counter.",
+      icon: "🔢",
+      route: "counter",
+      needsPersistence: true,
+      status: "active",
+    },
+    load: () => import("./counter"),
+  },
+  {
+    meta: {
       id: "grocery-list",
       name: "Grocery List",
       description: "Add items, check off, clear. Synced.",
