@@ -88,9 +88,44 @@ export default function NotesApp() {
 }
 ```
 
-## The push-app API
+## Foundry MCP server (preferred interface)
 
-`POST /api/push-app`
+Foundry exposes an MCP server at `POST /api/mcp` so any Claude client can
+push apps as a single tool call. Connect once with a bearer token; future
+sessions just call `foundry__push_app(...)`.
+
+Tools:
+
+| Tool | Args | Effect |
+| --- | --- | --- |
+| `push_app` | `id, name, description?, icon, route?, componentCode, needsPersistence?` | Commits `src/apps/<id>/index.tsx` to GitHub, regenerates `src/apps/registry.ts`, upserts `foundry_apps` row. Vercel redeploys ~30-60s later. |
+| `archive_app` | `id` | Sets `status='archived'`. Never deletes. |
+| `list_apps` | `includeArchived?` | Returns active apps (or all). |
+| `get_app` | `id` | Returns one row. |
+
+Auth: `Authorization: Bearer ${FOUNDRY_PUSH_SECRET}` on every request.
+
+Connect from Claude Desktop / Cowork:
+
+```jsonc
+{
+  "mcpServers": {
+    "foundry": {
+      "url": "https://foundry-seven-omega.vercel.app/api/mcp",
+      "headers": { "Authorization": "Bearer <FOUNDRY_PUSH_SECRET>" }
+    }
+  }
+}
+```
+
+See `PUSH_TEMPLATE.md` for the human-pastable prompt template.
+
+## REST endpoints (legacy / ad-hoc)
+
+The REST endpoints below remain available for curl-based testing and CI.
+Prefer the MCP tools above for any Claude-driven push.
+
+### POST /api/push-app
 
 Headers: `Authorization: Bearer ${FOUNDRY_PUSH_SECRET}`, `Content-Type: application/json`
 

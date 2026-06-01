@@ -39,8 +39,9 @@ lerna-debug.log*
 # vercel
 .vercel
 
-# bootstrap script — uses a PAT, never commit
+# scripts that take a PAT — never commit
 bootstrap.sh
+sync-mcp.sh
 
 # pwa
 public/sw.js
