@@ -12,6 +12,7 @@ import {
 import { useParams } from 'react-router-dom';
 
 import { findApp } from '@/apps/registry';
+import { withDisplay } from '@/lib/appRegistry';
 import NotFound from './NotFound';
 
 interface RouteParams {
@@ -40,7 +41,7 @@ export default function AppHost() {
             <IonBackButton defaultHref="/" text="" />
           </IonButtons>
           <IonTitle>
-            <span className="foundry-app-toolbar-title">{app.meta.name}</span>
+            <span className="foundry-app-toolbar-title">{withDisplay(app.meta).name}</span>
           </IonTitle>
         </IonToolbar>
       </IonHeader>
