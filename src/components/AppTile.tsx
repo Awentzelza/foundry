@@ -2,10 +2,14 @@ import type { AppMeta } from '@/types/app';
 
 interface AppTileProps {
   meta: AppMeta;
+  /** 1-based position in the directory, shown as a hallmark index. */
+  index?: number;
   onClick: () => void;
 }
 
-export default function AppTile({ meta, onClick }: AppTileProps) {
+export default function AppTile({ meta, index, onClick }: AppTileProps) {
+  const hallmark =
+    index != null ? `No. ${String(index).padStart(2, '0')}` : 'Foundry';
   return (
     <button
       type="button"
@@ -13,9 +17,8 @@ export default function AppTile({ meta, onClick }: AppTileProps) {
       onClick={onClick}
       aria-label={`Open ${meta.name}`}
     >
-      <span className="foundry-tile__status" aria-hidden />
-      <span className="foundry-tile__icon" aria-hidden>
-        {meta.icon}
+      <span className="foundry-tile__index" aria-hidden>
+        {hallmark}
       </span>
       <div className="foundry-tile__meta">
         <p className="foundry-tile__name">{meta.name}</p>

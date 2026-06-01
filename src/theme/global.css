@@ -1,8 +1,15 @@
+/*
+ * Foundry — global surfaces.
+ * Brand Book: every surface is a document; nothing seeks attention. No
+ * gradients, no glow, no continuous animation, no emoji. Flat cards, hairline
+ * borders, Ember used only for significance.
+ */
 html,
 body {
   background: var(--foundry-bg);
   color: var(--foundry-text);
   font-family: var(--foundry-font-body);
+  font-size: 17px;
   -webkit-font-smoothing: antialiased;
 }
 
@@ -13,7 +20,7 @@ ion-content {
 .foundry-display {
   font-family: var(--foundry-font-display);
   font-weight: 700;
-  letter-spacing: -0.015em;
+  letter-spacing: -0.02em;
 }
 
 .foundry-eyebrow {
@@ -21,39 +28,64 @@ ion-content {
   text-transform: uppercase;
   font-size: 10px;
   letter-spacing: 0.18em;
-  color: var(--foundry-text-dim);
+  color: var(--foundry-text-subtle);
 }
 
+/* ── THE MARK — F within an oval cartouche (Mark Gold, signet only) ── */
+.foundry-mark {
+  width: 34px;
+  height: 42px;
+  border: 1.5px solid var(--foundry-mark-gold);
+  border-radius: 50%;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  box-shadow: inset 0 0 0 3px rgba(200, 164, 90, 0.08);
+}
+.foundry-mark__f {
+  font-family: var(--foundry-font-display);
+  font-weight: 700;
+  font-size: 22px;
+  line-height: 1;
+  letter-spacing: -0.02em;
+  color: var(--foundry-mark-gold);
+}
+
+/* ── MASTHEAD ── */
 .foundry-header {
-  padding: 28px 20px 12px;
+  padding: 32px 20px 16px;
   display: flex;
-  align-items: baseline;
+  align-items: center;
   justify-content: space-between;
+  gap: 16px;
 }
-
+.foundry-header__lockup {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+}
+.foundry-header__words {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+}
+.foundry-header__eyebrow {
+  font-family: var(--foundry-font-mono);
+  font-size: 9px;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  color: var(--foundry-text-subtle);
+  margin: 0;
+}
 .foundry-header__title {
   font-family: var(--foundry-font-display);
   font-weight: 700;
-  font-size: 36px;
+  font-size: 34px;
   line-height: 1;
-  letter-spacing: -0.02em;
+  letter-spacing: -0.025em;
   margin: 0;
   color: var(--foundry-text);
-}
-
-.foundry-header__title em {
-  font-style: italic;
-  font-weight: 500;
-  color: var(--foundry-ember);
-}
-
-.foundry-header__subtitle {
-  font-family: var(--foundry-font-mono);
-  font-size: 11px;
-  letter-spacing: 0.16em;
-  text-transform: uppercase;
-  color: var(--foundry-text-dim);
-  margin: 0;
 }
 
 .foundry-refresh {
@@ -68,38 +100,29 @@ ion-content {
   align-items: center;
   justify-content: center;
   cursor: pointer;
-  font-size: 18px;
-  transition: color 0.15s ease, border-color 0.15s ease, background 0.15s ease, transform 0.15s ease;
+  font-size: 17px;
+  transition: color 0.15s ease, border-color 0.15s ease;
 }
 .foundry-refresh:hover {
   color: var(--foundry-text);
   border-color: var(--foundry-border-strong);
 }
-.foundry-refresh:active {
-  transform: scale(0.92);
-}
+.foundry-refresh:active { transform: scale(0.94); }
+/* Update available — a still ember outline, no pulse/glow (Brand Book). */
 .foundry-refresh--available {
   color: var(--foundry-ember);
   border-color: var(--foundry-ember);
-  background: rgba(232, 116, 44, 0.08);
-  animation: refresh-pulse 1.8s ease-in-out infinite;
-}
-@keyframes refresh-pulse {
-  0%, 100% { box-shadow: 0 0 0 0 rgba(232, 116, 44, 0.5); }
-  50%      { box-shadow: 0 0 0 6px rgba(232, 116, 44, 0); }
 }
 
+/* ── DIRECTORY OF TILES ── */
 .foundry-grid {
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
-  gap: 14px;
-  padding: 10px 16px 32px;
+  gap: 12px;
+  padding: 12px 16px 40px;
 }
-
 @media (min-width: 640px) {
-  .foundry-grid {
-    grid-template-columns: repeat(3, minmax(0, 1fr));
-  }
+  .foundry-grid { grid-template-columns: repeat(3, minmax(0, 1fr)); }
 }
 @media (min-width: 960px) {
   .foundry-grid {
@@ -109,97 +132,88 @@ ion-content {
   }
 }
 
+/* A tile is a calling card: hallmark index, name, supporting line. */
 .foundry-tile {
   position: relative;
-  background: linear-gradient(160deg, var(--foundry-bg-card) 0%, var(--foundry-bg-elevated) 100%);
+  text-align: left;
+  background: var(--foundry-card);
   border: 1px solid var(--foundry-border);
-  border-radius: var(--foundry-radius-lg);
-  padding: 20px 18px 18px;
-  min-height: 168px;
+  border-radius: var(--foundry-radius-md);
+  padding: 20px 20px 22px;
+  min-height: 150px;
   display: flex;
   flex-direction: column;
   justify-content: space-between;
-  overflow: hidden;
-  transition: transform 0.15s ease, border-color 0.15s ease, background 0.2s ease;
+  gap: 24px;
   cursor: pointer;
+  transition: border-color 0.15s ease, background 0.15s ease;
 }
-
-.foundry-tile::before {
-  content: '';
-  position: absolute;
-  inset: 0;
-  background:
-    radial-gradient(circle at top right, rgba(232, 116, 44, 0.08), transparent 55%),
-    repeating-linear-gradient(45deg, rgba(255, 255, 255, 0.012) 0 1px, transparent 1px 8px);
-  pointer-events: none;
-}
-
+.foundry-tile:hover { border-color: var(--foundry-border-strong); }
 .foundry-tile:active {
-  transform: scale(0.985);
   border-color: var(--foundry-border-strong);
+  background: var(--foundry-elevated);
 }
 
-.foundry-tile__icon {
-  font-size: 36px;
-  line-height: 1;
+.foundry-tile__index {
+  font-family: var(--foundry-font-mono);
+  font-size: 10px;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--foundry-text-subtle);
 }
 
 .foundry-tile__meta {
   display: flex;
   flex-direction: column;
-  gap: 4px;
+  gap: 6px;
 }
-
 .foundry-tile__name {
   font-family: var(--foundry-font-display);
-  font-size: 18px;
+  font-size: 21px;
   font-weight: 700;
-  letter-spacing: -0.01em;
+  letter-spacing: -0.02em;
   margin: 0;
   color: var(--foundry-text);
+  line-height: 1.05;
 }
-
 .foundry-tile__desc {
-  font-size: 12.5px;
-  line-height: 1.35;
+  font-family: var(--foundry-font-body);
+  font-size: 14px;
+  line-height: 1.45;
   color: var(--foundry-text-muted);
   margin: 0;
 }
 
-.foundry-tile__status {
-  position: absolute;
-  top: 14px;
-  right: 14px;
-  width: 6px;
-  height: 6px;
-  border-radius: 999px;
-  background: var(--foundry-ember);
-  box-shadow: 0 0 12px var(--foundry-ember);
-}
-
+/* ── EMPTY STATE — a blank ledger page ── */
 .foundry-empty {
   margin: 48px 20px;
-  border: 1px dashed var(--foundry-border-strong);
-  border-radius: var(--foundry-radius-lg);
+  border: 1px solid var(--foundry-border);
+  border-radius: var(--foundry-radius-md);
   padding: 40px 28px;
-  text-align: center;
-  background: rgba(28, 23, 20, 0.4);
+  background: var(--foundry-card);
 }
-
+.foundry-empty__eyebrow {
+  font-family: var(--foundry-font-mono);
+  font-size: 10px;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: var(--foundry-text-subtle);
+  margin: 0 0 12px;
+}
 .foundry-empty__title {
   font-family: var(--foundry-font-display);
-  font-size: 22px;
+  font-size: 24px;
   font-weight: 700;
   margin: 0 0 8px;
   color: var(--foundry-text);
-  letter-spacing: -0.01em;
+  letter-spacing: -0.02em;
 }
-
 .foundry-empty__body {
   margin: 0;
-  font-size: 14px;
+  font-family: var(--foundry-font-body);
+  font-size: 16px;
   color: var(--foundry-text-muted);
-  line-height: 1.5;
+  line-height: 1.6;
 }
 
 .foundry-app-toolbar-title {
@@ -207,10 +221,3 @@ ion-content {
   font-weight: 700;
   letter-spacing: -0.01em;
 }
-
-/* Tile pulse — subtle */
-@keyframes ember-pulse {
-  0%, 100% { opacity: 0.7; }
-  50% { opacity: 1; }
-}
-.foundry-tile__status { animation: ember-pulse 2.4s ease-in-out infinite; }

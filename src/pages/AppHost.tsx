@@ -40,10 +40,7 @@ export default function AppHost() {
             <IonBackButton defaultHref="/" text="" />
           </IonButtons>
           <IonTitle>
-            <span className="foundry-app-toolbar-title">
-              <span aria-hidden style={{ marginRight: 8 }}>{app.meta.icon}</span>
-              {app.meta.name}
-            </span>
+            <span className="foundry-app-toolbar-title">{app.meta.name}</span>
           </IonTitle>
         </IonToolbar>
       </IonHeader>

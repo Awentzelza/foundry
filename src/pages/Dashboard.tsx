@@ -28,11 +28,14 @@ export default function Dashboard() {
     <IonPage>
       <IonContent fullscreen>
         <header className="foundry-header">
-          <div>
-            <p className="foundry-header__subtitle">The Foundry</p>
-            <h1 className="foundry-header__title">
-              Tools, <em>forged</em>.
-            </h1>
+          <div className="foundry-header__lockup">
+            <span className="foundry-mark" aria-hidden>
+              <span className="foundry-mark__f">F</span>
+            </span>
+            <div className="foundry-header__words">
+              <p className="foundry-header__eyebrow">Private · Established 2026</p>
+              <h1 className="foundry-header__title">Foundry</h1>
+            </div>
           </div>
           <button
             type="button"
@@ -49,10 +52,11 @@ export default function Dashboard() {
           <EmptyForge />
         ) : (
           <div className="foundry-grid">
-            {apps.map((app) => (
+            {apps.map((app, i) => (
               <AppTile
                 key={app.meta.id}
                 meta={app.meta}
+                index={i + 1}
                 onClick={() => history.push(`/app/${app.meta.id}`)}
               />
             ))}

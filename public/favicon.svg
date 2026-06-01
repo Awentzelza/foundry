@@ -1,6 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32">
-  <rect width="32" height="32" rx="6" fill="#0d0a08"/>
-  <circle cx="22" cy="10" r="2" fill="#ff8a3d"/>
-  <path d="M6 18 h20 v2 h-20 z M9 22 h14 v3 h-14 z" fill="#e8742c"/>
+  <rect width="32" height="32" rx="6" fill="#111010"/>
+  <text x="16" y="23" text-anchor="middle"
+        font-family="Fraunces, Georgia, 'Times New Roman', serif"
+        font-weight="700" font-size="22" letter-spacing="-0.5"
+        fill="#C8A45A">F</text>
 </svg>
