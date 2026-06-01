@@ -10,6 +10,8 @@
  * through.
  */
 
+import { transform } from 'sucrase';
+
 export interface ValidationIssue {
   rule: string;
   message: string;
@@ -145,6 +147,24 @@ export function validatePushCode(code: string): ValidationResult {
         }
       }
     }
+  }
+
+  // --- Real syntax + JSX check (sucrase transpile, Edge-safe pure JS) ---
+  // The heuristics above catch known anti-patterns; this catches actual
+  // TypeScript/JSX syntax errors (unbalanced tags, malformed expressions)
+  // that would otherwise only surface during the Vercel build. sucrase does
+  // not type-check, but it parses the full module and throws on any syntax
+  // or JSX structural error, moving many remaining failures from build-time
+  // to push-time at zero Vercel cost.
+  try {
+    transform(code, { transforms: ['typescript', 'jsx'], production: true });
+  } catch (err) {
+    const message = err instanceof Error ? err.message : String(err);
+    issues.push({
+      rule: 'syntax-error',
+      message: `Code failed to parse (TypeScript/JSX): ${message}`,
+      hint: 'Fix the syntax/JSX error so the component parses as a valid .tsx module.',
+    });
   }
 
   return { ok: issues.length === 0, issues };
