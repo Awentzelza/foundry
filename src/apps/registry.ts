@@ -18,13 +18,25 @@ export const APP_REGISTRY: RegisteredApp[] = [
     meta: {
       id: "grocery-list",
       name: "Grocery List",
-      description: "Items to acquire. Check off as gathered.",
-      icon: "",
+      description: "Add items, check off, clear. Synced.",
+      icon: "🛒",
       route: "grocery-list",
       needsPersistence: true,
       status: "active",
     },
     load: () => import("./grocery-list"),
+  },
+  {
+    meta: {
+      id: "hyrox-tracker",
+      name: "Hyrox Tracker",
+      description: "Race-day sim tracker for Hyrox — splits, pace, and finish-time goal badges.",
+      icon: "🏃",
+      route: "hyrox-tracker",
+      needsPersistence: false,
+      status: "active",
+    },
+    load: () => import("./hyrox-tracker"),
   },
   {
     meta: {
@@ -42,8 +54,8 @@ export const APP_REGISTRY: RegisteredApp[] = [
     meta: {
       id: "pomodoro",
       name: "Pomodoro",
-      description: "Focused work in measured intervals.",
-      icon: "",
+      description: "25/5 focus timer. Counts today’s sessions.",
+      icon: "🍅",
       route: "pomodoro",
       needsPersistence: true,
       status: "active",
@@ -53,9 +65,9 @@ export const APP_REGISTRY: RegisteredApp[] = [
   {
     meta: {
       id: "water-tracker",
-      name: "Water",
-      description: "A record of water taken today.",
-      icon: "",
+      name: "Water Tracker",
+      description: "Track your daily 8 glasses. Tap to log, tap again to undo. 7-day history.",
+      icon: "💧",
       route: "water-tracker",
       needsPersistence: true,
       status: "active",
@@ -65,9 +77,9 @@ export const APP_REGISTRY: RegisteredApp[] = [
   {
     meta: {
       id: "workout-streak",
-      name: "Training Log",
-      description: "A record of days trained.",
-      icon: "",
+      name: "Workout Streak",
+      description: "Tap to mark today done. Tracks current and longest streak.",
+      icon: "🔥",
       route: "workout-streak",
       needsPersistence: true,
       status: "active",
