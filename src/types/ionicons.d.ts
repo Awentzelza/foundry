@@ -19,6 +19,7 @@ declare module 'ionicons/icons' {
   export const pause: string;
   export const play: string;
   export const refresh: string;
+  export const refreshOutline: string;
   export const stopCircle: string;
   // Catch-all for any other named icon import.
   const _all: { readonly [key: string]: string };

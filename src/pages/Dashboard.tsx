@@ -1,15 +1,18 @@
 import { useEffect, useState } from 'react';
-import { IonContent, IonPage } from '@ionic/react';
+import { IonContent, IonIcon, IonPage } from '@ionic/react';
 import { useHistory } from 'react-router-dom';
+import { refreshOutline } from 'ionicons/icons';
 
 import { loadActiveApps } from '@/lib/appRegistry';
 import type { RegisteredApp } from '@/types/app';
 import AppTile from '@/components/AppTile';
 import EmptyForge from '@/components/EmptyForge';
+import { usePwaUpdate } from '@/hooks/usePwaUpdate';
 
 export default function Dashboard() {
   const history = useHistory();
   const [apps, setApps] = useState<RegisteredApp[] | null>(null);
+  const { updateAvailable, forceRefresh } = usePwaUpdate();
 
   useEffect(() => {
     let cancelled = false;
@@ -31,6 +34,15 @@ export default function Dashboard() {
               Tools, <em>forged</em>.
             </h1>
           </div>
+          <button
+            type="button"
+            className={`foundry-refresh${updateAvailable ? ' foundry-refresh--available' : ''}`}
+            onClick={() => void forceRefresh()}
+            aria-label={updateAvailable ? 'New version available — tap to update' : 'Refresh'}
+            title={updateAvailable ? 'New version available' : 'Check for updates'}
+          >
+            <IonIcon icon={refreshOutline} />
+          </button>
         </header>
 
         {apps === null ? null : apps.length === 0 ? (
