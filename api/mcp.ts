@@ -34,12 +34,9 @@ import {
   type PushAppInput,
 } from './_operations';
 
-// Node runtime (not Edge) so we have a 60s function budget — long enough to
-// wait for a Vercel build to finish and return the verdict inline.
-export const config = {
-  runtime: 'nodejs',
-  maxDuration: 60,
-};
+// Edge runtime — 25s budget. We bound the deploy-wait inside that and rely on
+// the `verify_deploy` tool for builds that take longer than ~20s.
+export const config = { runtime: 'edge' };
 
 const PROTOCOL_VERSION = '2024-11-05';
 const SERVER_INFO = { name: 'foundry', version: '0.2.0' };

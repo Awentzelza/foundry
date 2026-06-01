@@ -19,8 +19,7 @@
 import { env, json, requireAuth } from './_lib';
 import { pushApp, type PushAppInput } from './_operations';
 
-// Node runtime + 60s budget so the wait-for-deploy logic in pushApp has room.
-export const config = { runtime: 'nodejs', maxDuration: 60 };
+export const config = { runtime: 'edge' };
 
 export default async function handler(req: Request): Promise<Response> {
   if (req.method !== 'POST') return json({ error: 'Method not allowed' }, { status: 405 });

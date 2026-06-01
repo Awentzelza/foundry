@@ -147,18 +147,21 @@ async function getBuildErrorLog(e: Env, uid: string): Promise<string> {
 export async function waitForDeploy(
   e: Env,
   commitSha: string,
-  timeoutMs = 50_000, // stay under the 60s Vercel Node function limit
+  timeoutMs = 20_000, // stay under the 25s Vercel Edge function limit
 ): Promise<DeployVerdict> {
   if (!configured(e)) return { available: false };
 
   const start = Date.now();
+  // Cap the discovery window to half the budget so we don't get stuck just
+  // looking for the deployment record.
+  const discoveryBudget = Math.min(8_000, Math.floor(timeoutMs / 2));
   let deployment: VercelDeployment | null = null;
 
-  // 1) Discovery phase — wait until Vercel registers a deployment for this SHA.
-  while (Date.now() - start < 15_000) {
+  // 1) Discovery phase.
+  while (Date.now() - start < discoveryBudget) {
     deployment = await findDeploymentBySha(e, commitSha);
     if (deployment && deployment.meta?.githubCommitSha === commitSha) break;
-    await wait(2_500);
+    await wait(2_000);
   }
   if (!deployment) {
     return { available: true, status: 'timeout' };
@@ -185,7 +188,7 @@ export async function waitForDeploy(
         errorLog: extractRelevantError(log),
       };
     }
-    await wait(4_000);
+    await wait(3_000);
   }
 
   return { available: true, status: 'timeout', deploymentUid: deployment.uid };
