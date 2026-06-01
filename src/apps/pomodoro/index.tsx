@@ -102,7 +102,7 @@ export default function PomodoroApp() {
   if (!ready) return null;
 
   const isWork = mode === 'work';
-  const accent = isWork ? 'var(--foundry-ember)' : '#6fbf73';
+  const accent = isWork ? 'var(--foundry-ember)' : 'var(--foundry-text-subtle)';
   const circumference = 2 * Math.PI * 96;
   const dashOffset = circumference * (1 - progress);
 

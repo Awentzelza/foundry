@@ -18,8 +18,8 @@ export const APP_REGISTRY: RegisteredApp[] = [
     meta: {
       id: "grocery-list",
       name: "Grocery List",
-      description: "Add items, check off, clear. Synced.",
-      icon: "🛒",
+      description: "Items to acquire. Check off as gathered.",
+      icon: "",
       route: "grocery-list",
       needsPersistence: true,
       status: "active",
@@ -42,8 +42,8 @@ export const APP_REGISTRY: RegisteredApp[] = [
     meta: {
       id: "pomodoro",
       name: "Pomodoro",
-      description: "25/5 focus timer. Counts today’s sessions.",
-      icon: "🍅",
+      description: "Focused work in measured intervals.",
+      icon: "",
       route: "pomodoro",
       needsPersistence: true,
       status: "active",
@@ -53,9 +53,9 @@ export const APP_REGISTRY: RegisteredApp[] = [
   {
     meta: {
       id: "water-tracker",
-      name: "Water Tracker",
-      description: "Track your daily 8 glasses. Tap to log, tap again to undo. 7-day history.",
-      icon: "💧",
+      name: "Water",
+      description: "A record of water taken today.",
+      icon: "",
       route: "water-tracker",
       needsPersistence: true,
       status: "active",
@@ -65,9 +65,9 @@ export const APP_REGISTRY: RegisteredApp[] = [
   {
     meta: {
       id: "workout-streak",
-      name: "Workout Streak",
-      description: "Tap to mark today done. Tracks current and longest streak.",
-      icon: "🔥",
+      name: "Training Log",
+      description: "A record of days trained.",
+      icon: "",
       route: "workout-streak",
       needsPersistence: true,
       status: "active",

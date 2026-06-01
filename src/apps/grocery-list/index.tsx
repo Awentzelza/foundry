@@ -120,8 +120,9 @@ export default function GroceryListApp() {
 
       {!ready ? null : items.length === 0 ? (
         <div className="foundry-empty" style={{ margin: '24px 16px' }}>
-          <h2 className="foundry-empty__title">Empty list.</h2>
-          <p className="foundry-empty__body">Add your first item above.</p>
+          <p className="foundry-empty__eyebrow">Grocery List</p>
+          <h2 className="foundry-empty__title">Nothing here.</h2>
+          <p className="foundry-empty__body">Add an item above.</p>
         </div>
       ) : (
         <>
@@ -180,7 +181,7 @@ export default function GroceryListApp() {
       {!persistent && (
         <IonText color="warning">
           <p style={{ padding: '0 20px', fontSize: 12 }}>
-            Supabase isn't configured — items live only in this session.
+            Supabase is not configured. Items remain only in this session.
           </p>
         </IonText>
       )}
