@@ -28,6 +28,18 @@ export const APP_REGISTRY: RegisteredApp[] = [
   },
   {
     meta: {
+      id: "ping",
+      name: "Ping",
+      description: "Tap to increment.",
+      icon: "📡",
+      route: "ping",
+      needsPersistence: true,
+      status: "active",
+    },
+    load: () => import("./ping"),
+  },
+  {
+    meta: {
       id: "pomodoro",
       name: "Pomodoro",
       description: "25/5 focus timer. Counts today’s sessions.",
