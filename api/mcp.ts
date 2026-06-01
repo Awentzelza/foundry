@@ -299,6 +299,35 @@ async function dispatch(
   }
 }
 
+// --- Per-IP rate limiting (in-memory token bucket) ---
+// 30 requests/minute per client IP. Best-effort only: Edge isolates are
+// ephemeral and per-region, so this is a soft cap that blunts a spam burst
+// (e.g. if the bearer token leaks again), not a hard distributed guarantee.
+const RATE_CAPACITY = 30; // max burst
+const RATE_REFILL_PER_MS = 30 / 60_000; // 30 tokens per 60s
+const rateBuckets = new Map<string, { tokens: number; last: number }>();
+
+function clientIp(req: Request): string {
+  const xff = req.headers.get('x-forwarded-for') || '';
+  const first = xff.split(',')[0].trim();
+  return first || req.headers.get('x-real-ip') || 'unknown';
+}
+
+/** Returns true if this request should be rejected (bucket empty). */
+function isRateLimited(ip: string): boolean {
+  const now = Date.now();
+  const b = rateBuckets.get(ip) ?? { tokens: RATE_CAPACITY, last: now };
+  b.tokens = Math.min(RATE_CAPACITY, b.tokens + (now - b.last) * RATE_REFILL_PER_MS);
+  b.last = now;
+  if (b.tokens < 1) {
+    rateBuckets.set(ip, b);
+    return true;
+  }
+  b.tokens -= 1;
+  rateBuckets.set(ip, b);
+  return false;
+}
+
 export default async function handler(req: Request): Promise<Response> {
   // CORS — Claude clients may preflight from random origins.
   const corsHeaders = {
@@ -324,6 +353,24 @@ export default async function handler(req: Request): Promise<Response> {
   }
   if (req.method !== 'POST') {
     return new Response('Method not allowed', { status: 405, headers: corsHeaders });
+  }
+
+  // Rate limit actual work (POST). OPTIONS/GET are cheap and skipped above.
+  const ip = clientIp(req);
+  if (isRateLimited(ip)) {
+    return new Response(
+      JSON.stringify(
+        rpcError(null, -32029, 'Rate limit exceeded — max 30 requests per minute.'),
+      ),
+      {
+        status: 429,
+        headers: {
+          ...corsHeaders,
+          'content-type': 'application/json',
+          'retry-after': '2',
+        },
+      },
+    );
   }
 
   const e = env();
