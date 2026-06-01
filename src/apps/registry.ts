@@ -30,7 +30,7 @@ export const APP_REGISTRY: RegisteredApp[] = [
     meta: {
       id: "workout-streak",
       name: "Workout Streak",
-      description: "Track your daily workout streak — tap to mark today done.",
+      description: "Tap to mark today done. Tracks current and longest streak.",
       icon: "🔥",
       route: "workout-streak",
       needsPersistence: true,
