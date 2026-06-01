@@ -55,10 +55,14 @@ export function requireAuth(req: Request, e: Env): Response | null {
   }
 
   // Accept the secret either way:
-  //   - Authorization: Bearer <secret>           (preferred — header)
-  //   - ?api_key=<secret>  /  ?token=<secret>   (fallback — query string, for
-  //     clients like claude.ai's custom connector UI which don't expose a
-  //     headers field).
+  //   - Authorization: Bearer <secret>           (PREFERRED — header)
+  //   - ?api_key=<secret>  /  ?token=<secret>   (FALLBACK — query string)
+  //
+  // SECURITY NOTE: the query-string fallback exists only because claude.ai's
+  // custom-connector UI has no header field. Secrets in query strings leak into
+  // server/proxy logs and browser history, so this path is connector/test-only.
+  // Prefer the Authorization header for any other client, and rotate
+  // FOUNDRY_PUSH_SECRET if the connector URL is ever exposed.
   const header = req.headers.get('authorization') || '';
   const headerToken = header.replace(/^Bearer\s+/i, '');
 

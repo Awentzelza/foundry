@@ -1,0 +1,356 @@
+/* meal-plan — per-app stylesheet (MFE-scoped CSS module).
+   Tokens only: every colour is a var(--foundry-...) token; fonts are brand tokens.
+   Ionic components are restyled via their OWN vars set to brand tokens.
+   Never redefines a foundry or ion theme token. */
+
+.root {
+  font-family: var(--foundry-font-body);
+  color: var(--foundry-text);
+  max-width: 540px;
+  margin: 0 auto;
+  padding: 0 0 var(--space-7);
+}
+
+.header { padding: var(--space-5) var(--space-5) 0; }
+
+.eyebrow {
+  font-family: var(--foundry-font-mono);
+  font-size: 10px;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: var(--foundry-text-subtle);
+  margin-bottom: var(--space-1);
+}
+
+.title {
+  font-family: var(--foundry-font-display);
+  font-size: 28px;
+  font-weight: 700;
+  letter-spacing: -0.02em;
+  color: var(--foundry-text);
+}
+
+.subtitle {
+  font-size: 13px;
+  color: var(--foundry-text-muted);
+  margin-top: var(--space-1);
+}
+
+.tabs {
+  display: flex;
+  gap: var(--space-2);
+  margin-top: var(--space-5);
+  border-bottom: 1px solid var(--foundry-border);
+}
+
+.tab {
+  padding: var(--space-2) var(--space-4);
+  border: none;
+  border-bottom: 2px solid transparent;
+  background: transparent;
+  cursor: pointer;
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--foundry-text-muted);
+  font-family: var(--foundry-font-body);
+}
+
+.tabActive {
+  border-bottom-color: var(--foundry-ember);
+  color: var(--foundry-text);
+}
+
+.section { padding: var(--space-4) var(--space-5); }
+
+.mealsList {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+}
+
+.recipeCard {
+  background: var(--foundry-card);
+  border: 1px solid var(--foundry-border);
+  border-radius: var(--foundry-radius-md);
+  padding: var(--space-4) 18px;
+  text-align: left;
+  cursor: pointer;
+  width: 100%;
+  font-family: var(--foundry-font-body);
+}
+
+.recipeCardHead {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: var(--space-2);
+}
+
+.tag {
+  font-size: 11px;
+  font-weight: 700;
+  padding: 2px 10px;
+  border-radius: 20px;
+  background: var(--foundry-elevated);
+  color: var(--foundry-text-muted);
+}
+
+.recipeName {
+  font-family: var(--foundry-font-display);
+  font-size: 16px;
+  font-weight: 700;
+  color: var(--foundry-text);
+  margin-bottom: var(--space-2);
+}
+
+.meta {
+  display: flex;
+  gap: var(--space-4);
+  font-size: 12px;
+  color: var(--foundry-text-muted);
+}
+
+.lunchCard {
+  background: var(--foundry-card);
+  border: 1px solid var(--foundry-border);
+  border-radius: var(--foundry-radius-md);
+  padding: var(--space-4) 18px;
+}
+
+.lunchName {
+  font-family: var(--foundry-font-display);
+  font-size: 15px;
+  font-weight: 700;
+  color: var(--foundry-text);
+  margin-bottom: var(--space-1);
+}
+
+.lunchBody {
+  font-size: 13px;
+  color: var(--foundry-text-muted);
+  line-height: 1.5;
+}
+
+/* Ionic IonButton ("Back to meals") restyled via its own vars. */
+.backBtn {
+  --background: transparent;
+  --background-hover: transparent;
+  --color: var(--foundry-ember);
+  --padding-start: 0;
+  --padding-end: 0;
+  margin: 0 0 var(--space-3);
+  font-family: var(--foundry-font-mono);
+  letter-spacing: 0.08em;
+  text-transform: none;
+}
+
+.detailName {
+  font-family: var(--foundry-font-display);
+  font-size: 22px;
+  font-weight: 700;
+  color: var(--foundry-text);
+  margin-bottom: var(--space-2);
+  line-height: 1.2;
+}
+
+.detailMeta {
+  display: flex;
+  gap: 14px;
+  font-size: 12px;
+  color: var(--foundry-text-muted);
+  margin-bottom: var(--space-5);
+}
+
+.tagAccent {
+  font-weight: 700;
+  color: var(--foundry-ember);
+}
+
+.blockLabel {
+  font-family: var(--foundry-font-mono);
+  font-size: 10px;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: var(--foundry-text-subtle);
+  margin-bottom: var(--space-3);
+}
+
+.listFrame {
+  background: var(--foundry-card);
+  border: 1px solid var(--foundry-border);
+  border-radius: var(--foundry-radius-md);
+  overflow: hidden;
+}
+
+.ingredientsCard {
+  background: var(--foundry-card);
+  border: 1px solid var(--foundry-border);
+  border-radius: var(--foundry-radius-md);
+  padding: var(--space-1) 0;
+  margin-bottom: var(--space-5);
+}
+
+.ingredientRow {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--space-3);
+  padding: 10px var(--space-4);
+}
+.ingredientRow:not(:last-child) { border-bottom: 1px solid var(--foundry-border); }
+
+.dash {
+  color: var(--foundry-ember);
+  font-weight: 700;
+  flex-shrink: 0;
+}
+
+.ingredientText {
+  font-size: 14px;
+  color: var(--foundry-text);
+  line-height: 1.4;
+}
+
+.stepsList {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.stepRow {
+  display: flex;
+  gap: 14px;
+  align-items: flex-start;
+}
+
+.stepNum {
+  width: 26px;
+  height: 26px;
+  border-radius: 50%;
+  background: var(--foundry-ember);
+  color: var(--foundry-bg);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 11px;
+  font-weight: 800;
+  flex-shrink: 0;
+}
+
+.stepText {
+  font-size: 14px;
+  line-height: 1.6;
+  color: var(--foundry-text);
+  padding-top: 3px;
+}
+
+.progressCard {
+  background: var(--foundry-card);
+  border: 1px solid var(--foundry-border);
+  border-radius: var(--foundry-radius-md);
+  padding: 14px var(--space-4);
+  margin-bottom: var(--space-5);
+}
+
+.progressRow {
+  display: flex;
+  justify-content: space-between;
+  font-size: 13px;
+  margin-bottom: 10px;
+}
+
+.progressLabel { font-weight: 700; color: var(--foundry-text); }
+.progressCount { color: var(--foundry-text-muted); }
+
+.barTrack {
+  background: var(--foundry-border);
+  border-radius: 20px;
+  height: 6px;
+  overflow: hidden;
+}
+
+.barFill {
+  height: 100%;
+  border-radius: 20px;
+  background: var(--foundry-ember);
+  transition: width 0.3s ease;
+}
+
+.catBlock { margin-bottom: var(--space-5); }
+
+.catLabel {
+  font-family: var(--foundry-font-mono);
+  font-size: 10px;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: var(--foundry-text-subtle);
+  margin-bottom: var(--space-2);
+  padding-left: var(--space-1);
+}
+
+.itemRow {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding: 13px var(--space-4);
+  cursor: pointer;
+}
+.itemRow:not(:last-child) { border-bottom: 1px solid var(--foundry-border); }
+
+.check {
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  flex-shrink: 0;
+  border: 2px solid var(--foundry-border);
+  background: transparent;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: background 0.2s, border-color 0.2s;
+}
+
+.checkOn {
+  border-color: transparent;
+  background: var(--foundry-ember);
+}
+
+.checkMark {
+  color: var(--foundry-bg);
+  font-size: 11px;
+  font-weight: 800;
+}
+
+.itemText { font-size: 14px; color: var(--foundry-text); }
+
+.itemTextDone {
+  color: var(--foundry-text-subtle);
+  text-decoration: line-through;
+}
+
+.haveRow {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding: 11px var(--space-4);
+}
+.haveRow:not(:last-child) { border-bottom: 1px solid var(--foundry-border); }
+
+.haveCheck {
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  flex-shrink: 0;
+  background: var(--foundry-elevated);
+  border: 1px solid var(--foundry-border);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.haveMark { color: var(--foundry-text-subtle); font-size: 11px; font-weight: 800; }
+
+.haveText {
+  font-size: 14px;
+  color: var(--foundry-text-subtle);
+  text-decoration: line-through;
+}

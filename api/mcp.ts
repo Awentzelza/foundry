@@ -489,8 +489,10 @@ async function dispatch(
 
 // --- Per-IP rate limiting (in-memory token bucket) ---
 // 30 requests/minute per client IP. Best-effort only: Edge isolates are
-// ephemeral and per-region, so this is a soft cap that blunts a spam burst
-// (e.g. if the bearer token leaks again), not a hard distributed guarantee.
+// ephemeral and per-region, so a determined caller can bypass this by spreading
+// requests across regions/IPs. It is a soft cap that blunts a single-source
+// spam burst (e.g. if the bearer token leaks again), NOT a hard distributed
+// guarantee — a real limiter would need a shared store (Redis/Durable Object).
 const RATE_CAPACITY = 30; // max burst
 const RATE_REFILL_PER_MS = 30 / 60_000; // 30 tokens per 60s
 const rateBuckets = new Map<string, { tokens: number; last: number }>();

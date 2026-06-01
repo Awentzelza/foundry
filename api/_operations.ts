@@ -70,6 +70,13 @@ export interface PushAppBuildError {
   deploymentUid?: string;
 }
 
+export interface PushAppMetadataError {
+  success: false;
+  status: 502;
+  error: string;
+  phase: 'metadata';
+}
+
 export interface OperationError {
   success: false;
   status: number;
@@ -110,7 +117,11 @@ export async function pushApp(
   input: PushAppInput,
   env: Env,
 ): Promise<
-  PushAppResult | OperationError | PushAppValidationError | PushAppBuildError
+  | PushAppResult
+  | OperationError
+  | PushAppValidationError
+  | PushAppBuildError
+  | PushAppMetadataError
 > {
   // --- Phase 1: metadata + heuristic code validation (instant) ---
   const metaError = validateMetadata(input);
@@ -167,6 +178,22 @@ export async function pushApp(
         { onConflict: 'id' },
       )
     : { error: { message: 'Supabase not configured' } };
+
+  // If Supabase IS configured but the metadata upsert failed (RLS, network, or
+  // db error), stop before committing. Committing the component without an
+  // active metadata row yields a deployed-but-invisible app and a misleading
+  // success. Fail loud so the caller can fix and retry. (A null client — i.e.
+  // Supabase not configured, local dev — falls through as before.)
+  if (client && upsert.error) {
+    return {
+      success: false,
+      status: 502,
+      phase: 'metadata',
+      error:
+        `Failed to persist app metadata for "${id}" to Supabase: ${upsert.error.message}. ` +
+        'No commit was made. Resolve the cause and call push_app again.',
+    };
+  }
 
   // --- Phase 2: commit to GitHub ---
   let commit: { sha?: string; skipped?: string } = {};

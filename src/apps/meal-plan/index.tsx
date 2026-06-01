@@ -1,6 +1,7 @@
 import { useState, useCallback } from 'react';
 import { IonButton } from '@ionic/react';
 import { useAppData } from '@/hooks/useAppData';
+import s from './styles.module.css';
 
 interface CheckedState { [key: string]: boolean }
 
@@ -195,22 +196,27 @@ export default function MealPlanApp() {
 
   if (!ready) return null;
 
-  const totalNeeded = groceryCategories.reduce((s, c) => s + c.items.length, 0);
+  const totalNeeded = groceryCategories.reduce((sum, c) => sum + c.items.length, 0);
   const totalChecked = groceryCategories.reduce(
-    (s, c) => s + c.items.filter((_, i) => checked[`${c.category}-${i}`]).length, 0
+    (sum, c) => sum + c.items.filter((_, i) => checked[`${c.category}-${i}`]).length, 0
   );
+  const pct = totalNeeded > 0 ? (totalChecked / totalNeeded) * 100 : 0;
 
   const recipe = activeRecipe !== null ? recipes.find(r => r.id === activeRecipe) : null;
 
   return (
-    <div style={{ fontFamily: 'var(--foundry-font-body)', color: 'var(--foundry-text)', maxWidth: 540, margin: '0 auto', padding: '0 0 40px' }}>
-      <div style={{ padding: '24px 20px 0' }}>
-        <div style={{ fontFamily: 'var(--foundry-font-mono)', fontSize: 10, letterSpacing: '0.18em', textTransform: 'uppercase', color: 'var(--foundry-text-subtle)', marginBottom: 4 }}>Week of June 2</div>
-        <div style={{ fontFamily: 'var(--foundry-font-display)', fontSize: 28, fontWeight: 700, letterSpacing: '-0.02em', color: 'var(--foundry-text)' }}>Meal Plan</div>
-        <div style={{ fontSize: 13, color: 'var(--foundry-text-muted)', marginTop: 4 }}>5 dinners · Mon–Fri lunches covered</div>
-        <div style={{ display: 'flex', gap: 8, marginTop: 20, borderBottom: '1px solid var(--foundry-border)' }}>
+    <div className={s.root}>
+      <div className={s.header}>
+        <div className={s.eyebrow}>Week of June 2</div>
+        <div className={s.title}>Meal Plan</div>
+        <div className={s.subtitle}>5 dinners · Mon–Fri lunches covered</div>
+        <div className={s.tabs}>
           {(['meals', 'grocery'] as const).map(t => (
-            <button key={t} onClick={() => { setTab(t); setActiveRecipe(null); }} style={{ padding: '8px 16px', border: 'none', borderBottom: tab === t ? '2px solid var(--foundry-ember)' : '2px solid transparent', background: 'transparent', cursor: 'pointer', fontSize: 13, fontWeight: 600, color: tab === t ? 'var(--foundry-text)' : 'var(--foundry-text-muted)', fontFamily: 'var(--foundry-font-body)' }}>
+            <button
+              key={t}
+              onClick={() => { setTab(t); setActiveRecipe(null); }}
+              className={`${s.tab} ${tab === t ? s.tabActive : ''}`}
+            >
               {t === 'meals' ? 'Recipes' : 'Grocery List'}
             </button>
           ))}
@@ -218,53 +224,53 @@ export default function MealPlanApp() {
       </div>
 
       {tab === 'meals' && !recipe && (
-        <div style={{ padding: '16px 20px', display: 'flex', flexDirection: 'column', gap: 12 }}>
+        <div className={`${s.section} ${s.mealsList}`}>
           {recipes.map(r => (
-            <button key={r.id} onClick={() => setActiveRecipe(r.id)} style={{ background: 'var(--foundry-card)', border: '1px solid var(--foundry-border)', borderRadius: 'var(--foundry-radius-md)', padding: '16px 18px', textAlign: 'left', cursor: 'pointer', width: '100%' }}>
-              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: 6 }}>
-                <div style={{ fontFamily: 'var(--foundry-font-mono)', fontSize: 10, letterSpacing: '0.18em', textTransform: 'uppercase', color: 'var(--foundry-text-subtle)' }}>{r.day}</div>
-                <span style={{ fontSize: 11, fontWeight: 700, padding: '2px 10px', borderRadius: 20, background: 'var(--foundry-elevated)', color: 'var(--foundry-text-muted)' }}>{r.tag}</span>
+            <button key={r.id} onClick={() => setActiveRecipe(r.id)} className={s.recipeCard}>
+              <div className={s.recipeCardHead}>
+                <div className={s.eyebrow}>{r.day}</div>
+                <span className={s.tag}>{r.tag}</span>
               </div>
-              <div style={{ fontFamily: 'var(--foundry-font-display)', fontSize: 16, fontWeight: 700, color: 'var(--foundry-text)', marginBottom: 8 }}>{r.title}</div>
-              <div style={{ display: 'flex', gap: 16, fontSize: 12, color: 'var(--foundry-text-muted)' }}>
+              <div className={s.recipeName}>{r.title}</div>
+              <div className={s.meta}>
                 <span>{r.protein}</span>
                 <span>{r.time}</span>
               </div>
             </button>
           ))}
-          <div style={{ background: 'var(--foundry-card)', border: '1px solid var(--foundry-border)', borderRadius: 'var(--foundry-radius-md)', padding: '16px 18px' }}>
-            <div style={{ fontFamily: 'var(--foundry-font-mono)', fontSize: 10, letterSpacing: '0.18em', textTransform: 'uppercase', color: 'var(--foundry-text-subtle)', marginBottom: 6 }}>Mon–Fri Lunches</div>
-            <div style={{ fontFamily: 'var(--foundry-font-display)', fontSize: 15, fontWeight: 700, color: 'var(--foundry-text)', marginBottom: 4 }}>Leftovers or Salad Bowls</div>
-            <div style={{ fontSize: 13, color: 'var(--foundry-text-muted)', lineHeight: 1.5 }}>Rotate between leftover dinner portions and the salad bags with sliced chicken.</div>
+          <div className={s.lunchCard}>
+            <div className={s.eyebrow}>Mon–Fri Lunches</div>
+            <div className={s.lunchName}>Leftovers or Salad Bowls</div>
+            <div className={s.lunchBody}>Rotate between leftover dinner portions and the salad bags with sliced chicken.</div>
           </div>
         </div>
       )}
 
       {tab === 'meals' && recipe && (
-        <div style={{ padding: '16px 20px' }}>
-          <IonButton fill="clear" onClick={() => setActiveRecipe(null)} style={{ marginBottom: 12, marginLeft: -12 }}>Back to meals</IonButton>
-          <div style={{ fontFamily: 'var(--foundry-font-mono)', fontSize: 10, letterSpacing: '0.18em', textTransform: 'uppercase', color: 'var(--foundry-text-subtle)', marginBottom: 4 }}>{recipe.day}</div>
-          <div style={{ fontFamily: 'var(--foundry-font-display)', fontSize: 22, fontWeight: 700, color: 'var(--foundry-text)', marginBottom: 8, lineHeight: 1.2 }}>{recipe.title}</div>
-          <div style={{ display: 'flex', gap: 14, fontSize: 12, color: 'var(--foundry-text-muted)', marginBottom: 24 }}>
+        <div className={s.section}>
+          <IonButton className={s.backBtn} fill="clear" onClick={() => setActiveRecipe(null)}>Back to meals</IonButton>
+          <div className={s.eyebrow}>{recipe.day}</div>
+          <div className={s.detailName}>{recipe.title}</div>
+          <div className={s.detailMeta}>
             <span>{recipe.protein}</span>
             <span>{recipe.time}</span>
-            <span style={{ fontWeight: 700, color: 'var(--foundry-ember)' }}>{recipe.tag}</span>
+            <span className={s.tagAccent}>{recipe.tag}</span>
           </div>
-          <div style={{ fontFamily: 'var(--foundry-font-mono)', fontSize: 10, letterSpacing: '0.18em', textTransform: 'uppercase', color: 'var(--foundry-text-subtle)', marginBottom: 12 }}>Ingredients</div>
-          <div style={{ background: 'var(--foundry-card)', border: '1px solid var(--foundry-border)', borderRadius: 'var(--foundry-radius-md)', padding: '4px 0', marginBottom: 24 }}>
+          <div className={s.blockLabel}>Ingredients</div>
+          <div className={s.ingredientsCard}>
             {recipe.ingredients.map((ing, i) => (
-              <div key={i} style={{ display: 'flex', alignItems: 'flex-start', gap: 12, padding: '10px 16px', borderBottom: i < recipe.ingredients.length - 1 ? '1px solid var(--foundry-border)' : 'none' }}>
-                <span style={{ color: 'var(--foundry-ember)', fontWeight: 700, flexShrink: 0 }}>—</span>
-                <span style={{ fontSize: 14, color: 'var(--foundry-text)', lineHeight: 1.4 }}>{ing}</span>
+              <div key={i} className={s.ingredientRow}>
+                <span className={s.dash}>—</span>
+                <span className={s.ingredientText}>{ing}</span>
               </div>
             ))}
           </div>
-          <div style={{ fontFamily: 'var(--foundry-font-mono)', fontSize: 10, letterSpacing: '0.18em', textTransform: 'uppercase', color: 'var(--foundry-text-subtle)', marginBottom: 12 }}>Steps</div>
-          <div style={{ display: 'flex', flexDirection: 'column', gap: 14 }}>
+          <div className={s.blockLabel}>Steps</div>
+          <div className={s.stepsList}>
             {recipe.steps.map((step, i) => (
-              <div key={i} style={{ display: 'flex', gap: 14, alignItems: 'flex-start' }}>
-                <div style={{ width: 26, height: 26, borderRadius: '50%', background: 'var(--foundry-ember)', color: 'var(--foundry-bg)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 11, fontWeight: 800, flexShrink: 0 }}>{i + 1}</div>
-                <div style={{ fontSize: 14, lineHeight: 1.6, color: 'var(--foundry-text)', paddingTop: 3 }}>{step}</div>
+              <div key={i} className={s.stepRow}>
+                <div className={s.stepNum}>{i + 1}</div>
+                <div className={s.stepText}>{step}</div>
               </div>
             ))}
           </div>
@@ -272,44 +278,44 @@ export default function MealPlanApp() {
       )}
 
       {tab === 'grocery' && (
-        <div style={{ padding: '16px 20px' }}>
-          <div style={{ background: 'var(--foundry-card)', border: '1px solid var(--foundry-border)', borderRadius: 'var(--foundry-radius-md)', padding: '14px 16px', marginBottom: 20 }}>
-            <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: 13, marginBottom: 10 }}>
-              <span style={{ fontWeight: 700, color: 'var(--foundry-text)' }}>Still need to grab</span>
-              <span style={{ color: 'var(--foundry-text-muted)' }}>{totalChecked} / {totalNeeded}</span>
+        <div className={s.section}>
+          <div className={s.progressCard}>
+            <div className={s.progressRow}>
+              <span className={s.progressLabel}>Still need to grab</span>
+              <span className={s.progressCount}>{totalChecked} / {totalNeeded}</span>
             </div>
-            <div style={{ background: 'var(--foundry-border)', borderRadius: 20, height: 6, overflow: 'hidden' }}>
-              <div style={{ height: '100%', borderRadius: 20, background: 'var(--foundry-ember)', width: `${totalNeeded > 0 ? (totalChecked / totalNeeded) * 100 : 0}%`, transition: 'width 0.3s ease' }} />
+            <div className={s.barTrack}>
+              <div className={s.barFill} style={{ width: `${pct}%` }} />
             </div>
           </div>
           {groceryCategories.map(cat => (
-            <div key={cat.category} style={{ marginBottom: 20 }}>
-              <div style={{ fontFamily: 'var(--foundry-font-mono)', fontSize: 10, letterSpacing: '0.18em', textTransform: 'uppercase', color: 'var(--foundry-text-subtle)', marginBottom: 8, paddingLeft: 4 }}>{cat.category}</div>
-              <div style={{ background: 'var(--foundry-card)', border: '1px solid var(--foundry-border)', borderRadius: 'var(--foundry-radius-md)', overflow: 'hidden' }}>
+            <div key={cat.category} className={s.catBlock}>
+              <div className={s.catLabel}>{cat.category}</div>
+              <div className={s.listFrame}>
                 {cat.items.map((item, i) => {
                   const key = `${cat.category}-${i}`;
                   const isChecked = !!checked[key];
                   return (
-                    <div key={i} onClick={() => toggleCheck(key)} style={{ display: 'flex', alignItems: 'center', gap: 14, padding: '13px 16px', borderBottom: i < cat.items.length - 1 ? '1px solid var(--foundry-border)' : 'none', cursor: 'pointer' }}>
-                      <div style={{ width: 20, height: 20, borderRadius: '50%', flexShrink: 0, border: isChecked ? 'none' : '2px solid var(--foundry-border)', background: isChecked ? 'var(--foundry-ember)' : 'transparent', display: 'flex', alignItems: 'center', justifyContent: 'center', transition: 'all 0.2s' }}>
-                        {isChecked && <span style={{ color: 'var(--foundry-bg)', fontSize: 11, fontWeight: 800 }}>✓</span>}
+                    <div key={i} onClick={() => toggleCheck(key)} className={s.itemRow}>
+                      <div className={`${s.check} ${isChecked ? s.checkOn : ''}`}>
+                        {isChecked && <span className={s.checkMark}>✓</span>}
                       </div>
-                      <span style={{ fontSize: 14, color: isChecked ? 'var(--foundry-text-subtle)' : 'var(--foundry-text)', textDecoration: isChecked ? 'line-through' : 'none' }}>{item}</span>
+                      <span className={isChecked ? s.itemTextDone : s.itemText}>{item}</span>
                     </div>
                   );
                 })}
               </div>
             </div>
           ))}
-          <div style={{ marginBottom: 20 }}>
-            <div style={{ fontFamily: 'var(--foundry-font-mono)', fontSize: 10, letterSpacing: '0.18em', textTransform: 'uppercase', color: 'var(--foundry-text-subtle)', marginBottom: 8, paddingLeft: 4 }}>Already Have</div>
-            <div style={{ background: 'var(--foundry-card)', border: '1px solid var(--foundry-border)', borderRadius: 'var(--foundry-radius-md)', overflow: 'hidden' }}>
+          <div className={s.catBlock}>
+            <div className={s.catLabel}>Already Have</div>
+            <div className={s.listFrame}>
               {alreadyHave.map((item, i) => (
-                <div key={i} style={{ display: 'flex', alignItems: 'center', gap: 14, padding: '11px 16px', borderBottom: i < alreadyHave.length - 1 ? '1px solid var(--foundry-border)' : 'none' }}>
-                  <div style={{ width: 20, height: 20, borderRadius: '50%', flexShrink: 0, background: 'var(--foundry-elevated)', border: '1px solid var(--foundry-border)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                    <span style={{ color: 'var(--foundry-text-subtle)', fontSize: 11, fontWeight: 800 }}>✓</span>
+                <div key={i} className={s.haveRow}>
+                  <div className={s.haveCheck}>
+                    <span className={s.haveMark}>✓</span>
                   </div>
-                  <span style={{ fontSize: 14, color: 'var(--foundry-text-subtle)', textDecoration: 'line-through' }}>{item}</span>
+                  <span className={s.haveText}>{item}</span>
                 </div>
               ))}
             </div>

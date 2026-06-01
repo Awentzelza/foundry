@@ -11,6 +11,7 @@ import {
 } from '@ionic/react';
 import { useParams } from 'react-router-dom';
 
+import { AppErrorBoundary } from '@/components/AppErrorBoundary';
 import { findApp } from '@/apps/registry';
 import { withDisplay } from '@/lib/appRegistry';
 import NotFound from './NotFound';
@@ -47,15 +48,17 @@ export default function AppHost() {
       </IonHeader>
       <IonContent fullscreen>
         <div className="foundry-app-scope" data-app={app.meta.id}>
-          <Suspense
-            fallback={
-              <div style={{ display: 'grid', placeItems: 'center', padding: 64 }}>
-                <IonSpinner name="crescent" />
-              </div>
-            }
-          >
-            <LazyApp />
-          </Suspense>
+          <AppErrorBoundary appId={app.meta.id}>
+            <Suspense
+              fallback={
+                <div style={{ display: 'grid', placeItems: 'center', padding: 64 }}>
+                  <IonSpinner name="crescent" />
+                </div>
+              }
+            >
+              <LazyApp />
+            </Suspense>
+          </AppErrorBoundary>
         </div>
       </IonContent>
     </IonPage>

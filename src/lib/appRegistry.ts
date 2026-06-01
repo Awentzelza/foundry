@@ -23,6 +23,7 @@ export const DISPLAY_OVERRIDES: Record<string, { name?: string; description?: st
   'pomodoro': { name: 'Pomodoro', description: 'Focused work in measured intervals.' },
   'grocery-list': { name: 'Grocery List', description: 'Items to acquire. Check off as gathered.' },
   'hyrox-tracker': { name: 'Hyrox', description: 'A record of Hyrox splits, pace, and finish time.' },
+  'meal-plan': { name: 'Meal Plan', description: 'The week\u2019s dinners and the grocery run.' },
 };
 
 /** Apply the brand display override (and never surface emoji icons). */

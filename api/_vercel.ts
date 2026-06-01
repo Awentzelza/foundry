@@ -249,7 +249,20 @@ function extractRelevantError(log: string): string {
       break;
     }
   }
-  if (firstError === -1) return lines.slice(-30).join('\n');
+  // No specific marker matched. Try a broad generic pass before giving up so
+  // a novel error format still surfaces its root line rather than a blind tail.
+  if (firstError === -1) {
+    const generic = /\b(error|failed|fatal|cannot|unexpected)\b/i;
+    for (let i = 0; i < lines.length; i++) {
+      if (generic.test(lines[i])) { firstError = i; break; }
+    }
+  }
+  if (firstError === -1) {
+    // Still nothing recognisable — return the tail, clearly labelled so the
+    // caller knows the root cause wasn't auto-located.
+    return '(no error marker matched; showing tail of build log)\n' +
+      lines.slice(-30).join('\n');
+  }
   const start = Math.max(0, firstError - 2);
   const end = Math.min(lines.length, firstError + 25);
   return lines.slice(start, end).join('\n');

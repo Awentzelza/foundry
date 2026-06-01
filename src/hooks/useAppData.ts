@@ -32,6 +32,12 @@ interface UseAppDataResult<T> {
   persistent: boolean;
   /** Mark this (appId, key) as archived. Never hard-deletes. */
   archive: () => Promise<void>;
+  /**
+   * Non-null when the most recent persist failed (network/RLS/db error).
+   * Cleared automatically on the next successful write. Lets an app surface a
+   * "not saved" state instead of silently losing the edit.
+   */
+  syncError: string | null;
 }
 
 function rowId(appId: string, key: string): string {
@@ -46,6 +52,7 @@ export function useAppData<T>(
   const [value, setLocal] = useState<T>(initialValue);
   const [loading, setLoading] = useState<boolean>(Boolean(supabase));
   const [ready, setReady] = useState<boolean>(!supabase);
+  const [syncError, setSyncError] = useState<string | null>(null);
   const initialRef = useRef(initialValue);
 
   // Write queue. `pending` holds the most recent value still to be persisted
@@ -107,12 +114,23 @@ export function useAppData<T>(
           status: 'active',
         };
         try {
-          await supabase!
+          // Supabase reports row-level/db failures via the returned `error`,
+          // not by throwing — check both.
+          const { error } = await supabase!
             .from('foundry_app_data')
             .upsert(row, { onConflict: 'id' });
-        } catch {
-          // Swallow: keep draining. A transient failure shouldn't wedge the
-          // queue; the next setValue re-arms `pending` and we try again.
+          if (error) throw error;
+          // Success: clear any prior failure signal.
+          setSyncError(null);
+        } catch (err) {
+          // Don't wedge the queue and don't re-arm `pending` (that would hot-loop
+          // on a persistent failure) — a later setValue retries. But surface it:
+          // log in dev and expose a signal so the app can show a "not saved" state.
+          const message = err instanceof Error ? err.message : 'Failed to save';
+          if (import.meta.env.DEV) {
+            console.error(`[useAppData] persist failed for ${rowId(appId, key)}:`, err);
+          }
+          setSyncError(message);
         }
       }
     } finally {
@@ -142,5 +160,5 @@ export function useAppData<T>(
       .eq('id', rowId(appId, key));
   }, [appId, key]);
 
-  return { value, setValue, loading, ready, persistent: !!supabase, archive };
+  return { value, setValue, loading, ready, persistent: !!supabase, archive, syncError };
 }
