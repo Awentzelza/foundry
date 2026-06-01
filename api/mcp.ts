@@ -48,6 +48,25 @@ const SERVER_INSTRUCTIONS =
   'Read https://github.com/Awentzelza/foundry/blob/main/CLAUDE.md for the full ' +
   'component contract before calling push_app.';
 
+const COMPONENT_EXAMPLE = `import { useCallback } from 'react';
+import { IonButton } from '@ionic/react';
+import { useAppData } from '@/hooks/useAppData';
+
+interface Counter { n: number }
+
+export default function CounterApp() {
+  const { value, setValue, ready } = useAppData<Counter>('counter', 'state', { n: 0 });
+  const inc = useCallback(() => setValue({ n: value.n + 1 }), [value, setValue]);
+  if (!ready) return null;
+  return (
+    <div style={{ padding: 32, textAlign: 'center' }}>
+      <div style={{ fontFamily: 'var(--foundry-font-display)', fontSize: 64 }}>{value.n}</div>
+      <IonButton onClick={inc}>+1</IonButton>
+    </div>
+  );
+}
+`;
+
 interface JsonRpcRequest {
   jsonrpc: '2.0';
   id?: number | string | null;
@@ -89,20 +108,8 @@ const TOOLS = [
       '     NEVER as `const [data, setData] = useAppData(...)` — that will fail.\n' +
       '     Available fields: { value, setValue, loading, ready, persistent, archive }.\n' +
       '  5. No `any`, no `@ts-ignore`, no `localStorage`/`sessionStorage`.\n\n' +
-      'Minimal example of a valid Foundry app:\n' +
-      "  import { useCallback } from 'react';\n" +
-      "  import { IonButton } from '@ionic/react';\n" +
-      "  import { useAppData } from '@/hooks/useAppData';\n" +
-      '  interface Counter { n: number }\n' +
-      '  export default function CounterApp() {\n' +
-      "    const { value, setValue, ready } = useAppData<Counter>('counter', 'state', { n: 0 });\n" +
-      '    const inc = useCallback(() => setValue({ n: value.n + 1 }), [value, setValue]);\n' +
-      '    if (!ready) return null;\n' +
-      '    return <div style={{ padding: 32, textAlign: "center" }}>\n' +
-      "      <div style={{ fontFamily: 'var(--foundry-font-display)', fontSize: 64 }}>{value.n}</div>\n" +
-      '      <IonButton onClick={inc}>+1</IonButton>\n' +
-      '    </div>;\n' +
-      '  }',
+      'Call the `get_component_example` tool for a full, valid example ' +
+      'component you can copy and adapt.',
     inputSchema: {
       type: 'object',
       required: ['id', 'name', 'icon', 'componentCode'],
@@ -140,6 +147,15 @@ const TOOLS = [
         },
       },
     },
+  },
+  {
+    name: 'get_component_example',
+    description:
+      'Return a full, valid Foundry app component as a copy-paste starting ' +
+      'point. Call this once when you need a concrete reminder of the ' +
+      'component contract (allowed imports, useAppData object-destructure, ' +
+      'JSX shape). Takes no arguments.',
+    inputSchema: { type: 'object', properties: {} },
   },
   {
     name: 'archive_app',
@@ -234,6 +250,9 @@ async function handleToolCall(name: string, args: Record<string, unknown>, e: En
     case 'push_app': {
       const result = await pushApp(args as unknown as PushAppInput, e);
       return toolContent(result, !result.success);
+    }
+    case 'get_component_example': {
+      return toolContent({ example: COMPONENT_EXAMPLE });
     }
     case 'archive_app': {
       const id = String(args.id ?? '');
