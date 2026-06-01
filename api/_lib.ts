@@ -47,9 +47,25 @@ export function requireAuth(req: Request, e: Env): Response | null {
   if (!e.FOUNDRY_PUSH_SECRET) {
     return json({ error: 'FOUNDRY_PUSH_SECRET not configured' }, { status: 500 });
   }
+
+  // Accept the secret either way:
+  //   - Authorization: Bearer <secret>           (preferred — header)
+  //   - ?api_key=<secret>  /  ?token=<secret>   (fallback — query string, for
+  //     clients like claude.ai's custom connector UI which don't expose a
+  //     headers field).
   const header = req.headers.get('authorization') || '';
-  const token = header.replace(/^Bearer\s+/i, '');
-  if (token !== e.FOUNDRY_PUSH_SECRET) {
+  const headerToken = header.replace(/^Bearer\s+/i, '');
+
+  let queryToken = '';
+  try {
+    const url = new URL(req.url);
+    queryToken = url.searchParams.get('api_key') || url.searchParams.get('token') || '';
+  } catch {
+    queryToken = '';
+  }
+
+  const provided = headerToken || queryToken;
+  if (provided !== e.FOUNDRY_PUSH_SECRET) {
     return json({ error: 'Unauthorized' }, { status: 401 });
   }
   return null;
