@@ -6,7 +6,7 @@
  * what it means to "push an app" or "archive an app."
  */
 import { commitFileToGitHub, getFileFromGitHub, type Env, isValidId, sb } from './_lib';
-import { validatePushCode, type ValidationIssue } from './_validate';
+import { validatePushCode, validateBrandStyles, type ValidationIssue } from './_validate';
 import {
   checkDeployByUid,
   checkDeployStatus,
@@ -24,6 +24,12 @@ export interface PushAppInput {
   icon: string;
   route?: string;
   componentCode: string;
+  /**
+   * Optional per-app CSS module. Committed to src/apps/<id>/styles.module.css.
+   * The component imports it (`import s from './styles.module.css'`) and uses
+   * the hashed class names. Scanned by the brand check before commit.
+   */
+  styles?: string;
   needsPersistence?: boolean;
   /**
    * Default false: return immediately after the commit with the deploymentUid
@@ -124,6 +130,24 @@ export async function pushApp(
     };
   }
 
+  // Per-app stylesheet brand check (consume tokens, never redefine them).
+  const styleCheck =
+    input.styles && input.styles.trim()
+      ? validateBrandStyles(input.styles)
+      : { issues: [], warnings: [] };
+  if (styleCheck.issues.length) {
+    return {
+      success: false,
+      status: 400,
+      phase: 'validation',
+      error:
+        `styles failed ${styleCheck.issues.length} brand check(s). ` +
+        'Fix the issues below and retry. No commit was made.',
+      issues: styleCheck.issues,
+      warnings: styleCheck.warnings.length ? styleCheck.warnings : undefined,
+    };
+  }
+
   const { id, name, description = '', icon, componentCode, needsPersistence = false } = input;
   const route = input.route ?? id;
   const shouldWait = input.waitForDeploy === true;
@@ -157,6 +181,18 @@ export async function pushApp(
       return { success: false, status: file.status, error: file.error };
     }
     commit = { sha: file.sha };
+
+    if (input.styles && input.styles.trim()) {
+      const styleFile = await commitFileToGitHub(env, {
+        path: `src/apps/${id}/styles.module.css`,
+        content: input.styles,
+        message: `Foundry: push styles for ${id}`,
+      });
+      if (!styleFile.ok) {
+        return { success: false, status: styleFile.status, error: styleFile.error };
+      }
+      commit = { sha: styleFile.sha };
+    }
 
     const regen = await regenerateRegistry(env);
     if (!regen.ok) commit = { ...commit, skipped: regen.error };
@@ -201,6 +237,7 @@ export async function pushApp(
     }
   }
 
+  const allWarnings = [...codeCheck.warnings, ...styleCheck.warnings];
   return {
     success: true,
     id,
@@ -208,7 +245,7 @@ export async function pushApp(
     commit,
     supabase: upsert.error ? { error: upsert.error.message } : { ok: true },
     deploy,
-    warnings: codeCheck.warnings.length ? codeCheck.warnings : undefined,
+    warnings: allWarnings.length ? allWarnings : undefined,
   };
 }
 

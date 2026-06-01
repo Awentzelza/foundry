@@ -89,6 +89,73 @@ export default function TallyApp() {
 }
 `;
 
+/**
+ * CSS-module example: per-app scoped styling. `component` imports the module
+ * and uses hashed class names; `styles` is committed to styles.module.css and
+ * is brand-checked (tokens only, brand fonts, no token redefinition). Note the
+ * Ionic component is restyled via its OWN vars set to --foundry-* tokens.
+ */
+const CSS_MODULE_EXAMPLE = {
+  component: `import { useCallback } from 'react';
+import { IonButton } from '@ionic/react';
+import { useAppData } from '@/hooks/useAppData';
+import s from './styles.module.css';
+
+interface Tally { count: number }
+
+export default function TallyApp() {
+  const { value, setValue, ready } = useAppData<Tally>('example', 'state', { count: 0 });
+  const add = useCallback(() => setValue({ count: value.count + 1 }), [value, setValue]);
+  if (!ready) return null;
+  return (
+    <div className={s.card}>
+      <div className={s.eyebrow}>Records</div>
+      <div className={s.value}>{value.count}</div>
+      <div className={s.note}>Entries recorded.</div>
+      <IonButton className={s.add} fill="outline" onClick={add}>Add entry</IonButton>
+    </div>
+  );
+}
+`,
+  styles: `.card {
+  background: var(--foundry-card);
+  border: 1px solid var(--foundry-border);
+  border-radius: var(--foundry-radius-md);
+  padding: var(--space-5);
+  max-width: 420px;
+  margin: var(--space-5) auto;
+}
+.eyebrow {
+  font-family: var(--foundry-font-mono);
+  font-size: 10px;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: var(--foundry-text-subtle);
+}
+.value {
+  font-family: var(--foundry-font-display);
+  font-size: 40px;
+  font-weight: 700;
+  color: var(--foundry-text);
+  letter-spacing: -0.02em;
+  margin-top: var(--space-1);
+}
+.note {
+  font-family: var(--foundry-font-body);
+  font-size: 14px;
+  color: var(--foundry-text-muted);
+  margin-top: var(--space-1);
+}
+/* Restyle the Ionic component via its own vars, sourced from brand tokens. */
+.add {
+  --background: transparent;
+  --color: var(--foundry-ember);
+  --border-color: var(--foundry-ember);
+  margin-top: var(--space-4);
+}
+`,
+};
+
 interface JsonRpcRequest {
   jsonrpc: '2.0';
   id?: number | string | null;
@@ -136,9 +203,18 @@ const TOOLS = [
       '  6. BRAND (enforced): no emoji; no exclamation points in copy; ' +
       'colours ONLY via var(--foundry-*) tokens (Ember is the sole accent, ' +
       'Mark Gold is signet-only); fonts ONLY via var(--foundry-font-*). ' +
-      'Off-brand pushes are rejected. Voice is a calm steward, not a coach.\n\n' +
+      'Off-brand pushes are rejected. Voice is a calm steward, not a coach.\n' +
+      '  7. STYLING (optional): pass a per-app CSS module in `styles`. It is ' +
+      'committed to src/apps/<id>/styles.module.css; import it in the ' +
+      "component as `import s from './styles.module.css'` and use s.<class>. " +
+      'Vite hashes the class names so an app cannot leak into the shell or ' +
+      'other apps. Restyle Ionic components via their own CSS vars ' +
+      '(--background, --color, --border-color, ...) set to var(--foundry-*) ' +
+      'tokens. The stylesheet is brand-checked too: tokens only (no raw ' +
+      'hex/rgb/hsl), brand fonts only, and it must NOT redefine any ' +
+      '--foundry-*/--ion-* token.\n\n' +
       'Call the `get_component_example` tool for a full, brand-valid ' +
-      'example component you can copy and adapt.',
+      'example (component + CSS module) you can copy and adapt.',
     inputSchema: {
       type: 'object',
       required: ['id', 'name', 'icon', 'componentCode'],
@@ -150,7 +226,7 @@ const TOOLS = [
         },
         name: { type: 'string', description: 'Display name (Title Case).' },
         description: { type: 'string', description: 'One-line tile description.' },
-        icon: { type: 'string', description: 'A single emoji.' },
+        icon: { type: 'string', description: 'Short label; not shown on the dashboard (display strips it). Do not use emoji.' },
         route: {
           type: 'string',
           description: 'Path under /app/. Defaults to id.',
@@ -161,6 +237,15 @@ const TOOLS = [
             'Full .tsx module source. See the hard rules and example in the ' +
             'tool description. The code is validated before commit and the ' +
             'build verdict is returned to you.',
+        },
+        styles: {
+          type: 'string',
+          description:
+            'Optional per-app CSS module (committed to ' +
+            'src/apps/<id>/styles.module.css). Import it in the component as ' +
+            "`import s from './styles.module.css'`. Tokens only (no raw " +
+            'hex/rgb/hsl), brand fonts only, and must not redefine any ' +
+            '--foundry-*/--ion-* token. Brand-checked before commit.',
         },
         needsPersistence: {
           type: 'boolean',
@@ -182,10 +267,11 @@ const TOOLS = [
   {
     name: 'get_component_example',
     description:
-      'Return a full, valid Foundry app component as a copy-paste starting ' +
-      'point. Call this once when you need a concrete reminder of the ' +
-      'component contract (allowed imports, useAppData object-destructure, ' +
-      'JSX shape). Takes no arguments.',
+      'Return full, valid Foundry examples as copy-paste starting points: a ' +
+      'minimal inline-styled component, and a CSS-module variant showing ' +
+      'per-app scoped styling (styles.module.css + Ionic var customization). ' +
+      'Call this once when you need a concrete reminder of the component or ' +
+      'styling contract. Takes no arguments.',
     inputSchema: { type: 'object', properties: {} },
   },
   {
@@ -303,7 +389,7 @@ async function handleToolCall(name: string, args: Record<string, unknown>, e: En
       return toolContent(result, !result.success);
     }
     case 'get_component_example': {
-      return toolContent({ example: COMPONENT_EXAMPLE });
+      return toolContent({ example: COMPONENT_EXAMPLE, cssModuleExample: CSS_MODULE_EXAMPLE });
     }
     case 'archive_app': {
       const id = String(args.id ?? '');

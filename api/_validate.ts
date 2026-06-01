@@ -72,6 +72,8 @@ export function validatePushCode(code: string): ValidationResult {
   // --- Allowed imports only ---
   const imports = extractImports(code);
   for (const src of imports) {
+    // A component may import its own per-app CSS module for scoped styling.
+    if (src === './styles.module.css') continue;
     if (!ALLOWED_IMPORTS.has(src)) {
       issues.push({
         rule: 'forbidden-import',
@@ -276,6 +278,95 @@ export function validateBrand(code: string): {
       rule: 'brand-stillness',
       message: 'Surfaces and the mark stay still — avoid continuous animation.',
     });
+  }
+
+  return { issues, warnings };
+}
+
+
+/**
+ * Brand check for a per-app CSS module (src/apps/<id>/styles.module.css).
+ *
+ * Same palette/font discipline as component code, plus the rule that keeps the
+ * MFE model on-brand: apps may CONSUME the theme tokens (var(--foundry-*)) and
+ * set component-level Ionic vars (--background, --color, ...), but must NEVER
+ * REDEFINE a --foundry-* / --ion-* token — that is what would let one app
+ * drift the whole design language.
+ */
+export function validateBrandStyles(css: string): {
+  issues: ValidationIssue[];
+  warnings: ValidationIssue[];
+} {
+  const issues: ValidationIssue[] = [];
+  const warnings: ValidationIssue[] = [];
+
+  // HARD — no emoji.
+  if (/\p{Extended_Pictographic}/u.test(css)) {
+    issues.push({
+      rule: 'brand-no-emoji',
+      message: 'No emoji in stylesheets. Foundry uses typographic marks and the signet.',
+    });
+  }
+
+  // HARD — off-palette hex colours.
+  const badHex = new Set<string>();
+  for (const m of css.matchAll(/#[0-9a-fA-F]{3,8}\b/g)) {
+    if (!PALETTE_HEX.has(m[0].toLowerCase())) badHex.add(m[0]);
+  }
+  if (badHex.size > 0) {
+    issues.push({
+      rule: 'brand-off-palette-color',
+      message: `Off-palette colour(s) in CSS: ${[...badHex].join(', ')}.`,
+      hint: 'Use a var(--foundry-*) token. Ember is the only accent; Mark Gold is signet-only.',
+    });
+  }
+
+  // HARD — raw colour functions. Colours come from tokens, not rgb()/hsl().
+  const colorFn = css.match(/\b(rgba?|hsla?)\s*\(/i);
+  if (colorFn) {
+    issues.push({
+      rule: 'brand-raw-color-fn',
+      message: `Raw colour function "${colorFn[1]}()" in CSS.`,
+      hint: 'Source colours from var(--foundry-*) tokens, not rgb()/rgba()/hsl().',
+    });
+  }
+
+  // HARD — brand fonts only.
+  for (const m of css.matchAll(/font-family\s*:\s*([^;}\n]+)/gi)) {
+    const val = m[1].trim();
+    const ok =
+      /var\(--foundry-font/.test(val) ||
+      /Fraunces|JetBrains Mono|EB Garamond/.test(val) ||
+      /^inherit$/.test(val);
+    if (!ok) {
+      issues.push({
+        rule: 'brand-font',
+        message: `Non-brand font-family in CSS: "${val}".`,
+        hint: 'Use var(--foundry-font-display | -mono | -body).',
+      });
+    }
+  }
+
+  // HARD — do not redefine theme tokens. Apps consume them; component-level
+  // Ionic vars (--background, --color, --padding, --border-color, ...) are fine.
+  const redef = css.match(/(?:^|[\s;{])(--(?:foundry|ion)-[\w-]+)\s*:/);
+  if (redef) {
+    issues.push({
+      rule: 'brand-token-redefinition',
+      message: `Stylesheet redefines a theme token (${redef[1]}). Apps consume --foundry-*/--ion-* tokens, never redefine them.`,
+      hint: 'To restyle an Ionic component, set its own vars (e.g. --background, --color) to a var(--foundry-*) token instead.',
+    });
+  }
+
+  // SOFT — gradients, glow, continuous animation.
+  if (/(?:linear|radial)-gradient\s*\(/.test(css)) {
+    warnings.push({ rule: 'brand-no-gradient', message: 'Gradients are off-brand — Foundry surfaces are flat.' });
+  }
+  if (/box-shadow\s*:/.test(css)) {
+    warnings.push({ rule: 'brand-no-glow', message: 'Avoid box-shadow / glow. Use a hairline border instead.' });
+  }
+  if (/@keyframes|animation\s*:/.test(css)) {
+    warnings.push({ rule: 'brand-stillness', message: 'Surfaces and the mark stay still — avoid continuous animation.' });
   }
 
   return { issues, warnings };

@@ -46,15 +46,17 @@ export default function AppHost() {
         </IonToolbar>
       </IonHeader>
       <IonContent fullscreen>
-        <Suspense
-          fallback={
-            <div style={{ display: 'grid', placeItems: 'center', padding: 64 }}>
-              <IonSpinner name="crescent" />
-            </div>
-          }
-        >
-          <LazyApp />
-        </Suspense>
+        <div className="foundry-app-scope" data-app={app.meta.id}>
+          <Suspense
+            fallback={
+              <div style={{ display: 'grid', placeItems: 'center', padding: 64 }}>
+                <IonSpinner name="crescent" />
+              </div>
+            }
+          >
+            <LazyApp />
+          </Suspense>
+        </div>
       </IonContent>
     </IonPage>
   );

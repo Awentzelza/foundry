@@ -88,6 +88,34 @@ export default function NotesApp() {
 }
 ```
 
+### Per-app styling (optional, MFE-scoped)
+
+Apps may ship their own stylesheet for structure/layout while branding stays
+consistent — the hybrid model (the lesson from Ketelo's federated MFE, which
+shares one token layer for consistency).
+
+- Pass a CSS module as the `styles` arg to `push_app`. It is committed to
+  `src/apps/<id>/styles.module.css`. Import it in the component as
+  `import s from './styles.module.css'` and use the hashed class names
+  (`<div className={s.card}>`). Vite hashes the classes, so an app's CSS can
+  never leak into the shell or another app — true MFE isolation.
+- The shared `--foundry-*` token layer (`src/theme/variables.css`, declared on
+  `:root`) is the branding spine. CSS custom properties inherit through Ionic's
+  shadow DOM, so `var(--foundry-*)` resolves inside app markup and inside Ionic
+  component parts. Apps **consume** these tokens.
+- Restyle an Ionic component the Ionic way: set its own CSS vars
+  (`--background`, `--color`, `--border-color`, `--padding`, ...) to a
+  `var(--foundry-*)` token. Use `::part()` for finer control.
+- The stylesheet is **brand-checked** at push time (same gate as component
+  code): tokens only (no raw hex/rgb/hsl), brand fonts only, no emoji; and it
+  must **never redefine** a `--foundry-*` / `--ion-*` token (that would drift
+  the whole design language). Gradients/glow/animation are soft warnings.
+- The app mounts inside `<div className="foundry-app-scope" data-app="<id>">`
+  (AppHost), giving each app a stable `[data-app]` root.
+
+Call `get_component_example` — it returns both a minimal inline-styled
+component and a CSS-module variant (`cssModuleExample: { component, styles }`).
+
 ## Foundry MCP server (preferred interface)
 
 Foundry exposes an MCP server at `POST /api/mcp` so any Claude client can
@@ -98,7 +126,7 @@ Tools:
 
 | Tool | Args | Effect |
 | --- | --- | --- |
-| `push_app` | `id, name, description?, icon, route?, componentCode, needsPersistence?` | Commits `src/apps/<id>/index.tsx` to GitHub, regenerates `src/apps/registry.ts`, upserts `foundry_apps` row. Vercel redeploys ~30-60s later. |
+| `push_app` | `id, name, description?, icon, route?, componentCode, styles?, needsPersistence?` | Commits `src/apps/<id>/index.tsx` to GitHub, regenerates `src/apps/registry.ts`, upserts `foundry_apps` row. Vercel redeploys ~30-60s later. |
 | `archive_app` | `id` | Sets `status='archived'`. Never deletes. |
 | `list_apps` | `includeArchived?` | Returns active apps (or all). |
 | `get_app` | `id` | Returns one row. |
