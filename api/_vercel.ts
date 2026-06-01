@@ -39,6 +39,39 @@ function configured(e: Env): boolean {
   return Boolean(e.VERCEL_TOKEN && e.VERCEL_PROJECT_ID && e.VERCEL_TEAM_ID);
 }
 
+/**
+ * One-shot status lookup for the deployment matching `commitSha`. Doesn't
+ * loop — call repeatedly if you need to poll. Use when push_app's internal
+ * wait timed out.
+ */
+export async function checkDeployStatus(
+  e: Env,
+  commitSha: string,
+): Promise<DeployVerdict> {
+  if (!configured(e)) return { available: false };
+  const deployment = await findDeploymentBySha(e, commitSha);
+  if (!deployment) return { available: true, status: 'timeout' };
+  if (deployment.state === 'READY') {
+    return {
+      available: true,
+      status: 'ready',
+      deploymentUid: deployment.uid,
+      url: deployment.url ? `https://${deployment.url}` : undefined,
+    };
+  }
+  if (deployment.state === 'ERROR' || deployment.state === 'CANCELED') {
+    const log = await getBuildErrorLog(e, deployment.uid);
+    return {
+      available: true,
+      status: 'error',
+      deploymentUid: deployment.uid,
+      errorLog: extractRelevantError(log),
+    };
+  }
+  // Still building (INITIALIZING / QUEUED / BUILDING)
+  return { available: true, status: 'timeout', deploymentUid: deployment.uid };
+}
+
 async function vfetch(e: Env, path: string): Promise<Response> {
   return fetch(`https://api.vercel.com${path}`, {
     headers: {
@@ -114,7 +147,7 @@ async function getBuildErrorLog(e: Env, uid: string): Promise<string> {
 export async function waitForDeploy(
   e: Env,
   commitSha: string,
-  timeoutMs = 90_000,
+  timeoutMs = 50_000, // stay under the 60s Vercel Node function limit
 ): Promise<DeployVerdict> {
   if (!configured(e)) return { available: false };
 

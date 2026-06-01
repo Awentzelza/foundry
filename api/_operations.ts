@@ -7,7 +7,9 @@
  */
 import { commitFileToGitHub, type Env, isValidId, sb } from './_lib';
 import { validatePushCode, type ValidationIssue } from './_validate';
-import { waitForDeploy, type DeployVerdict } from './_vercel';
+import { checkDeployStatus, waitForDeploy, type DeployVerdict } from './_vercel';
+
+export { checkDeployStatus };
 
 export interface PushAppInput {
   id: string;

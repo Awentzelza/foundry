@@ -25,9 +25,21 @@
  *   - get_app(id)
  */
 import { env, type Env, requireAuth } from './_lib';
-import { archiveApp, getApp, listApps, pushApp, type PushAppInput } from './_operations';
+import {
+  archiveApp,
+  checkDeployStatus,
+  getApp,
+  listApps,
+  pushApp,
+  type PushAppInput,
+} from './_operations';
 
-export const config = { runtime: 'edge' };
+// Node runtime (not Edge) so we have a 60s function budget — long enough to
+// wait for a Vercel build to finish and return the verdict inline.
+export const config = {
+  runtime: 'nodejs',
+  maxDuration: 60,
+};
 
 const PROTOCOL_VERSION = '2024-11-05';
 const SERVER_INFO = { name: 'foundry', version: '0.2.0' };
@@ -167,6 +179,24 @@ const TOOLS = [
       properties: { id: { type: 'string' } },
     },
   },
+  {
+    name: 'verify_deploy',
+    description:
+      'Check the Vercel deployment status for a specific commit. Use this ' +
+      'when push_app returned `deploy.status === "timeout"` because the ' +
+      "build took longer than push_app's internal wait window. Returns " +
+      "`ready` (live), `error` (with errorLog), or `timeout` (still building).",
+    inputSchema: {
+      type: 'object',
+      required: ['commitSha'],
+      properties: {
+        commitSha: {
+          type: 'string',
+          description: 'The commit SHA returned by push_app.',
+        },
+      },
+    },
+  },
 ] as const;
 
 function rpcResult(id: JsonRpcRequest['id'], result: unknown): JsonRpcSuccess {
@@ -209,6 +239,14 @@ async function handleToolCall(name: string, args: Record<string, unknown>, e: En
       const id = String(args.id ?? '');
       const result = await getApp(id, e);
       return toolContent(result, !result.success);
+    }
+    case 'verify_deploy': {
+      const commitSha = String(args.commitSha ?? '');
+      if (!commitSha) {
+        return toolContent({ error: 'Missing `commitSha`' }, true);
+      }
+      const result = await checkDeployStatus(e, commitSha);
+      return toolContent(result, result.status === 'error');
     }
     default:
       throw new Error(`Unknown tool: ${name}`);
