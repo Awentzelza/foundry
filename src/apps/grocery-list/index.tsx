@@ -19,7 +19,6 @@ import {
   IonReorder,
   IonReorderGroup,
   IonText,
-  IonToolbar,
   type ItemReorderEventDetail,
 } from '@ionic/react';
 import { add, checkmarkCircle, ellipseOutline, trashOutline } from 'ionicons/icons';
@@ -87,26 +86,28 @@ export default function GroceryListApp() {
   return (
     <div style={{ padding: '16px 0 32px' }}>
       <div style={{ padding: '0 16px 12px' }}>
-        <IonToolbar
+        <div
           style={{
-            '--background': 'var(--foundry-bg-card)',
+            display: 'flex',
+            alignItems: 'center',
+            gap: 8,
+            background: 'var(--foundry-card)',
             borderRadius: 'var(--foundry-radius-md)',
             border: '1px solid var(--foundry-border)',
-            padding: '4px 8px',
+            padding: '4px 8px 4px 12px',
           }}
         >
           <IonInput
             value={draft}
-            placeholder="Add item…"
+            placeholder="Add item"
             onIonInput={(e) => setDraft((e.target as HTMLIonInputElement).value as string)}
             onKeyDown={(e) => {
               if (e.key === 'Enter') void addItem();
             }}
             aria-label="New grocery item"
-            style={{ '--padding-start': '4px' }}
+            style={{ flex: 1, '--padding-start': '0' }}
           />
           <IonButton
-            slot="end"
             fill="solid"
             color="primary"
             disabled={!draft.trim()}
@@ -115,7 +116,7 @@ export default function GroceryListApp() {
           >
             <IonIcon slot="icon-only" icon={add} />
           </IonButton>
-        </IonToolbar>
+        </div>
       </div>
 
       {!ready ? null : items.length === 0 ? (

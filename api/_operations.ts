@@ -35,6 +35,8 @@ export interface PushAppResult {
   commit: { sha?: string; skipped?: string };
   supabase: { ok: true } | { error: string };
   deploy?: DeployVerdict;
+  /** Non-blocking brand advisories from the pre-flight check. */
+  warnings?: ValidationIssue[];
 }
 
 export interface PushAppValidationError {
@@ -42,6 +44,7 @@ export interface PushAppValidationError {
   status: 400;
   error: string;
   issues: ValidationIssue[];
+  warnings?: ValidationIssue[];
   phase: 'validation';
 }
 
@@ -111,6 +114,7 @@ export async function pushApp(
         `componentCode failed ${codeCheck.issues.length} pre-flight check(s). ` +
         'Fix the issues below and retry. No commit was made.',
       issues: codeCheck.issues,
+      warnings: codeCheck.warnings.length ? codeCheck.warnings : undefined,
     };
   }
 
@@ -189,6 +193,7 @@ export async function pushApp(
     commit,
     supabase: upsert.error ? { error: upsert.error.message } : { ok: true },
     deploy,
+    warnings: codeCheck.warnings.length ? codeCheck.warnings : undefined,
   };
 }
 

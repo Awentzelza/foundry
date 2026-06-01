@@ -21,6 +21,8 @@ export interface ValidationIssue {
 export interface ValidationResult {
   ok: boolean;
   issues: ValidationIssue[];
+  /** Non-blocking brand advisories. The push still proceeds. */
+  warnings: ValidationIssue[];
 }
 
 const ALLOWED_IMPORTS = new Set([
@@ -167,5 +169,114 @@ export function validatePushCode(code: string): ValidationResult {
     });
   }
 
-  return { ok: issues.length === 0, issues };
+  // --- Brand image check (Brand Book). Hard rules block; soft rules warn. ---
+  const brand = validateBrand(code);
+  for (const issue of brand.issues) issues.push(issue);
+
+  return { ok: issues.length === 0, issues, warnings: brand.warnings };
+}
+
+
+/**
+ * Foundry brand image check (Brand Book).
+ *
+ * HARD rules (block the push): no emoji; no off-palette hex colours; brand
+ * fonts only; no exclamation points in copy. SOFT rules (warn, non-blocking):
+ * gradients, glow/shadow, continuous animation.
+ */
+const PALETTE_HEX = new Set<string>([
+  '#111010', '#1a1815', '#211f1b', '#2e2b27', '#3d3a34',
+  '#f0ede8', '#a09b93', '#6b6560',
+  '#e8742c', '#f08540', '#c45a18', '#c8a45a', '#2a1a10',
+]);
+
+function stringLiteralContents(code: string): string[] {
+  const out: string[] = [];
+  const patterns = [/'(?:\\.|[^'\\])*'/g, /"(?:\\.|[^"\\])*"/g, /`(?:\\.|[^`\\])*`/g];
+  for (const re of patterns) {
+    for (const m of code.matchAll(re)) out.push(m[0].slice(1, -1));
+  }
+  return out;
+}
+
+export function validateBrand(code: string): {
+  issues: ValidationIssue[];
+  warnings: ValidationIssue[];
+} {
+  const issues: ValidationIssue[] = [];
+  const warnings: ValidationIssue[] = [];
+
+  // HARD — no emoji.
+  if (/\p{Extended_Pictographic}/u.test(code)) {
+    issues.push({
+      rule: 'brand-no-emoji',
+      message: 'No emoji. Foundry uses typographic marks and the signet, never emoji.',
+      hint: 'Remove the emoji; use a hallmark label or a Fraunces letterform instead.',
+    });
+  }
+
+  // HARD — off-palette hex colours.
+  const badHex = new Set<string>();
+  for (const m of code.matchAll(/#[0-9a-fA-F]{3,8}\b/g)) {
+    if (!PALETTE_HEX.has(m[0].toLowerCase())) badHex.add(m[0]);
+  }
+  if (badHex.size > 0) {
+    issues.push({
+      rule: 'brand-off-palette-color',
+      message: `Off-palette colour(s): ${[...badHex].join(', ')}.`,
+      hint:
+        'Use a var(--foundry-*) token (var(--foundry-bg|card|elevated|border|' +
+        'text|text-muted|text-subtle|ember)). Ember is the only accent; ' +
+        'Mark Gold is reserved for the signet.',
+    });
+  }
+
+  // HARD — brand fonts only.
+  for (const m of code.matchAll(/font-?[fF]amily\s*:\s*(['"`])([^'"`]*)\1/g)) {
+    const val = m[2];
+    const ok =
+      /var\(--foundry-font/.test(val) ||
+      /Fraunces|JetBrains Mono|EB Garamond/.test(val);
+    if (!ok) {
+      issues.push({
+        rule: 'brand-font',
+        message: `Non-brand font-family: "${val}".`,
+        hint: 'Use var(--foundry-font-display), var(--foundry-font-mono), or var(--foundry-font-body).',
+      });
+    }
+  }
+
+  // HARD — no exclamation points in user-facing copy.
+  for (const lit of stringLiteralContents(code)) {
+    if (lit.includes('!') && !/var\(|import|https?:|<svg|xmlns|!important/i.test(lit)) {
+      issues.push({
+        rule: 'brand-no-exclamation',
+        message: `Exclamation point in copy: "${lit.trim().slice(0, 48)}".`,
+        hint: 'Foundry speaks as a steward — state facts, no exclamation points.',
+      });
+      break;
+    }
+  }
+
+  // SOFT — gradients, glow, continuous animation.
+  if (/(?:linear|radial)-gradient\s*\(/.test(code)) {
+    warnings.push({
+      rule: 'brand-no-gradient',
+      message: 'Gradients are off-brand — Foundry surfaces are flat.',
+    });
+  }
+  if (/box-?[sS]hadow\s*:/.test(code)) {
+    warnings.push({
+      rule: 'brand-no-glow',
+      message: 'Avoid box-shadow / glow. Use a hairline border instead.',
+    });
+  }
+  if (/@keyframes|animation\s*:/.test(code)) {
+    warnings.push({
+      rule: 'brand-stillness',
+      message: 'Surfaces and the mark stay still — avoid continuous animation.',
+    });
+  }
+
+  return { issues, warnings };
 }

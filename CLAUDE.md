@@ -260,3 +260,26 @@ or fetch `/api/health` for config and read the registry from the repo.
 - Path alias `@/` resolves to `src/`.
 - Keep apps self-contained — no cross-imports between `src/apps/<a>` and
   `src/apps/<b>`.
+
+## Brand image (enforced at push time)
+
+Foundry follows the Brand Book: a private, editorial "signet" identity, not a
+startup SaaS look. Every new app must pass the brand check in
+`api/_validate.ts`. **Hard rules reject the push:**
+
+- **No emoji.** Use typographic marks/labels, never emoji.
+- **No exclamation points in copy.** Foundry speaks as a calm steward that
+  states facts — never a coach. ("Recorded." not "Great job!")
+- **Colours only via `var(--foundry-*)` tokens.** No raw hex outside the
+  palette. Ember (`--foundry-ember`) is the *only* accent; Mark Gold
+  (`--foundry-mark-gold`) is reserved for the signet/wordmark and never used
+  in UI.
+- **Fonts only via `var(--foundry-font-*)`** — Fraunces (display), JetBrains
+  Mono (labels, uppercase + tracked), EB Garamond (body).
+
+**Soft rules warn** (push still succeeds): gradients, box-shadow/glow, and
+continuous animation. Surfaces are flat; the mark stays still.
+
+Card anatomy: a hallmark label (mono, uppercase) → a primary value (Fraunces)
+→ a supporting line (EB Garamond). No celebration, no badges, no streaks, no
+gamification. Call `get_component_example` for a compliant starting point.

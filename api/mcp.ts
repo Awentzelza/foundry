@@ -52,16 +52,37 @@ const COMPONENT_EXAMPLE = `import { useCallback } from 'react';
 import { IonButton } from '@ionic/react';
 import { useAppData } from '@/hooks/useAppData';
 
-interface Counter { n: number }
+interface Tally { count: number }
 
-export default function CounterApp() {
-  const { value, setValue, ready } = useAppData<Counter>('counter', 'state', { n: 0 });
-  const inc = useCallback(() => setValue({ n: value.n + 1 }), [value, setValue]);
+export default function TallyApp() {
+  const { value, setValue, ready } = useAppData<Tally>('example', 'state', { count: 0 });
+  const add = useCallback(() => setValue({ count: value.count + 1 }), [value, setValue]);
   if (!ready) return null;
   return (
-    <div style={{ padding: 32, textAlign: 'center' }}>
-      <div style={{ fontFamily: 'var(--foundry-font-display)', fontSize: 64 }}>{value.n}</div>
-      <IonButton onClick={inc}>+1</IonButton>
+    <div style={{ padding: 24, maxWidth: 420, margin: '0 auto' }}>
+      <div style={{
+        background: 'var(--foundry-card)',
+        border: '1px solid var(--foundry-border)',
+        borderRadius: 'var(--foundry-radius-md)',
+        padding: 24,
+      }}>
+        <div style={{
+          fontFamily: 'var(--foundry-font-mono)', fontSize: 10,
+          letterSpacing: '0.18em', textTransform: 'uppercase',
+          color: 'var(--foundry-text-subtle)',
+        }}>Records</div>
+        <div style={{
+          fontFamily: 'var(--foundry-font-display)', fontSize: 40, fontWeight: 700,
+          color: 'var(--foundry-text)', letterSpacing: '-0.02em', marginTop: 4,
+        }}>{value.count}</div>
+        <div style={{
+          fontFamily: 'var(--foundry-font-body)', fontSize: 14,
+          color: 'var(--foundry-text-muted)', marginTop: 4,
+        }}>Entries recorded.</div>
+        <IonButton fill="outline" color="primary" onClick={add} style={{ marginTop: 16 }}>
+          Add entry
+        </IonButton>
+      </div>
     </div>
   );
 }
@@ -107,9 +128,13 @@ const TOOLS = [
       "       const { value, setValue, ready } = useAppData<T>('<id>', '<key>', initial);\n" +
       '     NEVER as `const [data, setData] = useAppData(...)` — that will fail.\n' +
       '     Available fields: { value, setValue, loading, ready, persistent, archive }.\n' +
-      '  5. No `any`, no `@ts-ignore`, no `localStorage`/`sessionStorage`.\n\n' +
-      'Call the `get_component_example` tool for a full, valid example ' +
-      'component you can copy and adapt.',
+      '  5. No `any`, no `@ts-ignore`, no `localStorage`/`sessionStorage`.\n' +
+      '  6. BRAND (enforced): no emoji; no exclamation points in copy; ' +
+      'colours ONLY via var(--foundry-*) tokens (Ember is the sole accent, ' +
+      'Mark Gold is signet-only); fonts ONLY via var(--foundry-font-*). ' +
+      'Off-brand pushes are rejected. Voice is a calm steward, not a coach.\n\n' +
+      'Call the `get_component_example` tool for a full, brand-valid ' +
+      'example component you can copy and adapt.',
     inputSchema: {
       type: 'object',
       required: ['id', 'name', 'icon', 'componentCode'],
