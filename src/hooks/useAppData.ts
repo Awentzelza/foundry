@@ -5,6 +5,9 @@
  * (app_id, key). Falls back to in-memory state when Supabase isn't configured,
  * so app components work in local development too.
  *
+ * Writes are serialised through a per-hook queue (see below) so rapid
+ * `setValue` calls can't race their upserts and leave a stale row behind.
+ *
  * IMPORTANT: deletes are soft — call `archive()` to set status='archived',
  * never hard delete. See CLAUDE.md / immutable-data rule.
  */
@@ -45,6 +48,16 @@ export function useAppData<T>(
   const [ready, setReady] = useState<boolean>(!supabase);
   const initialRef = useRef(initialValue);
 
+  // Write queue. `pending` holds the most recent value still to be persisted
+  // (intermediate values are coalesced — only the latest matters). `draining`
+  // guards against two drains running at once. Local React state updates stay
+  // immediate; only the network write is serialised.
+  const pendingRef = useRef<{ has: boolean; value: T }>({ has: false, value: initialValue });
+  const drainingRef = useRef(false);
+  // Set once the user has written, so a late-returning initial load doesn't
+  // clobber a fresh local edit.
+  const dirtyRef = useRef(false);
+
   // Load on mount.
   useEffect(() => {
     let cancelled = false;
@@ -59,7 +72,13 @@ export function useAppData<T>(
         .eq('id', rowId(appId, key))
         .maybeSingle();
       if (cancelled) return;
-      if (!error && data && data.status === 'active' && data.value != null) {
+      if (
+        !dirtyRef.current &&
+        !error &&
+        data &&
+        data.status === 'active' &&
+        data.value != null
+      ) {
         setLocal(data.value as T);
       }
       setLoading(false);
@@ -70,25 +89,53 @@ export function useAppData<T>(
     };
   }, [appId, key]);
 
+  const drain = useCallback(async () => {
+    if (!supabase || drainingRef.current) return;
+    drainingRef.current = true;
+    try {
+      // Keep writing while a newer value is pending. Marking `has=false`
+      // before the await means a value that arrives mid-write re-arms the
+      // loop, so the last write always reflects the latest value.
+      while (pendingRef.current.has) {
+        const next = pendingRef.current.value;
+        pendingRef.current = { has: false, value: next };
+        const row: Partial<AppDataRow<T>> = {
+          id: rowId(appId, key),
+          app_id: appId,
+          key,
+          value: next,
+          status: 'active',
+        };
+        try {
+          await supabase!
+            .from('foundry_app_data')
+            .upsert(row, { onConflict: 'id' });
+        } catch {
+          // Swallow: keep draining. A transient failure shouldn't wedge the
+          // queue; the next setValue re-arms `pending` and we try again.
+        }
+      }
+    } finally {
+      drainingRef.current = false;
+    }
+  }, [appId, key]);
+
   const setValue = useCallback(
     async (next: T) => {
       setLocal(next);
       if (!supabase) return;
-      const row: Partial<AppDataRow<T>> = {
-        id: rowId(appId, key),
-        app_id: appId,
-        key,
-        value: next,
-        status: 'active',
-      };
-      await supabase.from('foundry_app_data').upsert(row, { onConflict: 'id' });
+      dirtyRef.current = true;
+      pendingRef.current = { has: true, value: next };
+      await drain();
     },
-    [appId, key],
+    [drain],
   );
 
   const archive = useCallback(async () => {
     setLocal(initialRef.current);
     if (!supabase) return;
+    // Drop any queued write so it can't resurrect the row after archiving.
+    pendingRef.current = { has: false, value: initialRef.current };
     await supabase
       .from('foundry_app_data')
       .update({ status: 'archived' })

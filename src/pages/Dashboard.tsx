@@ -16,11 +16,23 @@ export default function Dashboard() {
 
   useEffect(() => {
     let cancelled = false;
-    loadActiveApps().then((list) => {
-      if (!cancelled) setApps(list);
-    });
+    const reload = () => {
+      loadActiveApps().then((list) => {
+        if (!cancelled) setApps(list);
+      });
+    };
+    reload();
+    // Re-fetch when the tab regains focus so apps archived/pushed elsewhere
+    // (e.g. via the Foundry MCP) show up without a hard reload.
+    const onVisible = () => {
+      if (document.visibilityState === 'visible') reload();
+    };
+    document.addEventListener('visibilitychange', onVisible);
+    window.addEventListener('focus', reload);
     return () => {
       cancelled = true;
+      document.removeEventListener('visibilitychange', onVisible);
+      window.removeEventListener('focus', reload);
     };
   }, []);
 
