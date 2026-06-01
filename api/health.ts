@@ -1,18 +1,13 @@
 /**
  * GET /api/health
- * Lightweight check used by the dashboard / monitoring.
+ * Lightweight liveness check used by the dashboard / monitoring.
+ * Intentionally returns no configuration details — health probes don't
+ * need to know which integrations are wired up.
  */
-import { env, json } from './_lib';
+import { json } from './_lib';
 
 export const config = { runtime: 'edge' };
 
 export default function handler(): Response {
-  const e = env();
-  return json({
-    ok: true,
-    supabase: Boolean(e.SUPABASE_URL && e.SUPABASE_SERVICE_ROLE_KEY),
-    github: Boolean(e.GITHUB_TOKEN),
-    pushAuthConfigured: Boolean(e.FOUNDRY_PUSH_SECRET),
-    time: new Date().toISOString(),
-  });
+  return json({ ok: true, time: new Date().toISOString() });
 }
