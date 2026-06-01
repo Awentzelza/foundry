@@ -52,6 +52,18 @@ export const APP_REGISTRY: RegisteredApp[] = [
   },
   {
     meta: {
+      id: "water-tracker",
+      name: "Water Tracker",
+      description: "Track your daily 8 glasses. Tap to log, tap again to undo. 7-day history.",
+      icon: "💧",
+      route: "water-tracker",
+      needsPersistence: true,
+      status: "active",
+    },
+    load: () => import("./water-tracker"),
+  },
+  {
+    meta: {
       id: "workout-streak",
       name: "Workout Streak",
       description: "Tap to mark today done. Tracks current and longest streak.",
