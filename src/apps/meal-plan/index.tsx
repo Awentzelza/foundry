@@ -204,31 +204,13 @@ export default function MealPlanApp() {
 
   return (
     <div style={{ fontFamily: 'var(--foundry-font-body)', color: 'var(--foundry-text)', maxWidth: 540, margin: '0 auto', padding: '0 0 40px' }}>
-
       <div style={{ padding: '24px 20px 0' }}>
-        <div style={{ fontFamily: 'var(--foundry-font-mono)', fontSize: 10, letterSpacing: '0.18em', textTransform: 'uppercase', color: 'var(--foundry-text-subtle)', marginBottom: 4 }}>
-          Week of June 2
-        </div>
-        <div style={{ fontFamily: 'var(--foundry-font-display)', fontSize: 28, fontWeight: 700, letterSpacing: '-0.02em', color: 'var(--foundry-text)' }}>
-          Meal Plan
-        </div>
-        <div style={{ fontSize: 13, color: 'var(--foundry-text-muted)', marginTop: 4 }}>
-          5 dinners · Mon–Fri lunches covered
-        </div>
-
+        <div style={{ fontFamily: 'var(--foundry-font-mono)', fontSize: 10, letterSpacing: '0.18em', textTransform: 'uppercase', color: 'var(--foundry-text-subtle)', marginBottom: 4 }}>Week of June 2</div>
+        <div style={{ fontFamily: 'var(--foundry-font-display)', fontSize: 28, fontWeight: 700, letterSpacing: '-0.02em', color: 'var(--foundry-text)' }}>Meal Plan</div>
+        <div style={{ fontSize: 13, color: 'var(--foundry-text-muted)', marginTop: 4 }}>5 dinners · Mon–Fri lunches covered</div>
         <div style={{ display: 'flex', gap: 8, marginTop: 20, borderBottom: '1px solid var(--foundry-border)' }}>
           {(['meals', 'grocery'] as const).map(t => (
-            <button
-              key={t}
-              onClick={() => { setTab(t); setActiveRecipe(null); }}
-              style={{
-                padding: '8px 16px', border: 'none',
-                borderBottom: tab === t ? '2px solid var(--foundry-ember)' : '2px solid transparent',
-                background: 'transparent', cursor: 'pointer', fontSize: 13, fontWeight: 600,
-                color: tab === t ? 'var(--foundry-text)' : 'var(--foundry-text-muted)',
-                fontFamily: 'var(--foundry-font-body)',
-              }}
-            >
+            <button key={t} onClick={() => { setTab(t); setActiveRecipe(null); }} style={{ padding: '8px 16px', border: 'none', borderBottom: tab === t ? '2px solid var(--foundry-ember)' : '2px solid transparent', background: 'transparent', cursor: 'pointer', fontSize: 13, fontWeight: 600, color: tab === t ? 'var(--foundry-text)' : 'var(--foundry-text-muted)', fontFamily: 'var(--foundry-font-body)' }}>
               {t === 'meals' ? 'Recipes' : 'Grocery List'}
             </button>
           ))}
@@ -238,11 +220,7 @@ export default function MealPlanApp() {
       {tab === 'meals' && !recipe && (
         <div style={{ padding: '16px 20px', display: 'flex', flexDirection: 'column', gap: 12 }}>
           {recipes.map(r => (
-            <button
-              key={r.id}
-              onClick={() => setActiveRecipe(r.id)}
-              style={{ background: 'var(--foundry-card)', border: '1px solid var(--foundry-border)', borderRadius: 'var(--foundry-radius-md)', padding: '16px 18px', textAlign: 'left', cursor: 'pointer', width: '100%' }}
-            >
+            <button key={r.id} onClick={() => setActiveRecipe(r.id)} style={{ background: 'var(--foundry-card)', border: '1px solid var(--foundry-border)', borderRadius: 'var(--foundry-radius-md)', padding: '16px 18px', textAlign: 'left', cursor: 'pointer', width: '100%' }}>
               <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: 6 }}>
                 <div style={{ fontFamily: 'var(--foundry-font-mono)', fontSize: 10, letterSpacing: '0.18em', textTransform: 'uppercase', color: 'var(--foundry-text-subtle)' }}>{r.day}</div>
                 <span style={{ fontSize: 11, fontWeight: 700, padding: '2px 10px', borderRadius: 20, background: 'var(--foundry-elevated)', color: 'var(--foundry-text-muted)' }}>{r.tag}</span>
@@ -272,7 +250,6 @@ export default function MealPlanApp() {
             <span>{recipe.time}</span>
             <span style={{ fontWeight: 700, color: 'var(--foundry-ember)' }}>{recipe.tag}</span>
           </div>
-
           <div style={{ fontFamily: 'var(--foundry-font-mono)', fontSize: 10, letterSpacing: '0.18em', textTransform: 'uppercase', color: 'var(--foundry-text-subtle)', marginBottom: 12 }}>Ingredients</div>
           <div style={{ background: 'var(--foundry-card)', border: '1px solid var(--foundry-border)', borderRadius: 'var(--foundry-radius-md)', padding: '4px 0', marginBottom: 24 }}>
             {recipe.ingredients.map((ing, i) => (
@@ -282,7 +259,6 @@ export default function MealPlanApp() {
               </div>
             ))}
           </div>
-
           <div style={{ fontFamily: 'var(--foundry-font-mono)', fontSize: 10, letterSpacing: '0.18em', textTransform: 'uppercase', color: 'var(--foundry-text-subtle)', marginBottom: 12 }}>Steps</div>
           <div style={{ display: 'flex', flexDirection: 'column', gap: 14 }}>
             {recipe.steps.map((step, i) => (
@@ -306,7 +282,6 @@ export default function MealPlanApp() {
               <div style={{ height: '100%', borderRadius: 20, background: 'var(--foundry-ember)', width: `${totalNeeded > 0 ? (totalChecked / totalNeeded) * 100 : 0}%`, transition: 'width 0.3s ease' }} />
             </div>
           </div>
-
           {groceryCategories.map(cat => (
             <div key={cat.category} style={{ marginBottom: 20 }}>
               <div style={{ fontFamily: 'var(--foundry-font-mono)', fontSize: 10, letterSpacing: '0.18em', textTransform: 'uppercase', color: 'var(--foundry-text-subtle)', marginBottom: 8, paddingLeft: 4 }}>{cat.category}</div>
@@ -326,7 +301,6 @@ export default function MealPlanApp() {
               </div>
             </div>
           ))}
-
           <div style={{ marginBottom: 20 }}>
             <div style={{ fontFamily: 'var(--foundry-font-mono)', fontSize: 10, letterSpacing: '0.18em', textTransform: 'uppercase', color: 'var(--foundry-text-subtle)', marginBottom: 8, paddingLeft: 4 }}>Already Have</div>
             <div style={{ background: 'var(--foundry-card)', border: '1px solid var(--foundry-border)', borderRadius: 'var(--foundry-radius-md)', overflow: 'hidden' }}>
