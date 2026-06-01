@@ -5,7 +5,7 @@
  * (/api/mcp) both call into these functions. One source of truth for
  * what it means to "push an app" or "archive an app."
  */
-import { commitFileToGitHub, type Env, isValidId, sb } from './_lib';
+import { commitFileToGitHub, getFileFromGitHub, type Env, isValidId, sb } from './_lib';
 import { validatePushCode, type ValidationIssue } from './_validate';
 import { checkDeployStatus, waitForDeploy, type DeployVerdict } from './_vercel';
 
@@ -303,4 +303,29 @@ async function regenerateRegistry(
   });
   if (!result.ok) return { ok: false, error: result.error };
   return { ok: true };
+}
+
+
+export async function getAppSource(
+  id: string,
+  env: Env,
+): Promise<
+  { success: true; id: string; path: string; source: string } | OperationError
+> {
+  if (!isValidId(id)) {
+    return { success: false, status: 400, error: 'Invalid `id`.' };
+  }
+  const path = `src/apps/${id}/index.tsx`;
+  const file = await getFileFromGitHub(env, path);
+  if (!file.ok) {
+    return {
+      success: false,
+      status: file.status,
+      error:
+        file.status === 404
+          ? `No source committed for app "${id}" at ${path}.`
+          : file.error,
+    };
+  }
+  return { success: true, id, path, source: file.content };
 }

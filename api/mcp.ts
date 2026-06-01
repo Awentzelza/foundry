@@ -29,6 +29,7 @@ import {
   archiveApp,
   checkDeployStatus,
   getApp,
+  getAppSource,
   listApps,
   pushApp,
   type PushAppInput,
@@ -177,6 +178,18 @@ const TOOLS = [
     },
   },
   {
+    name: 'view_code',
+    description:
+      "Fetch the current committed source of an app's component " +
+      '(src/apps/<id>/index.tsx) from GitHub and return it as text. Use this ' +
+      'to inspect what is actually deployed before iterating on an app.',
+    inputSchema: {
+      type: 'object',
+      required: ['id'],
+      properties: { id: { type: 'string' } },
+    },
+  },
+  {
     name: 'verify_deploy',
     description:
       'Check the Vercel deployment status for a specific commit. Use this ' +
@@ -235,6 +248,11 @@ async function handleToolCall(name: string, args: Record<string, unknown>, e: En
     case 'get_app': {
       const id = String(args.id ?? '');
       const result = await getApp(id, e);
+      return toolContent(result, !result.success);
+    }
+    case 'view_code': {
+      const id = String(args.id ?? '');
+      const result = await getAppSource(id, e);
       return toolContent(result, !result.success);
     }
     case 'verify_deploy': {

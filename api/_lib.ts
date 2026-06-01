@@ -144,3 +144,35 @@ export async function commitFileToGitHub(
   const j = (await put.json()) as { commit?: { sha?: string } };
   return { ok: true, sha: j.commit?.sha ?? '' };
 }
+
+/**
+ * Fetches a file's raw text content from GitHub via the contents API.
+ * Works for public or private repos (uses GITHUB_TOKEN when present).
+ * Path is relative to repo root (e.g. `src/apps/grocery-list/index.tsx`).
+ */
+export async function getFileFromGitHub(
+  e: Env,
+  path: string,
+): Promise<{ ok: true; content: string } | { ok: false; error: string; status: number }> {
+  if (!e.GITHUB_OWNER || !e.GITHUB_REPO) {
+    return { ok: false, error: 'GitHub env not configured', status: 500 };
+  }
+  const branch = e.GITHUB_DEFAULT_BRANCH || 'main';
+  const url = `https://api.github.com/repos/${e.GITHUB_OWNER}/${e.GITHUB_REPO}/contents/${encodeURI(path)}?ref=${branch}`;
+  const res = await fetch(url, {
+    headers: {
+      ...(e.GITHUB_TOKEN ? { authorization: `Bearer ${e.GITHUB_TOKEN}` } : {}),
+      'user-agent': 'foundry-push',
+      accept: 'application/vnd.github.raw',
+    },
+  });
+  if (res.status === 404) {
+    return { ok: false, error: `File not found: ${path}`, status: 404 };
+  }
+  if (!res.ok) {
+    const text = await res.text();
+    return { ok: false, error: `GitHub error: ${res.status} ${text}`, status: 502 };
+  }
+  const content = await res.text();
+  return { ok: true, content };
+}
