@@ -126,7 +126,7 @@ Tools:
 
 | Tool | Args | Effect |
 | --- | --- | --- |
-| `push_app` | `id, name, description?, icon, route?, componentCode, styles?, needsPersistence?` | Commits `src/apps/<id>/index.tsx` to GitHub, regenerates `src/apps/registry.ts`, upserts `foundry_apps` row. Vercel redeploys ~30-60s later. |
+| `push_app` | `id, name, description?, icon, route?, componentCode, styles?, needsPersistence?, dataScope?` | Commits `src/apps/<id>/index.tsx` to GitHub, regenerates `src/apps/registry.ts`, upserts `foundry_apps` row. Vercel redeploys ~30-60s later. New apps land **ungranted** (owner sees them; provision others on `/admin`). |
 | `archive_app` | `id` | Sets `status='archived'`. Never deletes. |
 | `list_apps` | `includeArchived?` | Returns active apps (or all). |
 | `get_app` | `id` | Returns one row. |
@@ -222,11 +222,62 @@ const { value, setValue, archive, loading, persistent } = useAppData<T>(
 );
 ```
 
-Storage is one row in `foundry_app_data` per `(app_id, key)` pair. The row
-id is `${app_id}::${key}`. `value` is JSONB — pass anything serialisable.
+`value` is JSONB — pass anything serialisable. The row id is **scoped by the
+app's fixed `data_scope`** (see Multi-user below):
+
+- `shared`   → `${app_id}::${key}::${householdId}` (one row per household)
+- `personal` → `${app_id}::${key}::${householdId}::${userId}` (one per member)
+- legacy / no session → `${app_id}::${key}` (single-tenant fallback)
+
+App code does NOT need to know any of this — `useAppData` reads the scope and
+the current household/user from session context and builds the id itself. Apps
+just call `useAppData(appId, key, initial)` exactly as before.
 
 If Supabase isn't configured, `useAppData` falls back to in-memory state
 and `persistent` is `false`. Apps should still work locally.
+
+## Multi-user (households + provisioning + data scope)
+
+Foundry is single-app but multi-tenant. The model has three independent axes:
+
+- **Household** — the container. One row in `households`. People are
+  `household_members` with a `role` (`owner` / `admin` / `member`) and a
+  `status` (`invited` / `active`). Andre is owner; Bel is a member.
+- **Provisioning (grants)** — *who can open an app.* A row in `app_grants`
+  grants an app to the **whole household** (`member_user_id IS NULL`) or to a
+  **specific member** (`member_user_id = <uid>`). Nothing is visible to a
+  member unless granted. **Owners/admins implicitly see every active app**
+  (a role short-circuit in `loadActiveApps`, not grant rows) so they can't
+  lock themselves out. New apps push **ungranted**.
+- **Data scope** — *whose data an app shows.* `foundry_apps.data_scope` is
+  fixed per app: `shared` (one household dataset, e.g. grocery-list, meal-plan)
+  or `personal` (each member's own data, e.g. water, training-log). It drives
+  the `useAppData` row id (see Persistence). Set it at creation via
+  `push_app({ dataScope })` (default `personal`). Changing it after data exists
+  is a real migration (1 row ↔ N rows), so the `/admin` UI shows it read-only.
+
+**Auth** is Supabase magic link (`src/pages/Login.tsx`). Session + household +
+role are resolved in `src/lib/session.tsx` (`SessionProvider` / `useSession`),
+which fails **closed** to `member` if a role can't be read. The login gate in
+`App.tsx` is enforced only when `VITE_REQUIRE_AUTH=true`; otherwise the app is
+auth-optional and behaves single-tenant (legacy row ids, all apps visible) so
+the rollout can't lock anyone out.
+
+**Admin** (`/admin`, owner/admin only, linked from the dashboard gear) manages
+the household name, members (invite / role / remove; owner row locked; pending
+invites), and per-app provisioning (No one / Everyone / Specific members). It
+writes `app_grants` / `household_members` directly via the authenticated
+client — **RLS is what actually enforces** that only owners/admins can write.
+Inviting a person needs the service role (the anon key can't create users), so
+it goes through `POST /api/invite`.
+
+**RLS is the security-critical piece.** Helpers `is_member(hh)` / `is_admin(hh)`
+/ `is_owner(hh)` are `SECURITY DEFINER` (avoid policy recursion). The tightened
+`foundry_app_data` policy is
+`is_member(household_id) AND (user_id IS NULL OR user_id = auth.uid())`. The
+service role bypasses RLS, so `push_app` / `/api/invite` / backfill are
+unaffected. Always run `db/2026-06-02_p2_rls_tests.sql` (it rolls back) before
+applying the tightening migration, and before inviting anyone new.
 
 ## Env vars
 
@@ -236,6 +287,7 @@ Set these in Vercel project settings.
 | --- | --- | --- |
 | `VITE_SUPABASE_URL` | client + server | Supabase project URL |
 | `VITE_SUPABASE_ANON_KEY` | client + server | Public anon key for client |
+| `VITE_REQUIRE_AUTH` | client | `true` enforces the magic-link login gate (Phase 2). Default off = auth-optional. |
 | `SUPABASE_SERVICE_ROLE_KEY` | server only | Privileged writes from edge fns |
 | `FOUNDRY_PUSH_SECRET` | server only | Bearer for push-app / archive-app |
 | `GITHUB_TOKEN` | server only | PAT with `repo` scope (for push-app commits) |
@@ -249,8 +301,10 @@ Set these in Vercel project settings.
 ## Deployment
 
 1. `git push origin main` — Vercel auto-deploys.
-2. Migrations: run `supabase/migration.sql` in the Supabase SQL editor when
-   schema changes. It's idempotent.
+2. Migrations: run the SQL files in `db/` in the Supabase SQL editor when
+   schema changes (idempotent). Multi-user rollout order: `p0a_schema` →
+   deploy → sign in once → `p0b_backfill` → verify → `p2_rls_tests` →
+   `p2_rls_tighten` (+ set `VITE_REQUIRE_AUTH=true`). See Multi-user below.
 3. After Vercel builds, the PWA service worker auto-updates clients.
 
 ## PWA + Capacitor
