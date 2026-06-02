@@ -40,6 +40,18 @@ export const APP_REGISTRY: RegisteredApp[] = [
   },
   {
     meta: {
+      id: "hyrox-trainer",
+      name: "Hyrox Trainer",
+      description: "Training tracker and sim pacer for HYROX race prep",
+      icon: "hyrox",
+      route: "hyrox-trainer",
+      needsPersistence: true,
+      status: "active",
+    },
+    load: () => import("./hyrox-trainer"),
+  },
+  {
+    meta: {
       id: "meal-plan",
       name: "Meal Plan",
       description: "Weekly dinners and grocery checklist.",
