@@ -19,7 +19,9 @@
 
 do $$
 declare
-  andre_email text := 'andre.wentzel@centialconsulting.com';
+  -- The email of the Supabase auth user who should be household owner.
+  -- This is the email you sign in to Foundry with (NOT the Cowork session email).
+  andre_email text := 'andre@wentzelza.com';
   andre_id    uuid;
   hh_id       uuid;
 begin
