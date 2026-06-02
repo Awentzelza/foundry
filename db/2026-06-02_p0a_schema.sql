@@ -78,6 +78,23 @@ alter table public.foundry_app_data
 alter table public.foundry_app_data
   add column if not exists user_id uuid references auth.users(id) on delete set null;
 
+-- The single-tenant build had UNIQUE(app_id, key). With per-member scoping,
+-- multiple rows now share an (app_id, key) (one per member for personal apps),
+-- so that constraint must go — uniqueness is enforced by the scoped primary
+-- key `id` instead. Drop it if present (name may vary; the default is below).
+alter table public.foundry_app_data
+  drop constraint if exists foundry_app_data_app_id_key_key;
+do $$
+declare c text;
+begin
+  for c in
+    select conname from pg_constraint
+    where conrelid = 'public.foundry_app_data'::regclass and contype = 'u'
+  loop
+    execute format('alter table public.foundry_app_data drop constraint %I', c);
+  end loop;
+end $$;
+
 -- --- Membership helpers (SECURITY DEFINER avoids RLS recursion) ------
 create or replace function public.is_member(hh uuid)
 returns boolean
