@@ -88,6 +88,24 @@ export function sb(e: Env): SupabaseClient | null {
   });
 }
 
+/**
+ * Verifies a Supabase user JWT (the access token the browser client holds) and
+ * returns the authenticated user. Used by endpoints called BY the signed-in
+ * client (e.g. /api/invite) rather than by the MCP push secret. Distinct from
+ * requireAuth, which checks FOUNDRY_PUSH_SECRET for the machine/MCP path.
+ */
+export async function getCaller(
+  req: Request,
+  client: SupabaseClient,
+): Promise<{ id: string; email: string | null } | null> {
+  const header = req.headers.get('authorization') || '';
+  const token = header.replace(/^Bearer\s+/i, '').trim();
+  if (!token) return null;
+  const { data, error } = await client.auth.getUser(token);
+  if (error || !data.user) return null;
+  return { id: data.user.id, email: data.user.email ?? null };
+}
+
 /** Slug validator — lowercase, hyphenated, 2..40 chars. */
 export function isValidId(id: string): boolean {
   return /^[a-z][a-z0-9-]{1,39}$/.test(id);

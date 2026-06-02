@@ -214,7 +214,11 @@ const TOOLS = [
       'hex/rgb/hsl), brand fonts only, and it must NOT redefine any ' +
       '--foundry-*/--ion-* token.\n\n' +
       'Call the `get_component_example` tool for a full, brand-valid ' +
-      'example (component + CSS module) you can copy and adapt.',
+      'example (component + CSS module) you can copy and adapt.\n\n' +
+      'PROVISIONING: a new app is created UNGRANTED — it appears for the ' +
+      'owner immediately but for no one else until provisioned on the /admin ' +
+      'page. Pass `dataScope` to fix whether its data is per-member ' +
+      "('personal', default) or one household dataset ('shared').",
     inputSchema: {
       type: 'object',
       required: ['id', 'name', 'icon', 'componentCode'],
@@ -251,6 +255,15 @@ const TOOLS = [
           type: 'boolean',
           default: false,
           description: 'True if the app uses useAppData.',
+        },
+        dataScope: {
+          type: 'string',
+          enum: ['shared', 'personal'],
+          default: 'personal',
+          description:
+            "Fixed data scope. 'personal' (default): each member sees only " +
+            "their own data. 'shared': one dataset for the whole household. " +
+            'Set once at creation; changing later is a data migration.',
         },
         waitForDeploy: {
           type: 'boolean',

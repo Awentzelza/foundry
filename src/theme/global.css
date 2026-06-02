@@ -228,3 +228,214 @@ ion-content {
 .foundry-app-scope {
   display: contents;
 }
+
+/* ── HEADER ACTIONS (refresh + admin) ── */
+.foundry-header__actions {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+/* ── FORM PRIMITIVES (login + admin) ── */
+.foundry-input {
+  width: 100%;
+  appearance: none;
+  background: var(--foundry-elevated);
+  border: 1px solid var(--foundry-border);
+  border-radius: var(--foundry-radius-sm);
+  color: var(--foundry-text);
+  font-family: var(--foundry-font-body);
+  font-size: 16px;
+  padding: 12px 14px;
+  outline: none;
+  transition: border-color 0.15s ease;
+}
+.foundry-input:focus { border-color: var(--foundry-border-strong); }
+.foundry-input::placeholder { color: var(--foundry-text-subtle); }
+
+.foundry-btn {
+  appearance: none;
+  cursor: pointer;
+  background: transparent;
+  border: 1px solid var(--foundry-ember);
+  color: var(--foundry-ember);
+  font-family: var(--foundry-font-mono);
+  font-size: 11px;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  border-radius: var(--foundry-radius-sm);
+  padding: 12px 18px;
+  transition: background 0.15s ease, color 0.15s ease, opacity 0.15s ease;
+}
+.foundry-btn:hover { background: rgba(232, 116, 44, 0.08); }
+.foundry-btn:disabled { opacity: 0.4; cursor: default; }
+.foundry-btn--quiet {
+  border-color: var(--foundry-border);
+  color: var(--foundry-text-muted);
+}
+.foundry-btn--quiet:hover {
+  border-color: var(--foundry-border-strong);
+  color: var(--foundry-text);
+  background: transparent;
+}
+
+/* ── LOGIN ── */
+.foundry-login {
+  min-height: 100%;
+  display: grid;
+  place-items: center;
+  padding: 24px;
+}
+.foundry-login__card {
+  width: 100%;
+  max-width: 380px;
+  background: var(--foundry-card);
+  border: 1px solid var(--foundry-border);
+  border-radius: var(--foundry-radius-md);
+  padding: 32px 28px;
+  text-align: left;
+}
+.foundry-login__eyebrow {
+  font-family: var(--foundry-font-mono);
+  font-size: 9px;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  color: var(--foundry-text-subtle);
+  margin: 18px 0 0;
+}
+.foundry-login__title {
+  font-family: var(--foundry-font-display);
+  font-weight: 700;
+  font-size: 34px;
+  letter-spacing: -0.025em;
+  margin: 2px 0 14px;
+  color: var(--foundry-text);
+}
+.foundry-login__body {
+  font-family: var(--foundry-font-body);
+  font-size: 15px;
+  line-height: 1.55;
+  color: var(--foundry-text-muted);
+  margin: 0 0 18px;
+}
+.foundry-login__form { display: flex; flex-direction: column; gap: 12px; }
+.foundry-login__error {
+  font-family: var(--foundry-font-mono);
+  font-size: 11px;
+  color: var(--foundry-danger, #b5544a);
+  margin: 12px 0 0;
+}
+
+/* ── ADMIN ── */
+.foundry-admin { max-width: 760px; margin: 0 auto; padding: 8px 16px 48px; }
+.foundry-admin__section {
+  background: var(--foundry-card);
+  border: 1px solid var(--foundry-border);
+  border-radius: var(--foundry-radius-md);
+  padding: 22px 20px;
+  margin-bottom: 14px;
+}
+.foundry-admin__eyebrow {
+  font-family: var(--foundry-font-mono);
+  font-size: 10px;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: var(--foundry-text-subtle);
+  margin: 0 0 4px;
+}
+.foundry-admin__h {
+  font-family: var(--foundry-font-display);
+  font-size: 22px;
+  font-weight: 700;
+  letter-spacing: -0.02em;
+  color: var(--foundry-text);
+  margin: 0 0 14px;
+}
+.foundry-admin__note {
+  font-family: var(--foundry-font-body);
+  font-size: 14px;
+  line-height: 1.5;
+  color: var(--foundry-text-muted);
+  margin: 8px 0 0;
+}
+.foundry-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 12px 0;
+  border-top: 1px solid var(--foundry-border);
+}
+.foundry-row:first-of-type { border-top: none; }
+.foundry-row__main { display: flex; flex-direction: column; gap: 2px; min-width: 0; }
+.foundry-row__name {
+  font-family: var(--foundry-font-body);
+  font-size: 16px;
+  color: var(--foundry-text);
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.foundry-row__sub {
+  font-family: var(--foundry-font-mono);
+  font-size: 10px;
+  letter-spacing: 0.08em;
+  color: var(--foundry-text-subtle);
+}
+.foundry-row__actions { display: flex; align-items: center; gap: 8px; flex-shrink: 0; }
+.foundry-badge {
+  font-family: var(--foundry-font-mono);
+  font-size: 9px;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--foundry-text-muted);
+  border: 1px solid var(--foundry-border);
+  border-radius: 999px;
+  padding: 3px 9px;
+}
+.foundry-badge--accent { color: var(--foundry-ember); border-color: var(--foundry-ember); }
+.foundry-select {
+  appearance: none;
+  background: var(--foundry-elevated);
+  border: 1px solid var(--foundry-border);
+  border-radius: var(--foundry-radius-sm);
+  color: var(--foundry-text);
+  font-family: var(--foundry-font-mono);
+  font-size: 11px;
+  padding: 6px 10px;
+}
+.foundry-prov { padding: 14px 0; border-top: 1px solid var(--foundry-border); }
+.foundry-prov__head {
+  display: flex; align-items: center; justify-content: space-between; gap: 12px;
+}
+.foundry-prov__modes { display: flex; gap: 14px; margin: 10px 0 0; flex-wrap: wrap; }
+.foundry-prov__mode {
+  font-family: var(--foundry-font-mono);
+  font-size: 11px;
+  letter-spacing: 0.04em;
+  color: var(--foundry-text-muted);
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  cursor: pointer;
+}
+.foundry-prov__members {
+  display: flex; flex-direction: column; gap: 8px; margin: 12px 0 0;
+  padding-left: 4px;
+}
+.foundry-check {
+  font-family: var(--foundry-font-body);
+  font-size: 14px;
+  color: var(--foundry-text);
+  display: inline-flex; align-items: center; gap: 8px; cursor: pointer;
+}
+.foundry-admin__back {
+  font-family: var(--foundry-font-mono);
+  font-size: 11px;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--foundry-text-muted);
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  padding: 16px 4px 8px;
+}

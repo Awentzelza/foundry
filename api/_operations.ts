@@ -32,6 +32,12 @@ export interface PushAppInput {
   styles?: string;
   needsPersistence?: boolean;
   /**
+   * Fixed data scope for the app's persisted data. 'personal' (default) = each
+   * member sees only their own data; 'shared' = one dataset for the household.
+   * Set once at creation; changing it after data exists is a migration.
+   */
+  dataScope?: 'shared' | 'personal';
+  /**
    * Default false: return immediately after the commit with the deploymentUid
    * to poll (the build runs async on Vercel). Pass true to block on the build
    * verdict within the Edge budget and auto-archive on a build failure — note
@@ -110,6 +116,13 @@ function validateMetadata(input: PushAppInput): OperationError | null {
       error: 'Missing required fields: name, icon, componentCode.',
     };
   }
+  if (input.dataScope && input.dataScope !== 'shared' && input.dataScope !== 'personal') {
+    return {
+      success: false,
+      status: 400,
+      error: "Invalid `dataScope` (must be 'shared' or 'personal').",
+    };
+  }
   return null;
 }
 
@@ -160,6 +173,7 @@ export async function pushApp(
   }
 
   const { id, name, description = '', icon, componentCode, needsPersistence = false } = input;
+  const dataScope = input.dataScope === 'shared' ? 'shared' : 'personal';
   const route = input.route ?? id;
   const shouldWait = input.waitForDeploy === true;
 
@@ -173,6 +187,7 @@ export async function pushApp(
           icon,
           route,
           needs_persistence: needsPersistence,
+          data_scope: dataScope,
           status: 'active',
         },
         { onConflict: 'id' },

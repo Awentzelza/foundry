@@ -1,14 +1,16 @@
 /**
- * Merges the build-time APP_REGISTRY with runtime status from Supabase, and
- * applies curated brand display names.
+ * Merges the build-time APP_REGISTRY with runtime status from Supabase, applies
+ * curated brand display names, and filters to the apps the current member has
+ * been provisioned (granted). Owners/admins see every active app.
  *
  * registry.ts is AUTO-GENERATED from Supabase on every push_app, so any brand
  * copy written there is overwritten on the next push. DISPLAY_OVERRIDES is the
  * durable, hand-maintained source of truth for an app's on-brand name and
- * description. Supabase is consulted only for runtime status (active/archived).
+ * description.
  */
 import { APP_REGISTRY } from '@/apps/registry';
 import { supabase } from './supabase';
+import type { Role } from './session';
 import type { AppMeta, AppStatus, RegisteredApp } from '@/types/app';
 
 interface FoundryAppRow {
@@ -23,7 +25,7 @@ export const DISPLAY_OVERRIDES: Record<string, { name?: string; description?: st
   'pomodoro': { name: 'Pomodoro', description: 'Focused work in measured intervals.' },
   'grocery-list': { name: 'Grocery List', description: 'Items to acquire. Check off as gathered.' },
   'hyrox-tracker': { name: 'Hyrox', description: 'A record of Hyrox splits, pace, and finish time.' },
-  'meal-plan': { name: 'Meal Plan', description: 'The week\u2019s dinners and the grocery run.' },
+  'meal-plan': { name: 'Meal Plan', description: 'The week’s dinners and the grocery run.' },
 };
 
 /** Apply the brand display override (and never surface emoji icons). */
@@ -37,7 +39,16 @@ export function withDisplay(meta: AppMeta): AppMeta {
   };
 }
 
-export async function loadActiveApps(): Promise<RegisteredApp[]> {
+export interface LoadAppsScope {
+  /** True if a user is signed in. When false, the auth-optional legacy path
+   *  shows all active apps (single-tenant behaviour). */
+  signedIn?: boolean;
+  householdId?: string | null;
+  userId?: string | null;
+  role?: Role | null;
+}
+
+export async function loadActiveApps(scope: LoadAppsScope = {}): Promise<RegisteredApp[]> {
   const finish = (apps: RegisteredApp[]) =>
     apps
       .filter((a) => a.meta.status === 'active')
@@ -52,10 +63,41 @@ export async function loadActiveApps(): Promise<RegisteredApp[]> {
     (data as FoundryAppRow[]).map((r) => [r.id, r.status]),
   );
 
-  return finish(
+  const active = finish(
     APP_REGISTRY.map<RegisteredApp>((app) => ({
       ...app,
       meta: { ...app.meta, status: statusById.get(app.meta.id) ?? app.meta.status },
     })),
   );
+
+  const { signedIn, householdId, userId, role } = scope;
+
+  // Not signed in (auth-optional rollout): behave as the single-tenant version
+  // and show all active apps.
+  if (!signedIn) return active;
+
+  // Owners & admins see everything (implicitly granted) — they can never lock
+  // themselves out of their own apps.
+  if (role === 'owner' || role === 'admin') return active;
+
+  // Signed in but not provisioned into a household yet: empty (fail closed).
+  if (!householdId) return [];
+
+  // Member: filter to apps granted household-wide (member_user_id null) or to
+  // this member specifically. On any error, fail closed to an empty list.
+  const { data: grants, error: grantErr } = await supabase
+    .from('app_grants')
+    .select('app_id, member_user_id')
+    .eq('household_id', householdId);
+
+  if (grantErr || !grants) return [];
+
+  const grantedAppIds = new Set<string>();
+  for (const g of grants as { app_id: string; member_user_id: string | null }[]) {
+    if (g.member_user_id == null || g.member_user_id === userId) {
+      grantedAppIds.add(g.app_id);
+    }
+  }
+
+  return active.filter((a) => grantedAppIds.has(a.meta.id));
 }

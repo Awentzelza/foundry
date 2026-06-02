@@ -1,18 +1,20 @@
 /**
  * useAppData(appId, key, initialValue)
  *
- * Persists JSON-serialisable state to Supabase `foundry_app_data` keyed by
- * (app_id, key). Falls back to in-memory state when Supabase isn't configured,
- * so app components work in local development too.
+ * Persists JSON-serialisable state to Supabase `foundry_app_data`. The row id
+ * is SCOPED by the app's fixed data_scope (read from session context):
+ *   shared   :  <app>::<key>::<householdId>            (one row per household)
+ *   personal :  <app>::<key>::<householdId>::<userId>  (one row per member)
+ * Before a household is resolved (no session / Supabase unconfigured / rollout
+ * auth-optional phase) it falls back to the legacy unscoped id `<app>::<key>`,
+ * so single-tenant behaviour is preserved exactly.
  *
- * Writes are serialised through a per-hook queue (see below) so rapid
- * `setValue` calls can't race their upserts and leave a stale row behind.
- *
- * IMPORTANT: deletes are soft — call `archive()` to set status='archived',
- * never hard delete. See CLAUDE.md / immutable-data rule.
+ * Writes are serialised through a per-hook queue so rapid `setValue` calls
+ * can't race their upserts. Deletes are soft — call `archive()`.
  */
-import { useCallback, useEffect, useRef, useState } from 'react';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { supabase } from '@/lib/supabase';
+import { useSession } from '@/lib/session';
 
 interface AppDataRow<T> {
   id: string;
@@ -20,6 +22,8 @@ interface AppDataRow<T> {
   key: string;
   value: T;
   status: 'active' | 'archived';
+  household_id?: string | null;
+  user_id?: string | null;
   updated_at?: string;
 }
 
@@ -34,14 +38,9 @@ interface UseAppDataResult<T> {
   archive: () => Promise<void>;
   /**
    * Non-null when the most recent persist failed (network/RLS/db error).
-   * Cleared automatically on the next successful write. Lets an app surface a
-   * "not saved" state instead of silently losing the edit.
+   * Cleared automatically on the next successful write.
    */
   syncError: string | null;
-}
-
-function rowId(appId: string, key: string): string {
-  return `${appId}::${key}`;
 }
 
 export function useAppData<T>(
@@ -49,34 +48,61 @@ export function useAppData<T>(
   key: string,
   initialValue: T,
 ): UseAppDataResult<T> {
+  const { householdId, userId, scopes } = useSession();
+  const scope = scopes[appId] ?? 'personal';
+
+  // Scoped row id. Falls back to the legacy unscoped id until a household is
+  // known, so the auth-optional rollout keeps working.
+  const id = useMemo(() => {
+    if (!householdId) return `${appId}::${key}`;
+    return scope === 'personal'
+      ? `${appId}::${key}::${householdId}::${userId ?? 'anon'}`
+      : `${appId}::${key}::${householdId}`;
+  }, [appId, key, householdId, userId, scope]);
+
   const [value, setLocal] = useState<T>(initialValue);
   const [loading, setLoading] = useState<boolean>(Boolean(supabase));
   const [ready, setReady] = useState<boolean>(!supabase);
   const [syncError, setSyncError] = useState<string | null>(null);
   const initialRef = useRef(initialValue);
 
-  // Write queue. `pending` holds the most recent value still to be persisted
-  // (intermediate values are coalesced — only the latest matters). `draining`
-  // guards against two drains running at once. Local React state updates stay
-  // immediate; only the network write is serialised.
   const pendingRef = useRef<{ has: boolean; value: T }>({ has: false, value: initialValue });
   const drainingRef = useRef(false);
-  // Set once the user has written, so a late-returning initial load doesn't
-  // clobber a fresh local edit.
   const dirtyRef = useRef(false);
 
-  // Load on mount.
+  // Build the row to persist, stamping scope columns when a household is known.
+  const buildRow = useCallback(
+    (next: T): Partial<AppDataRow<T>> => {
+      const row: Partial<AppDataRow<T>> = {
+        id,
+        app_id: appId,
+        key,
+        value: next,
+        status: 'active',
+      };
+      if (householdId) {
+        row.household_id = householdId;
+        row.user_id = scope === 'personal' ? userId : null;
+      }
+      return row;
+    },
+    [id, appId, key, householdId, userId, scope],
+  );
+
+  // Load on mount / when the scoped id changes (e.g. household resolves).
   useEffect(() => {
     let cancelled = false;
     if (!supabase) {
       setReady(true);
       return;
     }
+    dirtyRef.current = false;
+    setLoading(true);
     (async () => {
       const { data, error } = await supabase!
         .from('foundry_app_data')
         .select('value,status')
-        .eq('id', rowId(appId, key))
+        .eq('id', id)
         .maybeSingle();
       if (cancelled) return;
       if (
@@ -94,41 +120,26 @@ export function useAppData<T>(
     return () => {
       cancelled = true;
     };
-  }, [appId, key]);
+  }, [id]);
 
   const drain = useCallback(async () => {
     if (!supabase || drainingRef.current) return;
     drainingRef.current = true;
     try {
-      // Keep writing while a newer value is pending. Marking `has=false`
-      // before the await means a value that arrives mid-write re-arms the
-      // loop, so the last write always reflects the latest value.
       while (pendingRef.current.has) {
         const next = pendingRef.current.value;
         pendingRef.current = { has: false, value: next };
-        const row: Partial<AppDataRow<T>> = {
-          id: rowId(appId, key),
-          app_id: appId,
-          key,
-          value: next,
-          status: 'active',
-        };
         try {
-          // Supabase reports row-level/db failures via the returned `error`,
-          // not by throwing — check both.
           const { error } = await supabase!
             .from('foundry_app_data')
-            .upsert(row, { onConflict: 'id' });
+            .upsert(buildRow(next), { onConflict: 'id' });
           if (error) throw error;
-          // Success: clear any prior failure signal.
           setSyncError(null);
         } catch (err) {
-          // Don't wedge the queue and don't re-arm `pending` (that would hot-loop
-          // on a persistent failure) — a later setValue retries. But surface it:
-          // log in dev and expose a signal so the app can show a "not saved" state.
           const message = err instanceof Error ? err.message : 'Failed to save';
           if (import.meta.env.DEV) {
-            console.error(`[useAppData] persist failed for ${rowId(appId, key)}:`, err);
+            // eslint-disable-next-line no-console
+            console.error(`[useAppData] persist failed for ${id}:`, err);
           }
           setSyncError(message);
         }
@@ -136,7 +147,7 @@ export function useAppData<T>(
     } finally {
       drainingRef.current = false;
     }
-  }, [appId, key]);
+  }, [buildRow, id]);
 
   const setValue = useCallback(
     async (next: T) => {
@@ -152,13 +163,9 @@ export function useAppData<T>(
   const archive = useCallback(async () => {
     setLocal(initialRef.current);
     if (!supabase) return;
-    // Drop any queued write so it can't resurrect the row after archiving.
     pendingRef.current = { has: false, value: initialRef.current };
-    await supabase
-      .from('foundry_app_data')
-      .update({ status: 'archived' })
-      .eq('id', rowId(appId, key));
-  }, [appId, key]);
+    await supabase.from('foundry_app_data').update({ status: 'archived' }).eq('id', id);
+  }, [id]);
 
   return { value, setValue, loading, ready, persistent: !!supabase, archive, syncError };
 }

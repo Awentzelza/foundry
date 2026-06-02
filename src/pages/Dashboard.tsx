@@ -1,9 +1,10 @@
 import { useEffect, useState } from 'react';
 import { IonContent, IonIcon, IonPage } from '@ionic/react';
 import { useHistory } from 'react-router-dom';
-import { refreshOutline } from 'ionicons/icons';
+import { refreshOutline, settingsOutline } from 'ionicons/icons';
 
 import { loadActiveApps } from '@/lib/appRegistry';
+import { useSession } from '@/lib/session';
 import type { RegisteredApp } from '@/types/app';
 import AppTile from '@/components/AppTile';
 import EmptyForge from '@/components/EmptyForge';
@@ -13,17 +14,19 @@ export default function Dashboard() {
   const history = useHistory();
   const [apps, setApps] = useState<RegisteredApp[] | null>(null);
   const { updateAvailable, forceRefresh } = usePwaUpdate();
+  const { ready, session, householdId, userId, role, isAdmin } = useSession();
 
   useEffect(() => {
+    if (!ready) return;
     let cancelled = false;
     const reload = () => {
-      loadActiveApps().then((list) => {
+      loadActiveApps({ signedIn: !!session, householdId, userId, role }).then((list) => {
         if (!cancelled) setApps(list);
       });
     };
     reload();
-    // Re-fetch when the tab regains focus so apps archived/pushed elsewhere
-    // (e.g. via the Foundry MCP) show up without a hard reload.
+    // Re-fetch when the tab regains focus so apps archived/pushed/provisioned
+    // elsewhere show up without a hard reload.
     const onVisible = () => {
       if (document.visibilityState === 'visible') reload();
     };
@@ -34,7 +37,7 @@ export default function Dashboard() {
       document.removeEventListener('visibilitychange', onVisible);
       window.removeEventListener('focus', reload);
     };
-  }, []);
+  }, [ready, session, householdId, userId, role]);
 
   return (
     <IonPage>
@@ -49,15 +52,28 @@ export default function Dashboard() {
               <h1 className="foundry-header__title">Foundry</h1>
             </div>
           </div>
-          <button
-            type="button"
-            className={`foundry-refresh${updateAvailable ? ' foundry-refresh--available' : ''}`}
-            onClick={() => void forceRefresh()}
-            aria-label={updateAvailable ? 'New version available — tap to update' : 'Refresh'}
-            title={updateAvailable ? 'New version available' : 'Check for updates'}
-          >
-            <IonIcon icon={refreshOutline} />
-          </button>
+          <div className="foundry-header__actions">
+            {isAdmin ? (
+              <button
+                type="button"
+                className="foundry-refresh"
+                onClick={() => history.push('/admin')}
+                aria-label="Administration"
+                title="Administration"
+              >
+                <IonIcon icon={settingsOutline} />
+              </button>
+            ) : null}
+            <button
+              type="button"
+              className={`foundry-refresh${updateAvailable ? ' foundry-refresh--available' : ''}`}
+              onClick={() => void forceRefresh()}
+              aria-label={updateAvailable ? 'New version available — tap to update' : 'Refresh'}
+              title={updateAvailable ? 'New version available' : 'Check for updates'}
+            >
+              <IonIcon icon={refreshOutline} />
+            </button>
+          </div>
         </header>
 
         {apps === null ? null : apps.length === 0 ? (

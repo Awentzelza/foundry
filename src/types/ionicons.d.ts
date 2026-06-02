@@ -13,6 +13,7 @@ declare module 'ionicons/icons' {
   export const trashOutline: string;
   export const trash: string;
   export const settings: string;
+  export const settingsOutline: string;
   export const home: string;
   export const star: string;
   export const starOutline: string;
