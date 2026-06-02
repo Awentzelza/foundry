@@ -1,12 +1,15 @@
 import { useCallback, useState } from 'react';
 import { IonContent, IonPage } from '@ionic/react';
+import { Redirect } from 'react-router-dom';
 import { supabase } from '@/lib/supabase';
+import { useSession } from '@/lib/session';
 
 /**
  * Magic-link login. The calm gatehouse to the Foundry: enter an email, receive
  * a one-time link. No passwords. Brand voice — steward, not coach.
  */
 export default function Login() {
+  const { session, ready } = useSession();
   const [email, setEmail] = useState('');
   const [state, setState] = useState<'idle' | 'sending' | 'sent' | 'error'>('idle');
   const [message, setMessage] = useState<string | null>(null);
@@ -31,6 +34,8 @@ export default function Login() {
     },
     [email],
   );
+
+  if (ready && session) return <Redirect to="/" />;
 
   return (
     <IonPage>

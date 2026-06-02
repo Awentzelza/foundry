@@ -14,7 +14,7 @@ export default function Dashboard() {
   const history = useHistory();
   const [apps, setApps] = useState<RegisteredApp[] | null>(null);
   const { updateAvailable, forceRefresh } = usePwaUpdate();
-  const { ready, session, householdId, userId, role, isAdmin } = useSession();
+  const { ready, session, supabaseConfigured, householdId, userId, role, isAdmin } = useSession();
 
   useEffect(() => {
     if (!ready) return;
@@ -53,6 +53,15 @@ export default function Dashboard() {
             </div>
           </div>
           <div className="foundry-header__actions">
+            {supabaseConfigured && !session ? (
+              <button
+                type="button"
+                className="foundry-btn foundry-btn--quiet"
+                onClick={() => history.push('/login')}
+              >
+                Sign in
+              </button>
+            ) : null}
             {isAdmin ? (
               <button
                 type="button"

@@ -33,6 +33,7 @@ function Gate() {
   return (
     <IonRouterOutlet>
       <Route exact path="/" component={Dashboard} />
+      <Route exact path="/login" component={Login} />
       <Route exact path="/admin" component={Admin} />
       <Route exact path="/app/:appId" component={AppHost} />
       <Route exact path="/404" component={NotFound} />
