@@ -28,19 +28,22 @@ const WORKOUTS: Record<string, GroupDef[][]> = {
       { type:'single', block:{ id:'base-mon-sq', name:'Front Squat', sets:4, detail:'6 reps @ 70-75% (~230 lb). Tempo 3-1-1. Rest 2:30.' }},
       { type:'single', block:{ id:'base-mon-dl', name:'Trap-Bar Deadlift', sets:4, detail:'6 reps @ 70% (~280 lb). Full reset each rep.' }},
       { type:'single', block:{ id:'base-mon-pu', name:'Weighted Pull-Up', sets:4, detail:'6 reps @ +15 lb. Controlled 3-second descent.' }},
-      { type:'single', block:{ id:'base-mon-z2', name:'Z2 Run', detail:'30 min treadmill @ 1% incline. HR under 145.' }},
-      { type:'single', block:{ id:'base-mon-ski', name:'SkiErg Intervals', sets:3, detail:'500m @ 2:20/500m. Rest 90s between sets.' }},
+      { type:'single', block:{ id:'base-mon-z2', name:'Z2 Run', detail:'30 min treadmill @ 1% incline. 5.8–6.2 mph. HR under 145.' }},
+      { type:'single', block:{ id:'base-mon-ski', name:'SkiErg Intervals', sets:3, detail:'500m @ sub-2:20. Rest 90s between sets.' }},
     ],
     [
-      { type:'round', rounds:4, deloadRounds:2, restNote:'60s rest, then Round',
+      { type:'single', block:{ id:'base-tue-sq', name:'Back Squat', sets:4, detail:'5 reps @ 255–265 lb. Watch knee tracking.' }},
+      { type:'single', block:{ id:'base-tue-rdl', name:'Romanian Deadlift', sets:3, detail:'8 reps @ 185–205 lb. Controlled descent.' }},
+      { type:'single', block:{ id:'base-tue-bench', name:'Bench Press', sets:3, detail:'6–8 reps @ 185 lb.' }},
+      { type:'round', rounds:3, deloadRounds:2, restNote:'60s rest — then Round',
         blocks:[
-          { id:'base-tue-run', name:'500m Run', detail:'@ 5:18/km race pace. Straight onto the sled.' },
-          { id:'base-tue-sled', name:'Sled Push 25m', detail:'@ ~75 kg. Forearms on bar, hips low.' },
+          { id:'base-tue-run', name:'Run 0.37 mi', detail:'@ 6.3–6.5 mph. Straight onto sled.' },
+          { id:'base-tue-sled', name:'Sled Push 50m', detail:'4–5 plates (~270–315 lb). Overload vs race weight.' },
+          { id:'base-tue-ski', name:'SkiErg 500m', detail:'Target sub-2:10.' },
         ]},
-      { type:'single', block:{ id:'base-tue-mob', name:'Mobility Finish', detail:'10 min: couch stretch 60s/side, 90/90 hip switch, worlds greatest stretch x5/side.' }},
     ],
     [
-      { type:'single', block:{ id:'base-wed-z2', name:'Z2 Run', detail:'35 min @ 1% incline. HR 130-145.' }},
+      { type:'single', block:{ id:'base-wed-z2', name:'Z2 Run', detail:'35 min @ 1% incline. 5.8–6.2 mph. HR 130–145.' }},
       { type:'superset', label:'Superset A — Push / Pull', blocks:[
         { id:'base-wed-bench', name:'Bench Press', sets:4, detail:'8 reps @ 185 lb.' },
         { id:'base-wed-row', name:'BB Row', sets:4, detail:'8 reps @ 165 lb. 1s hold at top.' },
@@ -51,25 +54,32 @@ const WORKOUTS: Record<string, GroupDef[][]> = {
       ]},
     ],
     [
-      { type:'single', block:{ id:'base-thu-wu', name:'Warm-Up Run', detail:'15 min easy Z2.' }},
-      { type:'single', block:{ id:'base-thu-t1', name:'Threshold Interval 1', detail:'15 min @ 5:00/km. RPE 7-8.' }},
-      { type:'single', block:{ id:'base-thu-rec', name:'Recovery Jog', detail:'3 min easy @ 6:30/km.' }},
-      { type:'single', block:{ id:'base-thu-t2', name:'Threshold Interval 2', detail:'15 min @ 5:00/km. Match Interval 1.' }},
-      { type:'single', block:{ id:'base-thu-sled', name:'Sled Push — Technique', sets:4, detail:'25m @ 100 kg. Technique only.' }},
+      { type:'single', block:{ id:'base-thu-wu', name:'Warm-Up Run', detail:'15 min easy Z2. 5.5–5.8 mph.' }},
+      { type:'single', block:{ id:'base-thu-t1', name:'Threshold Interval 1', detail:'10 min @ 7.0–7.1 mph. RPE 7–8.' }},
+      { type:'single', block:{ id:'base-thu-rec', name:'Recovery Jog', detail:'3 min easy @ 5.5 mph.' }},
+      { type:'single', block:{ id:'base-thu-t2', name:'Threshold Interval 2', detail:'10 min @ 7.1–7.2 mph. Match or beat Interval 1.' }},
+      { type:'single', block:{ id:'base-thu-sled', name:'Sled Push — Technique', sets:4, detail:'25m @ race weight (335 lb / 5 plates). Technique only.' }},
       { type:'single', block:{ id:'base-thu-wb', name:'Wall Balls — Technique', sets:3, detail:'25 reps @ 6 kg unbroken.' }},
     ],
     [
-      { type:'single', block:{ id:'base-fri-ski', name:'SkiErg Intervals', sets:4, detail:'500m @ 2:15/500m. Rest 90s.' }},
-      { type:'single', block:{ id:'base-fri-row', name:'Row Intervals', sets:4, detail:'500m @ 2:15/500m. Rest 90s. Damper 4.' }},
-      { type:'single', block:{ id:'base-fri-bbj', name:'Burpee Broad Jumps', sets:4, detail:'20m. Step-up method. Target 2.0+ m per jump.' }},
-      { type:'single', block:{ id:'base-fri-sb', name:'Sandbag Lunges', sets:2, detail:'50m @ 20 kg. Long step 1.0-1.1 m.' }},
+      { type:'round', rounds:4, deloadRounds:3, restNote:'90s rest — then Round',
+        blocks:[
+          { id:'base-fri-run1', name:'Run 0.62 mi', detail:'Run 1: 6.0 mph. Build each round.' },
+          { id:'base-fri-ski', name:'SkiErg 1000m', detail:'Target sub-4:10. Hip-hinge drive, damper 5.' },
+          { id:'base-fri-run2', name:'Run 0.62 mi', detail:'Run 2: 6.3 mph.' },
+          { id:'base-fri-sled', name:'Sled Pull 50m', detail:'TRX bands. 2 plates. Deadlift stance, hip snap.' },
+          { id:'base-fri-run3', name:'Run 0.62 mi', detail:'Run 3: 6.5 mph.' },
+          { id:'base-fri-bbj', name:'Burpee Broad Jumps 80m', detail:'Step-up method. Chunk 4x20m.' },
+          { id:'base-fri-run4', name:'Run 0.62 mi', detail:'Run 4: 6.8–7.0 mph. Empty the tank.' },
+          { id:'base-fri-wb', name:'Wall Balls 100 reps', detail:'6 kg. Break 30/25/20/15/10 if needed.' },
+        ]},
     ],
     [
-      { type:'single', block:{ id:'base-sat-z2', name:'Long Z2 Run', detail:'70 min @ 1-2% incline. HR under 148.' }},
-      { type:'single', block:{ id:'base-sat-ins', name:'HYROX-Pace Inserts', sets:4, detail:'2 min @ 5:18/km in the final 20 min.' }},
+      { type:'single', block:{ id:'base-sat-z2', name:'Long Z2 Run', detail:'70 min @ 1–2% incline. 5.8–6.2 mph. HR under 148.' }},
+      { type:'single', block:{ id:'base-sat-ins', name:'HYROX-Pace Inserts', sets:4, detail:'2 min @ 6.5–6.8 mph in the final 20 min.' }},
     ],
     [
-      { type:'single', block:{ id:'base-sun-rest', name:'Full Rest', detail:'No training. Foam roll 10-15 min. 20 min walk optional.' }},
+      { type:'single', block:{ id:'base-sun-rest', name:'Full Rest', detail:'No training. Foam roll 10–15 min. 20 min walk optional.' }},
     ],
   ],
   BUILD: [
@@ -78,19 +88,19 @@ const WORKOUTS: Record<string, GroupDef[][]> = {
       { type:'single', block:{ id:'build-mon-dl', name:'Trap-Bar Deadlift', sets:4, detail:'4 reps @ 335 lb. Reset grip each rep.' }},
       { type:'single', block:{ id:'build-mon-pu', name:'Weighted Pull-Up', sets:4, detail:'5 reps @ +25 lb.' }},
       { type:'single', block:{ id:'build-mon-pp', name:'Push Press', sets:4, detail:'4 reps @ 155 lb.' }},
-      { type:'single', block:{ id:'build-mon-vo2', name:'VO2max Interval — 4 min', sets:5, detail:'4 min @ 4:30/km. RPE 9. Rest 3 min walk-jog.' }},
+      { type:'single', block:{ id:'build-mon-vo2', name:'VO2max Interval — 4 min', sets:5, detail:'4 min @ 7.5–8.0 mph. RPE 9. Rest 3 min walk-jog.' }},
     ],
     [
       { type:'round', rounds:4, deloadRounds:2, restNote:'60s rest — then Round',
         blocks:[
-          { id:'build-tue-run1', name:'500m Run', detail:'@ race pace. Straight into lunges.' },
+          { id:'build-tue-run1', name:'Run 0.31 mi', detail:'@ race pace 6.5–7.0 mph. Straight into lunges.' },
           { id:'build-tue-lunge', name:'Walking Lunges 30m', detail:'@ 20 kg sandbag.' },
-          { id:'build-tue-run2', name:'500m Run (2nd)', detail:'@ race pace.' },
+          { id:'build-tue-run2', name:'Run 0.31 mi', detail:'@ race pace 6.5–7.0 mph.' },
           { id:'build-tue-carry', name:'Farmers Carry 100m', detail:'@ 2x24 kg. End of round.' },
         ]},
     ],
     [
-      { type:'single', block:{ id:'build-wed-z2', name:'Z2 Run', detail:'30 min @ 1% incline.' }},
+      { type:'single', block:{ id:'build-wed-z2', name:'Z2 Run', detail:'30 min @ 1% incline. 5.8–6.2 mph.' }},
       { type:'superset', label:'Superset A — Push / Pull', blocks:[
         { id:'build-wed-bench', name:'Bench Press', sets:4, detail:'8 reps @ 195 lb.' },
         { id:'build-wed-row', name:'BB Row', sets:4, detail:'8 reps @ 165 lb.' },
@@ -99,26 +109,26 @@ const WORKOUTS: Record<string, GroupDef[][]> = {
       { type:'single', block:{ id:'build-wed-hlr', name:'Hanging Leg Raise', sets:3, detail:'12 reps. Controlled.' }},
     ],
     [
-      { type:'single', block:{ id:'build-thu-wu', name:'Warm-Up', detail:'15 min easy Z2.' }},
-      { type:'single', block:{ id:'build-thu-t1', name:'Threshold Interval 1', detail:'15 min @ 5:00/km.' }},
-      { type:'single', block:{ id:'build-thu-rec', name:'Recovery Jog', detail:'3 min easy.' }},
-      { type:'single', block:{ id:'build-thu-t2', name:'Threshold Interval 2', detail:'15 min @ 5:00/km.' }},
-      { type:'single', block:{ id:'build-thu-slp', name:'Sled Pull', sets:4, detail:'25m @ 103 kg. Deadlift stance, hip-snap.' }},
+      { type:'single', block:{ id:'build-thu-wu', name:'Warm-Up', detail:'15 min easy Z2. 5.5 mph.' }},
+      { type:'single', block:{ id:'build-thu-t1', name:'Threshold Interval 1', detail:'15 min @ 7.0–7.1 mph.' }},
+      { type:'single', block:{ id:'build-thu-rec', name:'Recovery Jog', detail:'3 min easy. 5.5 mph.' }},
+      { type:'single', block:{ id:'build-thu-t2', name:'Threshold Interval 2', detail:'15 min @ 7.1–7.2 mph.' }},
+      { type:'single', block:{ id:'build-thu-slp', name:'Sled Pull', sets:4, detail:'25m @ 2 plates. Deadlift stance, hip-snap.' }},
       { type:'single', block:{ id:'build-thu-wb', name:'Wall Balls', sets:3, detail:'25 reps @ 6 kg unbroken.' }},
     ],
     [
-      { type:'single', block:{ id:'build-fri-r1', name:'Run 1 — 1 km', detail:'@ race pace. Straight into SkiErg.' }},
-      { type:'single', block:{ id:'build-fri-ski', name:'SkiErg — 1000m', detail:'@ race target.' }},
-      { type:'single', block:{ id:'build-fri-r2', name:'Run 2 — 1 km', detail:'@ race pace.' }},
-      { type:'single', block:{ id:'build-fri-sled', name:'Sled Push — 50m', detail:'@ 152 kg.' }},
-      { type:'single', block:{ id:'build-fri-r3', name:'Run 3 — 1 km', detail:'@ race pace.' }},
-      { type:'single', block:{ id:'build-fri-slp', name:'Sled Pull — 50m', detail:'@ 103 kg.' }},
-      { type:'single', block:{ id:'build-fri-r4', name:'Run 4 — 1 km', detail:'@ race pace.' }},
-      { type:'single', block:{ id:'build-fri-bbj', name:'Burpee Broad Jumps — 80m', detail:'Step-up method. Chunk 4x20m. Target: sub-40 min.' }},
+      { type:'single', block:{ id:'build-fri-r1', name:'Run 1 — 0.62 mi', detail:'@ 6.5 mph. Restraint.' }},
+      { type:'single', block:{ id:'build-fri-ski', name:'SkiErg — 1000m', detail:'Target sub-4:00.' }},
+      { type:'single', block:{ id:'build-fri-r2', name:'Run 2 — 0.62 mi', detail:'@ 6.5–6.8 mph.' }},
+      { type:'single', block:{ id:'build-fri-sled', name:'Sled Push — 50m', detail:'@ race weight 335 lb / 5 plates.' }},
+      { type:'single', block:{ id:'build-fri-r3', name:'Run 3 — 0.62 mi', detail:'@ 6.8 mph.' }},
+      { type:'single', block:{ id:'build-fri-slp', name:'Sled Pull — 50m', detail:'@ 2 plates TRX.' }},
+      { type:'single', block:{ id:'build-fri-r4', name:'Run 4 — 0.62 mi', detail:'@ 7.0+ mph. Empty the tank.' }},
+      { type:'single', block:{ id:'build-fri-bbj', name:'Burpee Broad Jumps — 80m', detail:'Step-up method. Chunk 4x20m.' }},
     ],
     [
-      { type:'single', block:{ id:'build-sat-z2', name:'Long Z2/3 Run', detail:'75 min. Mostly Z2, last 30 min introduce Z3.' }},
-      { type:'single', block:{ id:'build-sat-ins', name:'HYROX-Pace Inserts', sets:4, detail:'3 min @ 5:18/km in last 30 min.' }},
+      { type:'single', block:{ id:'build-sat-z2', name:'Long Z2/3 Run', detail:'75 min. Mostly Z2, last 30 min introduce Z3. 6.0–6.5 mph.' }},
+      { type:'single', block:{ id:'build-sat-ins', name:'HYROX-Pace Inserts', sets:4, detail:'3 min @ 6.5–7.0 mph in last 30 min.' }},
     ],
     [
       { type:'single', block:{ id:'build-sun-rest', name:'Full Rest', detail:'Full rest. HRV check.' }},
@@ -129,20 +139,20 @@ const WORKOUTS: Record<string, GroupDef[][]> = {
       { type:'single', block:{ id:'peak-mon-sq', name:'Squat', sets:3, detail:'3 reps @ 80% (~260 lb). Maintenance.' }},
       { type:'single', block:{ id:'peak-mon-dl', name:'Deadlift', sets:3, detail:'3 reps @ 80% (~320 lb).' }},
       { type:'single', block:{ id:'peak-mon-bench', name:'Bench', sets:3, detail:'5 reps @ 75% (~185 lb).' }},
-      { type:'single', block:{ id:'peak-mon-vo2', name:'VO2max Interval — 4 min', sets:5, detail:'4 min @ 4:30/km. Rest 3 min. RPE 9.' }},
+      { type:'single', block:{ id:'peak-mon-vo2', name:'VO2max Interval — 4 min', sets:5, detail:'4 min @ 7.5–8.0 mph. Rest 3 min. RPE 9.' }},
     ],
     [
       { type:'round', rounds:4, restNote:'60s rest — then Round',
         blocks:[
-          { id:'peak-tue-run1', name:'500m Run', detail:'@ race pace.' },
+          { id:'peak-tue-run1', name:'Run 0.31 mi', detail:'@ race pace 6.5–7.0 mph.' },
           { id:'peak-tue-lunge', name:'Walking Lunges 30m', detail:'@ 20 kg sandbag.' },
-          { id:'peak-tue-run2', name:'500m Run (2nd)', detail:'@ race pace.' },
+          { id:'peak-tue-run2', name:'Run 0.31 mi', detail:'@ race pace 6.5–7.0 mph.' },
           { id:'peak-tue-carry', name:'Farmers Carry 100m', detail:'@ 2x24 kg.' },
         ]},
     ],
     [
-      { type:'single', block:{ id:'peak-wed-wu', name:'Warm-Up + Drills', detail:'15 min easy Z2 + drills.' }},
-      { type:'single', block:{ id:'peak-wed-1k', name:'Keystone — 1000m @ Race Pace', sets:6, detail:'1000m @ 4:50/km. 90s standing rest between sets.' }},
+      { type:'single', block:{ id:'peak-wed-wu', name:'Warm-Up + Drills', detail:'15 min easy Z2 + drills. 5.5 mph.' }},
+      { type:'single', block:{ id:'peak-wed-1k', name:'Keystone — 1 mi @ Race Pace', sets:6, detail:'1 mi @ 6.5–7.0 mph. 90s standing rest between sets.' }},
       { type:'superset', label:'Light Upper', blocks:[
         { id:'peak-wed-pu', name:'Pull-Ups', sets:3, detail:'6 reps bodyweight.' },
         { id:'peak-wed-pp', name:'Push Press', sets:3, detail:'5 reps @ 135 lb.' },
@@ -150,29 +160,29 @@ const WORKOUTS: Record<string, GroupDef[][]> = {
       ]},
     ],
     [
-      { type:'single', block:{ id:'peak-thu-wu', name:'Warm-Up', detail:'15 min easy Z2.' }},
-      { type:'single', block:{ id:'peak-thu-t1', name:'Threshold Interval 1', detail:'15 min @ 5:00/km.' }},
-      { type:'single', block:{ id:'peak-thu-rec', name:'Recovery Jog', detail:'3 min easy.' }},
-      { type:'single', block:{ id:'peak-thu-t2', name:'Threshold Interval 2', detail:'15 min @ 5:00/km.' }},
-      { type:'single', block:{ id:'peak-thu-sled', name:'Sled Push', sets:4, detail:'25m @ 152 kg. Race-pace efforts.' }},
+      { type:'single', block:{ id:'peak-thu-wu', name:'Warm-Up', detail:'15 min easy Z2. 5.5 mph.' }},
+      { type:'single', block:{ id:'peak-thu-t1', name:'Threshold Interval 1', detail:'15 min @ 7.0–7.1 mph.' }},
+      { type:'single', block:{ id:'peak-thu-rec', name:'Recovery Jog', detail:'3 min easy. 5.5 mph.' }},
+      { type:'single', block:{ id:'peak-thu-t2', name:'Threshold Interval 2', detail:'15 min @ 7.1–7.2 mph.' }},
+      { type:'single', block:{ id:'peak-thu-sled', name:'Sled Push', sets:4, detail:'25m @ race weight 335 lb / 5 plates.' }},
       { type:'single', block:{ id:'peak-thu-sb', name:'Sandbag Lunges', sets:2, detail:'100m @ 20 kg. Attack the distance.' }},
     ],
     [
-      { type:'single', block:{ id:'peak-fri-r1', name:'Run 1 — 1 km', detail:'@ race pace.' }},
-      { type:'single', block:{ id:'peak-fri-ski', name:'SkiErg — 1000m', detail:'@ race target.' }},
-      { type:'single', block:{ id:'peak-fri-r2', name:'Run 2 — 1 km', detail:'@ race pace.' }},
-      { type:'single', block:{ id:'peak-fri-sled', name:'Sled Push — 50m', detail:'@ 152 kg.' }},
-      { type:'single', block:{ id:'peak-fri-r3', name:'Run 3 — 1 km', detail:'@ race pace.' }},
-      { type:'single', block:{ id:'peak-fri-slp', name:'Sled Pull — 50m', detail:'@ 103 kg.' }},
-      { type:'single', block:{ id:'peak-fri-r4', name:'Run 4 — 1 km', detail:'@ race pace.' }},
-      { type:'single', block:{ id:'peak-fri-bbj', name:'Burpee BJ — 80m', detail:'Step-up method. Target: sub-40 min.' }},
+      { type:'single', block:{ id:'peak-fri-r1', name:'Run 1 — 0.62 mi', detail:'@ 6.5 mph. Restraint.' }},
+      { type:'single', block:{ id:'peak-fri-ski', name:'SkiErg — 1000m', detail:'Target sub-4:00.' }},
+      { type:'single', block:{ id:'peak-fri-r2', name:'Run 2 — 0.62 mi', detail:'@ 6.5–6.8 mph.' }},
+      { type:'single', block:{ id:'peak-fri-sled', name:'Sled Push — 50m', detail:'@ race weight 335 lb / 5 plates.' }},
+      { type:'single', block:{ id:'peak-fri-r3', name:'Run 3 — 0.62 mi', detail:'@ 6.8 mph.' }},
+      { type:'single', block:{ id:'peak-fri-slp', name:'Sled Pull — 50m', detail:'@ 2 plates TRX.' }},
+      { type:'single', block:{ id:'peak-fri-r4', name:'Run 4 — 0.62 mi', detail:'@ 7.0+ mph. Empty the tank.' }},
+      { type:'single', block:{ id:'peak-fri-bbj', name:'Burpee BJ — 80m', detail:'Step-up method. Chunk 4x20m.' }},
     ],
     [
-      { type:'single', block:{ id:'peak-sat-z2', name:'Long Run', detail:'70 min Z2 with pace inserts in last 25 min.' }},
-      { type:'single', block:{ id:'peak-sat-ins', name:'HYROX-Pace Inserts', sets:5, detail:'2 min @ 5:18/km in last 25 min.' }},
+      { type:'single', block:{ id:'peak-sat-z2', name:'Long Run', detail:'70 min Z2 with pace inserts in last 25 min. 5.8–6.2 mph base.' }},
+      { type:'single', block:{ id:'peak-sat-ins', name:'HYROX-Pace Inserts', sets:5, detail:'2 min @ 6.5–7.0 mph in last 25 min.' }},
     ],
     [
-      { type:'single', block:{ id:'peak-sun-rest', name:'Full Rest', detail:'Full rest. HRV check. Sleep 8-9 hrs.' }},
+      { type:'single', block:{ id:'peak-sun-rest', name:'Full Rest', detail:'Full rest. HRV check. Sleep 8–9 hrs.' }},
     ],
   ],
   TAPER: [
@@ -180,28 +190,28 @@ const WORKOUTS: Record<string, GroupDef[][]> = {
       { type:'single', block:{ id:'taper-mon-sq', name:'Squat', sets:3, detail:'3 reps @ 60% (~195 lb). Feel only.' }},
       { type:'single', block:{ id:'taper-mon-dl', name:'Deadlift', sets:3, detail:'3 reps @ 60% (~240 lb).' }},
       { type:'single', block:{ id:'taper-mon-bench', name:'Bench', sets:3, detail:'5 reps @ 65% (~160 lb).' }},
-      { type:'single', block:{ id:'taper-mon-sled', name:'Sled Push — Technique', sets:4, detail:'12.5m @ race weight. 80% effort.' }},
+      { type:'single', block:{ id:'taper-mon-sled', name:'Sled Push — Technique', sets:4, detail:'12.5m @ race weight 335 lb. 80% effort.' }},
     ],
     [
       { type:'round', rounds:3, restNote:'90s rest — then Round',
         blocks:[
-          { id:'taper-tue-run', name:'400m Run', detail:'@ race pace.' },
-          { id:'taper-tue-sled', name:'Sled Push 50m', detail:'@ ~120 kg.' },
+          { id:'taper-tue-run', name:'Run 0.25 mi', detail:'@ race pace 6.8–7.0 mph.' },
+          { id:'taper-tue-sled', name:'Sled Push 50m', detail:'@ 3 plates (~265 lb). Light taper load.' },
           { id:'taper-tue-row', name:'Row 200m', detail:'Moderate effort. End of round.' },
         ]},
     ],
     [
-      { type:'single', block:{ id:'taper-wed-z2', name:'Easy Z2 Run', detail:'25 min easy. HR under 135.' }},
+      { type:'single', block:{ id:'taper-wed-z2', name:'Easy Z2 Run', detail:'25 min easy. 5.5–5.8 mph. HR under 135.' }},
     ],
     [
       { type:'single', block:{ id:'taper-thu-sim', name:'3-Station Light Sim', detail:'3 stations @ 70% effort. ~25 min total.' }},
     ],
     [
-      { type:'single', block:{ id:'taper-fri-z2', name:'Easy Z2', detail:'30 min. HR under 140.' }},
+      { type:'single', block:{ id:'taper-fri-z2', name:'Easy Z2', detail:'30 min. 5.5 mph. HR under 140.' }},
     ],
     [
-      { type:'single', block:{ id:'taper-sat-z2', name:'Z2 Run', detail:'45 min Z2.' }},
-      { type:'single', block:{ id:'taper-sat-ins', name:'HYROX-Pace Strides', sets:3, detail:'2 min @ 5:18/km in final 15 min.' }},
+      { type:'single', block:{ id:'taper-sat-z2', name:'Z2 Run', detail:'45 min Z2. 5.8 mph.' }},
+      { type:'single', block:{ id:'taper-sat-ins', name:'HYROX-Pace Strides', sets:3, detail:'2 min @ 6.8–7.0 mph in final 15 min.' }},
     ],
     [
       { type:'single', block:{ id:'taper-sun-rest', name:'Full Rest', detail:'Full rest. Begin 5-day hydration ramp: +500 ml water + sodium.' }},
@@ -210,44 +220,48 @@ const WORKOUTS: Record<string, GroupDef[][]> = {
 };
 
 const DELOAD_OVERRIDES: Record<string, string> = {
-  'base-mon-ski': 'Deload — 2x500m easy @ 2:30/500m only.',
-  'base-thu-t2': 'Deload — skip second interval. 1x12 min @ 5:00/km only.',
+  'base-mon-ski': 'Deload — 2x500m easy @ 2:30. Two sets only.',
+  'base-thu-t2': 'Deload — skip second interval. 1x10 min @ 7.0 mph only.',
   'base-sat-ins': 'Deload — skip pace inserts.',
-  'build-mon-vo2': 'Deload — 3x4 min @ 4:40/km only.',
+  'build-mon-vo2': 'Deload — 3x4 min @ 7.5 mph only.',
   'build-sat-ins': 'Deload — skip pace inserts.',
 };
 
 const DELOAD_WEEKS = [4, 7, 11, 14];
 
 const SIM_SEGMENTS = [
-  { name:'Run 1',          type:'run',     target:285, note:'1 km — restraint' },
+  { name:'Run 1',          type:'run',     target:285, note:'0.62 mi — restraint, 6.5 mph' },
   { name:'SkiErg',         type:'station', target:325, note:'1000m — hip-hinge, damper 5' },
-  { name:'Run 2',          type:'run',     target:310, note:'1 km — arms cooked' },
-  { name:'Sled Push',      type:'station', target:250, note:'50m @ 152 kg' },
-  { name:'Run 3',          type:'run',     target:315, note:'1 km — short steps' },
-  { name:'Sled Pull',      type:'station', target:340, note:'50m @ 103 kg' },
-  { name:'Run 4',          type:'run',     target:320, note:'1 km — settle HR' },
+  { name:'Run 2',          type:'run',     target:310, note:'0.62 mi — build to 6.8 mph' },
+  { name:'Sled Push',      type:'station', target:250, note:'50m @ 335 lb / 5 plates' },
+  { name:'Run 3',          type:'run',     target:315, note:'0.62 mi — short steps, 6.8 mph' },
+  { name:'Sled Pull',      type:'station', target:340, note:'50m @ 2 plates TRX' },
+  { name:'Run 4',          type:'run',     target:320, note:'0.62 mi — settle HR, 6.8 mph' },
   { name:'Burpee BJ',      type:'station', target:340, note:'80m — chunk 4x20m' },
-  { name:'Run 5',          type:'run',     target:325, note:'1 km — biggest spike' },
-  { name:'Row',            type:'station', target:330, note:'1000m — damper 4' },
-  { name:'Run 6',          type:'run',     target:325, note:'1 km — legs fresh' },
-  { name:'Farmers Carry',  type:'station', target:190, note:'200m @ 2x24 kg' },
-  { name:'Run 7',          type:'run',     target:330, note:'1 km — grip shot' },
+  { name:'Run 5',          type:'run',     target:325, note:'0.62 mi — biggest spike, 6.8 mph' },
+  { name:'Row',            type:'station', target:330, note:'1000m — damper 4, sub-5:00' },
+  { name:'Run 6',          type:'run',     target:325, note:'0.62 mi — 7.0 mph' },
+  { name:'Farmers Carry',  type:'station', target:190, note:'200m @ 2x24 kg — unbroken' },
+  { name:'Run 7',          type:'run',     target:330, note:'0.62 mi — grip shot, 7.0 mph' },
   { name:'Sandbag Lunges', type:'station', target:340, note:'100m @ 20 kg — attack' },
-  { name:'Run 8',          type:'run',     target:340, note:'1 km — empty the tank' },
+  { name:'Run 8',          type:'run',     target:340, note:'0.62 mi — empty the tank, 7.5 mph' },
   { name:'Wall Balls',     type:'station', target:435, note:'100 reps @ 6 kg — 30/25/20/15/10' },
 ];
 
 const DAY_NAMES = ['Mon','Tue','Wed','Thu','Fri','Sat','Sun'];
 const SESSION_TITLES: Record<string, string[]> = {
-  BASE:  ['Heavy Lower + Engine','Compromised Brick','Z2 + Upper Strength','Threshold + Station Skill','Station Skill + Mixed Modal','Long Run','Rest'],
+  BASE:  ['Heavy Lower + Engine','Strength + Compromised Brick','Z2 + Upper Strength','Threshold + Station Skill','Mini Sim — Station Day','Long Run','Rest'],
   BUILD: ['Strength + VO2max','Compromised Race Brick','Z2 + Upper Strength','Threshold + Stations','Half Sim','Long Run + HYROX Pace','Rest'],
-  PEAK:  ['Maintenance Strength + VO2','Race-Specific Brick','Keystone 6x1000m','Threshold + Stations','Full / Half Sim','Long Run + HYROX Pace','Rest'],
+  PEAK:  ['Maintenance Strength + VO2','Race-Specific Brick','Keystone 6x1 mi','Threshold + Stations','Full / Half Sim','Long Run + HYROX Pace','Rest'],
   TAPER: ['Technique @ 80%','Light Brick','Easy Shakeout','Light Half Sim','Easy Z2','Short Long Run','Rest + Carb Load'],
 };
 
+// Race date: September 18, 2026. Week 1 started April 27, 2026.
 function getCurrentWeek(): number {
-  return Math.min(Math.max(Math.floor((Date.now() - new Date('2025-05-01').getTime()) / (7 * 864e5)) + 1, 1), 20);
+  const start = new Date('2026-04-27T00:00:00');
+  const now = new Date();
+  const elapsed = Math.floor((now.getTime() - start.getTime()) / (7 * 24 * 3600 * 1000));
+  return Math.min(Math.max(elapsed + 1, 1), 20);
 }
 function getPhase(w: number): string {
   return w <= 7 ? 'BASE' : w <= 14 ? 'BUILD' : w <= 18 ? 'PEAK' : 'TAPER';
