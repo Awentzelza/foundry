@@ -1,5 +1,5 @@
 
-import { useState } from 'react';
+import { useState, type ReactNode } from 'react';
 import { IonSegment, IonSegmentButton, IonLabel, IonBadge } from '@ionic/react';
 import s from './styles.module.css';
 
@@ -212,10 +212,18 @@ const months = [
 
 type SectionKey = 'her' | 'him' | 'together';
 
+interface SupItem { name: string; timing: string; note: string; }
+interface MonthData {
+  number: number; label: string; theme: string; focus: string;
+  her: { supplements: SupItem[]; diet: string[]; tracking: string[]; lifestyle: string[]; };
+  him: { supplements: SupItem[]; diet: string[]; lifestyle: string[]; };
+  together: string[];
+}
+
 export default function TTCPlan() {
   const [activeMonth, setActiveMonth] = useState(0);
   const [activeSection, setActiveSection] = useState<SectionKey>('her');
-  const m = months[activeMonth];
+  const m = months[activeMonth] as MonthData;
 
   return (
     <div className={s.root}>
@@ -297,7 +305,7 @@ export default function TTCPlan() {
   );
 }
 
-function Section({ title, children }: { title: string; children: React.ReactNode }) {
+function Section({ title, children }: { title: string; children: ReactNode }) {
   return (
     <div className={s.card}>
       <div className={s.cardTitle}>{title}</div>
