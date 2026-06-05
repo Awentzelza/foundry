@@ -1,6 +1,6 @@
 
 import { useState } from 'react';
-import { IonButton, IonSegment, IonSegmentButton, IonLabel, IonBadge } from '@ionic/react';
+import { IonSegment, IonSegmentButton, IonLabel, IonBadge } from '@ionic/react';
 import s from './styles.module.css';
 
 const months = [
@@ -25,7 +25,7 @@ const months = [
         'Reduce refined carbs — swap white rice for quinoa',
         'Morning half-caf or decaf latte: approx 30-50mg caffeine, well under 200mg daily limit',
         'Afternoon matcha: approx 30-40mg caffeine, good antioxidant profile',
-        'Total daily caffeine goal: stay under 150-200mg — your current routine is well-calibrated',
+        'Total daily caffeine target: stay under 150-200mg — your current routine is well-calibrated',
         'Choose Swiss Water Process decaf for lowest chemical exposure',
         'Hydrate: 2-2.5L water daily for cervical mucus quality',
       ],
@@ -46,8 +46,8 @@ const months = [
     },
     him: {
       supplements: [
-        { name: 'FullWell Men\'s Multivitamin', timing: '2 caps AM, 2 caps with lunch', note: 'Top pick — swap to this from Gorilla Mind' },
-        { name: 'FullWell Fertility Booster', timing: '2 caps daily', note: 'Add for sperm DNA protection — CoQ10, NAC, ALA, Ashwagandha' },
+        { name: "FullWell Men's Multivitamin", timing: '2 caps AM, 2 caps with lunch', note: 'Top pick — swap to this from Gorilla Mind' },
+        { name: 'FullWell Fertility Booster', timing: '2 caps daily', note: 'Adds CoQ10, NAC, ALA, Ashwagandha for sperm DNA protection' },
         { name: '365 Whole Foods Fish Oil', timing: 'With dinner', note: 'Keep — good omega-3 source' },
         { name: 'Magnesium glycinate', timing: 'Before bed', note: 'Already taking — supports testosterone, sleep, and stress reduction' },
       ],
@@ -74,8 +74,8 @@ const months = [
       'Schedule intercourse every other day during the fertile window — use Mira to time precisely',
       'Use Conceive Plus or Pre-Seed lubricant (sperm-safe)',
       'Consider getting a semen analysis — Legacy or Fellow are HSA/FSA eligible with clinic-grade results',
-      'Swap plastic containers for glass, filter tap water',
-      'Your morning latte routine is well within safe caffeine limits — no need to change it',
+      'Swap plastic containers for glass and filter tap water',
+      'Your morning latte routine is well within safe caffeine limits — no need to change',
     ],
   },
   {
@@ -94,18 +94,18 @@ const months = [
         'Add lentils or chickpeas 4x/week for iron and folate',
         'Eat a wide variety of vegetables daily',
         'Prioritize wild-caught salmon over tuna (lower mercury)',
-        'Incorporate pomegranate juice for antioxidants and uterine lining support',
+        'Pomegranate juice for antioxidants and uterine lining support',
         'Reduce sugar — swap for fruit',
         'Morning latte and afternoon matcha remain your ideal caffeine rhythm',
         'If going fully decaf, choose Swiss Water Process brands',
       ],
       tracking: [
         'Mira Ultra4: by now you have one full cycle of data — review your hormonal trends',
-        'Check PdG levels 7-10 days post-ovulation — should show a clear rise confirming ovulation',
-        'Track FSH at cycle start (CD2-3) — rising FSH is worth noting for your OB',
+        'Check PdG levels 7-10 days post-ovulation — should show a clear rise',
+        'Track FSH at cycle start (CD2-3) — rising FSH is worth sharing with your OB',
         'Note cycle length consistency — should be within 2 days each month',
-        'Track luteal phase length using PdG: aim for 12-14 days of elevated PdG post-ovulation',
-        'Export your Mira app data to share with your OB — it is clinically relevant',
+        'Track luteal phase using PdG: aim for 12-14 days of elevated PdG post-ovulation',
+        'Export your Mira app data to share with your OB',
       ],
       lifestyle: [
         'Add acupuncture if accessible — evidence supports fertility benefits',
@@ -116,9 +116,9 @@ const months = [
     },
     him: {
       supplements: [
-        { name: 'FullWell Men\'s Multivitamin', timing: 'Continue', note: 'Month 2 — sperm quality improvements are building' },
+        { name: "FullWell Men's Multivitamin", timing: 'Continue', note: 'Month 2 — sperm quality improvements are building' },
         { name: 'FullWell Fertility Booster', timing: 'Continue', note: 'Sperm cycle is approx 74 days — stay consistent' },
-        { name: 'Fish Oil (omega-3 EPA/DHA)', timing: 'With dinner', note: 'Consider upgrading to triglyceride form for better absorption' },
+        { name: 'Fish Oil omega-3', timing: 'With dinner', note: 'Consider upgrading to triglyceride form for better absorption' },
         { name: 'Magnesium', timing: 'Before bed', note: 'Continue — good for testosterone and sleep quality' },
       ],
       diet: [
@@ -131,7 +131,7 @@ const months = [
         'Keep coffee to 1-2 cups per day',
       ],
       lifestyle: [
-        'At-home sperm test this month: Legacy or Fellow — both HSA/FSA eligible, CLIA-certified',
+        'At-home sperm test this month: Legacy or Fellow — HSA/FSA eligible, CLIA-certified',
         'Legacy tests count, motility, and morphology — the most important metrics',
         'Track sleep: aim for 7-8hrs minimum',
         'Mindfulness or meditation to reduce cortisol',
@@ -155,10 +155,10 @@ const months = [
         { name: 'Perelel full stack', timing: 'Continue all', note: 'Maintain' },
         { name: 'Whole Food Vitamin D', timing: 'With fatty meal', note: 'Continue — ask OB to test serum levels' },
         { name: 'Magnesium', timing: 'Before bed', note: 'Continue — especially important for luteal phase support' },
-        { name: 'Inositol (Myo + D-Chiro blend)', timing: 'As directed', note: 'Consider if Mira shows irregular FSH or luteal phase issues' },
+        { name: 'Inositol Myo + D-Chiro blend', timing: 'As directed', note: 'Consider if Mira shows irregular FSH or luteal phase issues' },
       ],
       diet: [
-        'Request blood work: ferritin, vitamin D, thyroid (TSH), AMH, fasting glucose',
+        'Request blood work: ferritin, vitamin D, thyroid TSH, AMH, fasting glucose',
         'Eat anti-inflammatory: turmeric, ginger, berries, olive oil',
         'Maximize whole food folate sources',
         'Your latte and matcha routine remains balanced and sustainable',
@@ -168,7 +168,7 @@ const months = [
         'Mira Ultra4: export your 3-cycle hormonal report to share with your OB',
         'Highlight any cycles where PdG did not rise adequately in the luteal phase',
         'Confirm FSH trend from CD2-3 data across months 8-10',
-        'Get a day 3 FSH and estradiol blood draw if OB recommends — compare to your Mira FSH',
+        'Consider a day 3 FSH and estradiol blood draw if OB recommends — compare to your Mira FSH',
         'Progesterone blood draw at 7DPO to cross-validate your Mira PdG readings',
       ],
       lifestyle: [
@@ -180,11 +180,11 @@ const months = [
     },
     him: {
       supplements: [
-        { name: 'FullWell Men\'s Multivitamin', timing: 'Continue', note: 'Month 3 — sperm quality improvements are now peaking' },
+        { name: "FullWell Men's Multivitamin", timing: 'Continue', note: 'Month 3 — sperm quality improvements are now peaking' },
         { name: 'FullWell Fertility Booster', timing: 'Continue', note: '3-month mark is when CoQ10 shows measurable results in sperm' },
         { name: 'Fish Oil', timing: 'Continue', note: 'Maintain' },
         { name: 'Magnesium', timing: 'Before bed', note: 'Continue — supports overall hormonal health' },
-        { name: 'L-Carnitine (optional)', timing: '500-1000mg daily', note: 'Evidence-backed for motility if sperm test showed low motility' },
+        { name: 'L-Carnitine optional', timing: '500-1000mg daily', note: 'Evidence-backed for motility if sperm test showed low motility' },
       ],
       diet: [
         'Continue antioxidant-rich, Mediterranean approach',
@@ -219,8 +219,6 @@ export default function TTCPlan() {
 
   return (
     <div className={s.root}>
-
-      {/* Month selector */}
       <div className={s.monthBar}>
         {months.map((mo, i) => (
           <button
@@ -234,13 +232,11 @@ export default function TTCPlan() {
         ))}
       </div>
 
-      {/* Focus card */}
       <div className={s.focusCard}>
         <div className={s.focusEyebrow}>Month {m.number} Focus</div>
         <p className={s.focusText}>{m.focus}</p>
       </div>
 
-      {/* Section tabs */}
       <IonSegment
         value={activeSection}
         onIonChange={e => setActiveSection(e.detail.value as SectionKey)}
@@ -251,7 +247,6 @@ export default function TTCPlan() {
         <IonSegmentButton value="together"><IonLabel>Together</IonLabel></IonSegmentButton>
       </IonSegment>
 
-      {/* Her */}
       {activeSection === 'her' && (
         <div className={s.sections}>
           <Section title="Supplements">
@@ -259,19 +254,12 @@ export default function TTCPlan() {
               <SupRow key={i} name={sup.name} timing={sup.timing} note={sup.note} last={i === m.her.supplements.length - 1} />
             ))}
           </Section>
-          <Section title="Diet and Nutrition">
-            <BulletList items={m.her.diet} />
-          </Section>
-          <Section title="Cycle Tracking — Mira Ultra4">
-            <BulletList items={m.her.tracking} />
-          </Section>
-          <Section title="Lifestyle">
-            <BulletList items={m.her.lifestyle} />
-          </Section>
+          <Section title="Diet and Nutrition"><BulletList items={m.her.diet} /></Section>
+          <Section title="Cycle Tracking — Mira Ultra4"><BulletList items={m.her.tracking} /></Section>
+          <Section title="Lifestyle"><BulletList items={m.her.lifestyle} /></Section>
         </div>
       )}
 
-      {/* Him */}
       {activeSection === 'him' && (
         <div className={s.sections}>
           <Section title="Supplements">
@@ -279,16 +267,11 @@ export default function TTCPlan() {
               <SupRow key={i} name={sup.name} timing={sup.timing} note={sup.note} last={i === m.him.supplements.length - 1} />
             ))}
           </Section>
-          <Section title="Diet and Nutrition">
-            <BulletList items={m.him.diet} />
-          </Section>
-          <Section title="Lifestyle">
-            <BulletList items={m.him.lifestyle} />
-          </Section>
+          <Section title="Diet and Nutrition"><BulletList items={m.him.diet} /></Section>
+          <Section title="Lifestyle"><BulletList items={m.him.lifestyle} /></Section>
         </div>
       )}
 
-      {/* Together */}
       {activeSection === 'together' && (
         <div className={s.sections}>
           <Section title="As a Couple This Month">
