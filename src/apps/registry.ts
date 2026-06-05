@@ -88,6 +88,18 @@ export const APP_REGISTRY: RegisteredApp[] = [
   },
   {
     meta: {
+      id: "ttc-plan",
+      name: "TTC Plan",
+      description: "Monthly supplement, diet, tracking, and lifestyle guide for months 8-10.",
+      icon: "TTC",
+      route: "ttc-plan",
+      needsPersistence: false,
+      status: "active",
+    },
+    load: () => import("./ttc-plan"),
+  },
+  {
+    meta: {
       id: "water-tracker",
       name: "Water Tracker",
       description: "Track your daily 8 glasses. Tap to log, tap again to undo. 7-day history.",
