@@ -1,0 +1,224 @@
+
+.root {
+  padding: var(--space-4) var(--space-4) var(--space-8);
+  max-width: 680px;
+  margin: 0 auto;
+  font-family: var(--foundry-font-body);
+}
+
+.monthBar {
+  display: flex;
+  gap: var(--space-2);
+  margin-bottom: var(--space-4);
+}
+
+.monthBtn {
+  flex: 1;
+  background: var(--foundry-card);
+  border: 1px solid var(--foundry-border);
+  border-radius: var(--foundry-radius-md);
+  padding: var(--space-3) var(--space-2);
+  cursor: pointer;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  transition: border-color 0.2s, background 0.2s;
+}
+
+.monthBtnActive {
+  border-color: var(--foundry-ember);
+  background: var(--foundry-surface);
+}
+
+.monthNum {
+  font-family: var(--foundry-font-display);
+  font-size: 22px;
+  font-weight: 700;
+  color: var(--foundry-text);
+  letter-spacing: -0.02em;
+}
+
+.monthTheme {
+  font-family: var(--foundry-font-mono);
+  font-size: 9px;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--foundry-text-subtle);
+  text-align: center;
+}
+
+.focusCard {
+  background: var(--foundry-surface);
+  border-left: 3px solid var(--foundry-ember);
+  border-radius: var(--foundry-radius-md);
+  padding: var(--space-4);
+  margin-bottom: var(--space-4);
+}
+
+.focusEyebrow {
+  font-family: var(--foundry-font-mono);
+  font-size: 10px;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: var(--foundry-ember);
+  margin-bottom: var(--space-1);
+}
+
+.focusText {
+  font-family: var(--foundry-font-body);
+  font-size: 15px;
+  line-height: 1.6;
+  color: var(--foundry-text);
+  margin: 0;
+}
+
+.segment {
+  margin-bottom: var(--space-4);
+  --background: var(--foundry-card);
+  --border-color: var(--foundry-border);
+}
+
+.sections {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+}
+
+.card {
+  background: var(--foundry-card);
+  border: 1px solid var(--foundry-border);
+  border-radius: var(--foundry-radius-md);
+  padding: var(--space-4);
+}
+
+.cardTitle {
+  font-family: var(--foundry-font-mono);
+  font-size: 10px;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: var(--foundry-text-subtle);
+  margin-bottom: var(--space-3);
+}
+
+.supRow {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  padding: var(--space-3) 0;
+}
+
+.supRowBorder {
+  border-bottom: 1px solid var(--foundry-border);
+}
+
+.supTop {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: var(--space-2);
+  flex-wrap: wrap;
+}
+
+.supName {
+  font-family: var(--foundry-font-body);
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--foundry-text);
+}
+
+.timingBadge {
+  font-family: var(--foundry-font-mono);
+  font-size: 10px;
+  --background: var(--foundry-surface);
+  --color: var(--foundry-text-muted);
+  flex-shrink: 0;
+}
+
+.supNote {
+  font-family: var(--foundry-font-body);
+  font-size: 13px;
+  color: var(--foundry-text-muted);
+}
+
+.bulletList {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+}
+
+.bulletRow {
+  display: flex;
+  gap: var(--space-2);
+  align-items: flex-start;
+}
+
+.bullet {
+  width: 5px;
+  height: 5px;
+  border-radius: 50%;
+  background: var(--foundry-ember);
+  margin-top: 7px;
+  flex-shrink: 0;
+}
+
+.bulletText {
+  font-family: var(--foundry-font-body);
+  font-size: 14px;
+  line-height: 1.6;
+  color: var(--foundry-text);
+}
+
+.togetherRow {
+  display: flex;
+  gap: var(--space-3);
+  align-items: flex-start;
+  padding: var(--space-3) 0;
+}
+
+.togetherRowBorder {
+  border-bottom: 1px solid var(--foundry-border);
+}
+
+.togetherNum {
+  flex-shrink: 0;
+  --background: var(--foundry-surface);
+  --color: var(--foundry-ember);
+  font-family: var(--foundry-font-mono);
+  font-size: 11px;
+  min-width: 24px;
+  text-align: center;
+}
+
+.togetherText {
+  font-family: var(--foundry-font-body);
+  font-size: 14px;
+  line-height: 1.6;
+  color: var(--foundry-text);
+  padding-top: 2px;
+}
+
+.closingCard {
+  background: var(--foundry-surface);
+  border: 1px solid var(--foundry-border);
+  border-radius: var(--foundry-radius-md);
+  padding: var(--space-5);
+  text-align: center;
+}
+
+.closingTitle {
+  font-family: var(--foundry-font-display);
+  font-size: 20px;
+  font-weight: 600;
+  color: var(--foundry-text);
+  margin: 0 0 var(--space-3);
+  letter-spacing: -0.01em;
+}
+
+.closingBody {
+  font-family: var(--foundry-font-body);
+  font-size: 14px;
+  line-height: 1.7;
+  color: var(--foundry-text-muted);
+  margin: 0;
+}
