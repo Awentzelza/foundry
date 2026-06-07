@@ -1,325 +1,241 @@
-import { useState, useCallback } from 'react';
-import { IonButton } from '@ionic/react';
-import { useAppData } from '@/hooks/useAppData';
-import s from './styles.module.css';
+import { useState } from 'react';
 
-interface CheckedState { [key: string]: boolean }
+interface Breakfast { day: string; name: string; items: string[]; ttc: string; }
+interface Lunch { day: string; name: string; items: string[]; ttc: string; }
+interface Dinner { id: number; day: string; name: string; tag: string; protein: string; ttcNote: string; ingredients: string[]; steps: string[]; }
 
-const recipes = [
+const breakfasts: Breakfast[] = [
+  { day: 'Monday', name: 'Scrambled Eggs with Spinach and Yogurt', items: ['2-3 eggs scrambled with a handful of spinach', 'Full fat Greek yogurt on the side', '2-3 Brazil nuts and pumpkin seeds on yogurt', 'Half-caf or decaf latte'], ttc: 'Eggs provide choline and Vitamin E. Spinach delivers folate. Brazil nuts supply selenium for sperm DNA integrity. Yogurt supports hormone balance.' },
+  { day: 'Tuesday', name: 'Overnight Oats with Yogurt', items: ['Overnight oats with protein powder', 'Berries stirred in', 'Full fat Greek yogurt on the side or mixed in', 'Pumpkin seeds on top'], ttc: 'Berries provide antioxidants for egg quality. Pumpkin seeds deliver zinc. Yogurt supports progesterone production.' },
+  { day: 'Wednesday', name: 'Eggs with Spinach', items: ['2-3 fried or scrambled eggs', 'Handful of spinach cooked in', '2-3 Brazil nuts on the side'], ttc: 'Daily eggs are a cornerstone of the TTC plan. Spinach folate and iron are critical for Isabel.' },
+  { day: 'Thursday', name: 'Overnight Oats with Nuts and Yogurt', items: ['Overnight oats with protein powder', 'Full fat Greek yogurt mixed in or on side', 'Berries and walnuts on top', 'Pumpkin seeds'], ttc: 'Walnuts provide omega-3s for sperm motility. Berries deliver antioxidant load for both.' },
+  { day: 'Friday', name: 'Scrambled Eggs with Spinach', items: ['2-3 eggs scrambled with spinach', 'Full fat Greek yogurt', 'Brazil nuts and pumpkin seeds', 'Slice of bread with olive oil (optional)'], ttc: 'End the week strong. Olive oil on bread adds Mediterranean healthy fat.' },
+];
+
+const lunches: Lunch[] = [
+  { day: 'Monday', name: 'Leftover Chicken Salad', items: ['Sliced leftover lemon herb chicken', 'Lettuce, cucumber, and green onion', 'Olive oil and lemon dressing', 'Feta crumbled on top (optional)'], ttc: 'Greens with olive oil reduce inflammation. Feta adds full fat dairy.' },
+  { day: 'Tuesday', name: 'Leftover Beef Bowl Salad', items: ['Leftover ground beef over lettuce', 'Cucumber and cherry tomatoes', 'Olive oil, lemon, and salt', 'Greek yogurt as dressing'], ttc: 'Tomatoes provide lycopene for sperm DNA protection. Yogurt doubles as dressing and dairy hit.' },
+  { day: 'Wednesday', name: 'Leftover Stir Fry Rice Bowl', items: ['Leftover chicken and stir fry veggies over rice', 'Cucumber slices on the side', 'Olive oil and lemon drizzle', 'Handful of spinach stirred in cold'], ttc: 'Colorful veggies deliver antioxidant variety. Cold spinach still provides folate.' },
+  { day: 'Thursday', name: 'Mediterranean Salad with Chicken', items: ['Leftover roasted chicken over lettuce', 'Cherry tomatoes, cucumber, and kalamata olives', 'Olive oil, lemon, and oregano dressing', 'Feta on top'], ttc: 'Olives provide healthy fat. Tomatoes add lycopene again. Most TTC-optimized lunch of the week.' },
+  { day: 'Friday', name: 'Simple Salad with Leftover Protein', items: ['Lettuce, cucumber, green onion, and cherry tomatoes', 'Any leftover protein from the week', 'Olive oil and lemon dressing', 'Pumpkin seeds on top'], ttc: 'Clean, anti-inflammatory close to the week. Pumpkin seeds add zinc.' },
+];
+
+const dinners: Dinner[] = [
   {
-    id: 1, day: 'Monday', title: 'Sheet Pan Chicken & Sweet Potatoes',
-    protein: 'Chicken', time: '40 min', tag: 'Clean',
-    ingredients: [
-      '2 boneless skinless chicken breasts',
-      '2 sweet potatoes, cubed',
-      '2 cups baby spinach or arugula',
-      '3 tbsp olive oil',
-      '4 cloves garlic, minced',
-      '1 tsp paprika',
-      '1 tsp garlic powder',
-      '1 tsp onion powder',
-      '1 tsp dried rosemary',
-      'Salt and pepper to taste',
-    ],
-    steps: [
-      'Preheat oven to 425 F.',
-      'Cube sweet potatoes and toss with 1.5 tbsp olive oil, salt, pepper, and paprika. Spread on one side of a sheet pan.',
-      'Roast sweet potatoes for 10 minutes while you prep the chicken.',
-      'Mix remaining olive oil, garlic, garlic powder, onion powder, rosemary, salt and pepper. Coat chicken breasts.',
-      'Add chicken to the other side of the sheet pan.',
-      'Roast everything together for 25-28 minutes until chicken hits 165 F internal temp.',
-      'In the last 5 minutes, scatter spinach or arugula over the sweet potatoes and let it wilt in the oven.',
-      'Let chicken rest 5 minutes before slicing. Serve everything together.',
-    ],
+    id: 1, day: 'Monday', name: 'Lemon Herb Chicken over Couscous', tag: 'Folate + Zinc', protein: 'Thawed chicken breast',
+    ttcNote: 'Couscous and broccoli deliver folate. Olive oil pan sauce provides hormone-healthy fat. Fire roasted tomatoes add lycopene.',
+    ingredients: ['1 chicken breast (thawed)', '3/4 cup couscous', '1/2 cup chicken broth for couscous', '1 cup broccoli florets', '1/2 can Muir Glen fire roasted tomatoes', '1/2 yellow onion sliced', '2 tbsp olive oil', '2 garlic cloves minced', 'Juice of 1 lemon', '1 tsp oregano, 1/2 tsp cumin', 'Salt, pepper, Maldon to finish', 'Green onion for garnish'],
+    steps: ['Pound chicken to even thickness. Season with oregano, cumin, salt, and pepper.', 'Sear in cast iron with olive oil — 4-5 min per side until golden. Rest 5 min, then slice.', 'In same pan: saute onion and garlic 2 min. Add fire roasted tomatoes, lemon juice, and splash of broth. Scrape bits. Simmer 2 min.', 'Cook couscous: bring 3/4 cup broth to boil, add couscous, cover, off heat 5 min. Fluff.', 'Steam or air fry broccoli. Plate couscous, top with sliced chicken and tomato pan sauce. Finish with Maldon and green onion.'],
   },
   {
-    id: 2, day: 'Tuesday', title: 'Taco Rice Bowls',
-    protein: 'Ground Beef', time: '30 min', tag: 'Performance',
-    ingredients: [
-      '1 lb ground beef',
-      '1 sweet onion, diced',
-      '2 cups cooked white rice',
-      '2 cups chopped romaine or spinach',
-      '2 avocados, sliced',
-      '1 cup shredded carrots',
-      '1/2 cup shredded cheese',
-      '2 tsp cumin',
-      '1 tsp chili powder',
-      '1 tsp garlic powder',
-      'Salt and pepper to taste',
-      'Lime juice (optional)',
-    ],
-    steps: [
-      'Cook rice according to package instructions.',
-      'Brown ground beef in a skillet over medium-high heat, breaking it up as it cooks.',
-      'Drain excess fat. Add diced onion and cook 3-4 more minutes until softened.',
-      'Season with cumin, chili powder, garlic powder, salt, and pepper. Stir well and cook 1 more minute.',
-      'Build bowls: bed of chopped romaine or spinach then rice then beef mixture then sliced avocado then shredded carrots then cheese.',
-      'Squeeze lime juice over the top if using.',
-    ],
+    id: 2, day: 'Tuesday', name: 'Mediterranean Ground Beef Rice Bowls', tag: 'Iron + Zinc', protein: '1 lb ground beef',
+    ttcNote: 'Beef provides zinc and iron for ovulation. Pumpkin seeds on top add zinc for Andre. Tomatoes and spinach round out the nutrients.',
+    ingredients: ['1 lb ground beef', '1.5 cups rice cooked', '1/2 yellow onion diced', '2 garlic cloves', '1/2 can Muir Glen fire roasted tomatoes', '1 tsp cumin, 1 tsp smoked paprika, 1/2 tsp cinnamon', 'Salt and pepper', '1/2 cucumber diced', 'Green onion sliced', 'Handful of fresh spinach', 'Lemon squeeze and olive oil drizzle', 'Pumpkin seeds for topping', 'Full fat Greek yogurt as sauce'],
+    steps: ['Cook rice. Brown ground beef in cast iron over medium-high. Drain most fat.', 'Add onion and garlic. Cook 3 min. Add cumin, paprika, cinnamon, and fire roasted tomatoes. Stir and cook 2 min.', 'Add handful of spinach right at end. Stir until wilted, about 30 seconds. Off heat.', 'Build bowls: rice base, beef and tomato mixture, fresh cucumber and green onion on top.', 'Finish with lemon, olive oil, and Maldon. Pumpkin seeds on top for Andre. Yogurt on the side as sauce.'],
   },
   {
-    id: 3, day: 'Wednesday', title: 'Creamy Tuscan Chicken over Banza Pasta',
-    protein: 'Chicken', time: '35 min', tag: 'Performance',
-    ingredients: [
-      '2 boneless skinless chicken breasts',
-      '2 cups Banza chickpea pasta',
-      '4 cloves garlic, minced',
-      '1/2 cup heavy whipping cream',
-      '1/2 cup chicken broth',
-      '1 cup baby spinach',
-      '1/2 cup sun-dried tomatoes',
-      '2 tbsp butter',
-      '1 tsp Italian seasoning',
-      'Salt, pepper, red pepper flakes',
-      'Parmesan to finish (optional)',
-    ],
-    steps: [
-      'Cook Banza pasta per package — slightly al dente. Reserve 1/4 cup pasta water. Drain.',
-      'Season chicken with salt, pepper, and Italian seasoning. Sear in butter over medium-high heat 5-6 min per side until cooked through. Remove and slice.',
-      'In the same pan, saute garlic 1 minute. Add sun-dried tomatoes.',
-      'Pour in chicken broth and heavy cream. Stir and simmer 3-4 minutes until slightly thickened.',
-      'Add spinach and stir until wilted. Season with red pepper flakes.',
-      'Toss in pasta, add pasta water as needed to loosen sauce.',
-      'Plate pasta, top with sliced chicken. Finish with parmesan if using.',
-    ],
+    id: 3, day: 'Wednesday', name: 'Chicken and Veggie Stir Fry over Rice', tag: 'Antioxidants', protein: 'Chicken breast #2',
+    ttcNote: 'Colorful stir fry veggies deliver antioxidant variety for egg and sperm quality. Coconut aminos over soy — less processed.',
+    ingredients: ['1 chicken breast thin-sliced', '1 bag frozen stir fry veggies', 'Handful fresh spinach (add at end)', '1.5 cups rice cooked', '2 tbsp olive oil or avocado oil', '2 garlic cloves minced', '1 tbsp coconut aminos', '1 tsp sesame oil', '1/2 tsp ginger', 'Green onion and lemon squeeze', 'Pumpkin seeds to top'],
+    steps: ['Slice chicken thin. Season with salt, pepper, and garlic powder.', 'Cook rice. Heat cast iron hot with olive oil. Sear chicken 3-4 min per side. Remove.', 'Add frozen veggies to hot pan. Stir fry 4-5 min — aim for char, not mush.', 'Add garlic, ginger, coconut aminos, and sesame oil. Toss 1 min. Add spinach last — 30 seconds until wilted.', 'Return chicken. Toss everything. Serve over rice. Top with green onion and pumpkin seeds.'],
   },
   {
-    id: 4, day: 'Thursday', title: 'Beef & Veggie Stir Fry over Rice',
-    protein: 'Ground Beef', time: '25 min', tag: 'Clean',
-    ingredients: [
-      '1 lb ground beef (or sliced steak)',
-      '2 cups cooked white rice',
-      '2 cups baby spinach',
-      '1 cup shredded carrots',
-      '1/2 sweet onion, sliced',
-      '3 cloves garlic, minced',
-      '3 tbsp soy sauce or coconut aminos',
-      '1 tbsp sesame oil',
-      '1 tsp ginger (powder or fresh)',
-      '1 tsp sriracha (optional)',
-      'Green onions to garnish (optional)',
-    ],
-    steps: [
-      'Cook rice. While rice cooks, prep veggies.',
-      'Heat sesame oil in a large skillet or wok over high heat.',
-      'Add beef, break apart and brown fully. Drain excess fat if using ground beef.',
-      'Push meat to the side. Add onion and carrots, stir fry 3 minutes.',
-      'Add garlic and ginger, cook 1 minute.',
-      'Mix everything together. Add soy sauce and sriracha. Toss to coat.',
-      'Add spinach and stir until just wilted, about 1 minute.',
-      'Serve over rice. Garnish with green onions if using.',
-    ],
+    id: 4, day: 'Thursday', name: 'Sheet Pan Chicken with Roasted Carrots and Broccoli', tag: 'Beta Carotene', protein: 'Chicken breast #3',
+    ttcNote: 'Carrots and broccoli roasted in olive oil form a beta carotene and folate powerhouse. Mediterranean salad kit rounds it out.',
+    ingredients: ['1 chicken breast', '1 cup tri-color carrots sliced', '1 cup broccoli florets', 'Mediterranean salad kit', '3 tbsp olive oil', '1 tsp oregano, 1/2 tsp garlic powder, 1/2 tsp smoked paprika', 'Lemon juice', 'Salt, pepper, and Maldon', 'Feta to crumble over top', 'Kalamata olives on the side'],
+    steps: ['Preheat oven to 425F. Toss carrots and broccoli in olive oil, oregano, paprika, salt, and pepper. Spread on sheet pan.', 'Season chicken with olive oil, garlic powder, oregano, and salt. Lay on same sheet pan.', 'Roast 22-25 min until chicken hits 165F and veggies are caramelized on edges.', 'While roasting, prep Mediterranean salad kit. Add kalamata olives.', 'Slice chicken. Plate over veggies. Crumble feta on top. Salad on the side. Finish with lemon and Maldon.'],
   },
   {
-    id: 5, day: 'Friday', title: 'Baked Chicken Pasta',
-    protein: 'Chicken', time: '50 min', tag: 'Comfort',
-    ingredients: [
-      '2 boneless skinless chicken breasts, cubed',
-      '12 oz spaghetti or linguine',
-      '4 cloves garlic, minced',
-      '1 cup heavy whipping cream',
-      '1 cup chicken broth',
-      '1 cup shredded cheese (mozzarella or mixed)',
-      '2 tbsp butter',
-      '1 tsp Italian seasoning',
-      '1 tsp garlic powder',
-      'Salt, pepper, red pepper flakes',
-    ],
-    steps: [
-      'Preheat oven to 375 F.',
-      'Cook pasta just under al dente (it will finish in the oven). Drain.',
-      'Season and saute cubed chicken in butter until golden and cooked through. Remove.',
-      'In the same pan, saute garlic 1 minute. Add broth and cream. Simmer 4-5 min.',
-      'Season sauce with Italian seasoning, garlic powder, salt, pepper.',
-      'Combine pasta, chicken, and sauce in a large baking dish. Toss to coat.',
-      'Top with shredded cheese.',
-      'Bake uncovered 20-25 minutes until bubbly and golden on top.',
-      'Rest 5 minutes before serving.',
-    ],
+    id: 5, day: 'Friday', name: 'Nuggets with Sweet Potato Fries and Veggie Tray', tag: 'Easy Night', protein: 'Chicken nuggets',
+    ttcNote: 'Sweet potato converts beta carotene to Vitamin A, which is critical for fertility. Friday is your rest night — keep it easy and clean.',
+    ingredients: ['Chicken nuggets (full bag)', 'Sweet potato fries (frozen bag)', 'Tri-color carrots raw or steamed', 'Cucumber slices', 'Cherry tomatoes', 'Greek yogurt dip: plain yogurt, garlic, lemon, and salt', 'Lemon squeeze over veggies'],
+    steps: ['Air fry nuggets at 375F for 10-12 min.', 'Air fry sweet potato fries per package in batches.', 'Arrange raw veggies — carrots, cucumber, and cherry tomatoes.', 'Make quick yogurt dip: Greek yogurt with minced garlic, lemon juice, and salt. Two minutes.', 'Plate family style. The yogurt dip keeps it TTC-aligned. Done.'],
   },
 ];
 
-const groceryCategories = [
-  {
-    category: 'Protein',
-    items: [
-      'Boneless skinless chicken breasts (2 more packs)',
-      'Ground beef (2 lbs)',
-      'Eggs (1 dozen)',
-    ],
-  },
-  {
-    category: 'Produce',
-    items: [
-      'Garlic (fresh bulb)',
-      'Baby spinach (large bag)',
-      'Romaine or arugula',
-      'Green onions (optional)',
-      'Lime (optional)',
-    ],
-  },
-  {
-    category: 'Pantry',
-    items: [
-      'Sun-dried tomatoes',
-      'Soy sauce or coconut aminos',
-      'Chicken broth (32 oz)',
-      'Sesame oil',
-      'Parmesan (optional)',
-    ],
-  },
-  {
-    category: 'Dairy',
-    items: [
-      'Milk',
-      'Mozzarella or shredded cheese (extra)',
-    ],
-  },
+const grocerySections = [
+  { title: 'Proteins and Dairy', items: ['Eggs (1 dozen — daily use)', 'Full fat Greek yogurt (large tub)', 'Feta cheese (block or crumbled)'] },
+  { title: 'Produce', items: ['Baby spinach (large bag)', 'Lemons (4-5)', 'Garlic (1 head or pre-minced)', 'Cherry tomatoes'] },
+  { title: 'Pantry', items: ['Coconut aminos', 'Kalamata olives (jarred)', 'Sesame oil', 'Cumin (if low)', 'Smoked paprika (if low)', 'Oregano (if low)', 'Extra virgin olive oil (if low)'] },
+  { title: 'TTC Daily Adds', items: ['Brazil nuts (2-3 per day for Andre — selenium)', 'Pumpkin seeds (zinc — goes on everything)', 'Walnuts (omega-3s for sperm motility)', 'Blueberries or strawberries (antioxidants)', 'Avocados (2-3)'] },
+  { title: 'Already Have — Confirm Before Buying', items: ['Yellow onion', 'Cucumber', 'Green onion', 'Lettuce', 'Rice', 'Couscous', 'Chicken broth', 'Bread', 'Muir Glen fire roasted tomatoes', 'Sweet potato fries', 'Chicken nuggets', 'Broccoli florets', 'Tri-color carrots', 'Stir fry veggies', 'Mediterranean salad kit', 'Protein powder'] },
 ];
 
-const alreadyHave = [
-  '1 pack chicken breasts', '1 lb ground beef', 'Sweet potatoes', 'White rice',
-  'Banza pasta', 'Spaghetti or linguine', 'Shredded carrots', 'Sweet onion',
-  'Avocados (2)', 'Heavy whipping cream', 'Butter', 'Cheese (some left)',
-  '2 bags salad', 'Mayo', 'Seasonings and pantry basics',
-];
+const DAYS = ['Monday','Tuesday','Wednesday','Thursday','Friday'];
 
 export default function MealPlanApp() {
-  const { value: checked, setValue: setChecked, ready } = useAppData<CheckedState>('meal-plan', 'grocery', {});
-  const [tab, setTab] = useState<'meals' | 'grocery'>('meals');
-  const [activeRecipe, setActiveRecipe] = useState<number | null>(null);
+  const [mainTab, setMainTab] = useState<'meals'|'grocery'>('meals');
+  const [activeDay, setActiveDay] = useState('Monday');
+  const [mealType, setMealType] = useState<null|'breakfast'|'lunch'|'dinner'>(null);
+  const [checked, setChecked] = useState<Record<string, boolean>>({});
 
-  const toggleCheck = useCallback((key: string) => {
-    setChecked({ ...checked, [key]: !checked[key] });
-  }, [checked, setChecked]);
+  const bfast = breakfasts.find(b => b.day === activeDay);
+  const lunch = lunches.find(l => l.day === activeDay);
+  const dinner = dinners.find(d => d.day === activeDay);
 
-  if (!ready) return null;
-
-  const totalNeeded = groceryCategories.reduce((sum, c) => sum + c.items.length, 0);
-  const totalChecked = groceryCategories.reduce(
-    (sum, c) => sum + c.items.filter((_, i) => checked[`${c.category}-${i}`]).length, 0
-  );
-  const pct = totalNeeded > 0 ? (totalChecked / totalNeeded) * 100 : 0;
-
-  const recipe = activeRecipe !== null ? recipes.find(r => r.id === activeRecipe) : null;
+  const toggle = (key: string) => setChecked(prev => ({ ...prev, [key]: !prev[key] }));
+  const goBack = () => setMealType(null);
 
   return (
-    <div className={s.root}>
-      <div className={s.header}>
-        <div className={s.eyebrow}>Week of June 2</div>
-        <div className={s.title}>Meal Plan</div>
-        <div className={s.subtitle}>5 dinners · Mon–Fri lunches covered</div>
-        <div className={s.tabs}>
-          {(['meals', 'grocery'] as const).map(t => (
-            <button
-              key={t}
-              onClick={() => { setTab(t); setActiveRecipe(null); }}
-              className={`${s.tab} ${tab === t ? s.tabActive : ''}`}
-            >
-              {t === 'meals' ? 'Recipes' : 'Grocery List'}
-            </button>
+    <div style={{ fontFamily: 'var(--foundry-font-body)', color: 'var(--foundry-text)', minHeight: '100vh', background: 'var(--foundry-bg)' }}>
+
+      {/* Header */}
+      <div style={{ background: 'var(--foundry-card)', borderBottom: '1px solid var(--foundry-border)', padding: '16px 20px' }}>
+        <div style={{ fontFamily: 'var(--foundry-font-mono)', fontSize: 10, letterSpacing: '0.18em', textTransform: 'uppercase', color: 'var(--foundry-text-subtle)', marginBottom: 4 }}>Week of June 8 — TTC Aligned</div>
+        <div style={{ fontFamily: 'var(--foundry-font-display)', fontSize: 22, fontWeight: 700, color: 'var(--foundry-text)', letterSpacing: '-0.02em' }}>Mediterranean Meal Plan</div>
+        <div style={{ fontFamily: 'var(--foundry-font-body)', fontSize: 12, color: 'var(--foundry-text-muted)', marginTop: 3 }}>Breakfast · Lunch · Dinner · 5 days</div>
+        <div style={{ display: 'flex', gap: 6, marginTop: 10, flexWrap: 'wrap' }}>
+          {['Eggs daily','Olive oil','Spinach','Brazil nuts','Pumpkin seeds'].map(t => (
+            <div key={t} style={{ background: 'var(--foundry-surface)', border: '1px solid var(--foundry-border)', borderRadius: 'var(--foundry-radius-sm)', padding: '2px 8px', fontSize: 11, color: 'var(--foundry-text-muted)', fontFamily: 'var(--foundry-font-mono)', letterSpacing: '0.05em' }}>{t}</div>
           ))}
         </div>
       </div>
 
-      {tab === 'meals' && !recipe && (
-        <div className={`${s.section} ${s.mealsList}`}>
-          {recipes.map(r => (
-            <button key={r.id} onClick={() => setActiveRecipe(r.id)} className={s.recipeCard}>
-              <div className={s.recipeCardHead}>
-                <div className={s.eyebrow}>{r.day}</div>
-                <span className={s.tag}>{r.tag}</span>
-              </div>
-              <div className={s.recipeName}>{r.title}</div>
-              <div className={s.meta}>
-                <span>{r.protein}</span>
-                <span>{r.time}</span>
-              </div>
-            </button>
-          ))}
-          <div className={s.lunchCard}>
-            <div className={s.eyebrow}>Mon–Fri Lunches</div>
-            <div className={s.lunchName}>Leftovers or Salad Bowls</div>
-            <div className={s.lunchBody}>Rotate between leftover dinner portions and the salad bags with sliced chicken.</div>
-          </div>
-        </div>
-      )}
+      {/* Main tabs */}
+      <div style={{ display: 'flex', background: 'var(--foundry-card)', borderBottom: '1px solid var(--foundry-border)' }}>
+        {(['meals','grocery'] as const).map(t => (
+          <button key={t} onClick={() => { setMainTab(t); setMealType(null); }} style={{
+            flex: 1, padding: '12px 0', border: 'none', background: 'transparent', cursor: 'pointer',
+            borderBottom: mainTab === t ? '2px solid var(--foundry-ember)' : '2px solid transparent',
+            color: mainTab === t ? 'var(--foundry-ember)' : 'var(--foundry-text-muted)',
+            fontFamily: 'var(--foundry-font-body)', fontSize: 13, fontWeight: mainTab === t ? 600 : 400,
+          }}>{t === 'meals' ? 'Meals' : 'Grocery List'}</button>
+        ))}
+      </div>
 
-      {tab === 'meals' && recipe && (
-        <div className={s.section}>
-          <IonButton className={s.backBtn} fill="clear" onClick={() => setActiveRecipe(null)}>Back to meals</IonButton>
-          <div className={s.eyebrow}>{recipe.day}</div>
-          <div className={s.detailName}>{recipe.title}</div>
-          <div className={s.detailMeta}>
-            <span>{recipe.protein}</span>
-            <span>{recipe.time}</span>
-            <span className={s.tagAccent}>{recipe.tag}</span>
-          </div>
-          <div className={s.blockLabel}>Ingredients</div>
-          <div className={s.ingredientsCard}>
-            {recipe.ingredients.map((ing, i) => (
-              <div key={i} className={s.ingredientRow}>
-                <span className={s.dash}>—</span>
-                <span className={s.ingredientText}>{ing}</span>
-              </div>
+      {mainTab === 'meals' && (
+        <div>
+          {/* Day tabs */}
+          <div style={{ display: 'flex', background: 'var(--foundry-surface)', borderBottom: '1px solid var(--foundry-border)', overflowX: 'auto' }}>
+            {DAYS.map(d => (
+              <button key={d} onClick={() => { setActiveDay(d); setMealType(null); }} style={{
+                flex: 1, minWidth: 56, padding: '9px 4px', border: 'none', background: 'transparent', cursor: 'pointer',
+                borderBottom: activeDay === d ? '2px solid var(--foundry-ember)' : '2px solid transparent',
+                color: activeDay === d ? 'var(--foundry-text)' : 'var(--foundry-text-muted)',
+                fontFamily: 'var(--foundry-font-mono)', fontSize: 11, fontWeight: activeDay === d ? 600 : 400,
+                letterSpacing: '0.05em',
+              }}>{d.slice(0,3).toUpperCase()}</button>
             ))}
           </div>
-          <div className={s.blockLabel}>Steps</div>
-          <div className={s.stepsList}>
-            {recipe.steps.map((step, i) => (
-              <div key={i} className={s.stepRow}>
-                <div className={s.stepNum}>{i + 1}</div>
-                <div className={s.stepText}>{step}</div>
-              </div>
-            ))}
-          </div>
-        </div>
-      )}
 
-      {tab === 'grocery' && (
-        <div className={s.section}>
-          <div className={s.progressCard}>
-            <div className={s.progressRow}>
-              <span className={s.progressLabel}>Still need to grab</span>
-              <span className={s.progressCount}>{totalChecked} / {totalNeeded}</span>
-            </div>
-            <div className={s.barTrack}>
-              <div className={s.barFill} style={{ width: `${pct}%` }} />
-            </div>
-          </div>
-          {groceryCategories.map(cat => (
-            <div key={cat.category} className={s.catBlock}>
-              <div className={s.catLabel}>{cat.category}</div>
-              <div className={s.listFrame}>
-                {cat.items.map((item, i) => {
-                  const key = `${cat.category}-${i}`;
-                  const isChecked = !!checked[key];
-                  return (
-                    <div key={i} onClick={() => toggleCheck(key)} className={s.itemRow}>
-                      <div className={`${s.check} ${isChecked ? s.checkOn : ''}`}>
-                        {isChecked && <span className={s.checkMark}>✓</span>}
-                      </div>
-                      <span className={isChecked ? s.itemTextDone : s.itemText}>{item}</span>
-                    </div>
-                  );
-                })}
-              </div>
-            </div>
-          ))}
-          <div className={s.catBlock}>
-            <div className={s.catLabel}>Already Have</div>
-            <div className={s.listFrame}>
-              {alreadyHave.map((item, i) => (
-                <div key={i} className={s.haveRow}>
-                  <div className={s.haveCheck}>
-                    <span className={s.haveMark}>✓</span>
+          <div style={{ padding: 16 }}>
+            {!mealType ? (
+              <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
+                {/* Breakfast */}
+                <button onClick={() => setMealType('breakfast')} style={{ background: 'var(--foundry-card)', border: '1px solid var(--foundry-border)', borderRadius: 'var(--foundry-radius-md)', padding: '14px 16px', textAlign: 'left', cursor: 'pointer', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                  <div>
+                    <div style={{ fontFamily: 'var(--foundry-font-mono)', fontSize: 10, letterSpacing: '0.15em', textTransform: 'uppercase', color: 'var(--foundry-text-subtle)', marginBottom: 4 }}>Breakfast</div>
+                    <div style={{ fontFamily: 'var(--foundry-font-body)', fontSize: 15, fontWeight: 600, color: 'var(--foundry-text)' }}>{bfast?.name}</div>
                   </div>
-                  <span className={s.haveText}>{item}</span>
+                  <div style={{ color: 'var(--foundry-text-subtle)', fontSize: 18 }}>›</div>
+                </button>
+
+                {/* Lunch */}
+                <button onClick={() => setMealType('lunch')} style={{ background: 'var(--foundry-card)', border: '1px solid var(--foundry-border)', borderRadius: 'var(--foundry-radius-md)', padding: '14px 16px', textAlign: 'left', cursor: 'pointer', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                  <div>
+                    <div style={{ fontFamily: 'var(--foundry-font-mono)', fontSize: 10, letterSpacing: '0.15em', textTransform: 'uppercase', color: 'var(--foundry-text-subtle)', marginBottom: 4 }}>Lunch</div>
+                    <div style={{ fontFamily: 'var(--foundry-font-body)', fontSize: 15, fontWeight: 600, color: 'var(--foundry-text)' }}>{lunch?.name}</div>
+                  </div>
+                  <div style={{ color: 'var(--foundry-text-subtle)', fontSize: 18 }}>›</div>
+                </button>
+
+                {/* Dinner */}
+                <button onClick={() => setMealType('dinner')} style={{ background: 'var(--foundry-card)', border: `1px solid var(--foundry-border)`, borderLeft: '3px solid var(--foundry-ember)', borderRadius: 'var(--foundry-radius-md)', padding: '14px 16px', textAlign: 'left', cursor: 'pointer' }}>
+                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
+                    <div style={{ flex: 1 }}>
+                      <div style={{ fontFamily: 'var(--foundry-font-mono)', fontSize: 10, letterSpacing: '0.15em', textTransform: 'uppercase', color: 'var(--foundry-ember)', marginBottom: 4 }}>Dinner — Full Recipe</div>
+                      <div style={{ fontFamily: 'var(--foundry-font-body)', fontSize: 15, fontWeight: 600, color: 'var(--foundry-text)' }}>{dinner?.name}</div>
+                      <div style={{ fontFamily: 'var(--foundry-font-body)', fontSize: 12, color: 'var(--foundry-text-muted)', marginTop: 2 }}>{dinner?.protein}</div>
+                    </div>
+                    <div style={{ background: 'var(--foundry-surface)', border: '1px solid var(--foundry-border)', borderRadius: 'var(--foundry-radius-sm)', padding: '2px 8px', fontSize: 11, color: 'var(--foundry-text-subtle)', fontFamily: 'var(--foundry-font-mono)', marginLeft: 8, flexShrink: 0 }}>{dinner?.tag}</div>
+                  </div>
+                  <div style={{ marginTop: 10, padding: '8px 10px', background: 'var(--foundry-surface)', borderRadius: 'var(--foundry-radius-sm)', borderLeft: '2px solid var(--foundry-border)', fontSize: 12, color: 'var(--foundry-text-muted)', fontFamily: 'var(--foundry-font-body)', lineHeight: 1.5 }}>
+                    {dinner?.ttcNote}
+                  </div>
+                </button>
+              </div>
+            ) : mealType === 'breakfast' || mealType === 'lunch' ? (
+              <div>
+                <button onClick={goBack} style={{ background: 'none', border: 'none', cursor: 'pointer', color: 'var(--foundry-ember)', fontFamily: 'var(--foundry-font-body)', fontSize: 13, display: 'flex', alignItems: 'center', gap: 4, marginBottom: 14, padding: 0 }}>← Back</button>
+                <div style={{ background: 'var(--foundry-card)', border: '1px solid var(--foundry-border)', borderRadius: 'var(--foundry-radius-md)', overflow: 'hidden' }}>
+                  <div style={{ background: 'var(--foundry-surface)', borderBottom: '1px solid var(--foundry-border)', padding: '16px 20px' }}>
+                    <div style={{ fontFamily: 'var(--foundry-font-mono)', fontSize: 10, letterSpacing: '0.15em', textTransform: 'uppercase', color: 'var(--foundry-text-subtle)', marginBottom: 4 }}>{activeDay} — {mealType === 'breakfast' ? 'Breakfast' : 'Lunch'}</div>
+                    <div style={{ fontFamily: 'var(--foundry-font-display)', fontSize: 18, fontWeight: 700, color: 'var(--foundry-text)' }}>{mealType === 'breakfast' ? bfast?.name : lunch?.name}</div>
+                    {mealType === 'lunch' && <div style={{ fontSize: 12, color: 'var(--foundry-text-muted)', marginTop: 2, fontFamily: 'var(--foundry-font-body)' }}>Mostly leftovers — keep it simple</div>}
+                  </div>
+                  <div style={{ padding: '16px 20px' }}>
+                    {(mealType === 'breakfast' ? bfast?.items : lunch?.items)?.map((item, i) => (
+                      <div key={i} style={{ display: 'flex', gap: 10, marginBottom: 10, alignItems: 'flex-start' }}>
+                        <div style={{ width: 6, height: 6, borderRadius: '50%', background: 'var(--foundry-ember)', marginTop: 7, flexShrink: 0 }} />
+                        <span style={{ fontSize: 14, fontFamily: 'var(--foundry-font-body)', color: 'var(--foundry-text)', lineHeight: 1.5 }}>{item}</span>
+                      </div>
+                    ))}
+                    <div style={{ marginTop: 14, padding: '10px 12px', background: 'var(--foundry-surface)', borderRadius: 'var(--foundry-radius-sm)', borderLeft: '2px solid var(--foundry-ember)', fontSize: 12, color: 'var(--foundry-text-muted)', fontFamily: 'var(--foundry-font-body)', lineHeight: 1.6 }}>
+                      {mealType === 'breakfast' ? bfast?.ttc : lunch?.ttc}
+                    </div>
+                  </div>
                 </div>
-              ))}
-            </div>
+              </div>
+            ) : (
+              <div>
+                <button onClick={goBack} style={{ background: 'none', border: 'none', cursor: 'pointer', color: 'var(--foundry-ember)', fontFamily: 'var(--foundry-font-body)', fontSize: 13, display: 'flex', alignItems: 'center', gap: 4, marginBottom: 14, padding: 0 }}>← Back</button>
+                <div style={{ background: 'var(--foundry-card)', border: '1px solid var(--foundry-border)', borderRadius: 'var(--foundry-radius-md)', overflow: 'hidden' }}>
+                  <div style={{ background: 'var(--foundry-surface)', borderBottom: '1px solid var(--foundry-border)', padding: '16px 20px' }}>
+                    <div style={{ fontFamily: 'var(--foundry-font-mono)', fontSize: 10, letterSpacing: '0.15em', textTransform: 'uppercase', color: 'var(--foundry-ember)', marginBottom: 4 }}>{activeDay} — Dinner — {dinner?.tag}</div>
+                    <div style={{ fontFamily: 'var(--foundry-font-display)', fontSize: 20, fontWeight: 700, color: 'var(--foundry-text)' }}>{dinner?.name}</div>
+                    <div style={{ fontSize: 12, color: 'var(--foundry-text-muted)', marginTop: 4, fontFamily: 'var(--foundry-font-body)', lineHeight: 1.5 }}>{dinner?.ttcNote}</div>
+                  </div>
+                  <div style={{ padding: '16px 20px' }}>
+                    <div style={{ fontFamily: 'var(--foundry-font-mono)', fontSize: 10, letterSpacing: '0.15em', textTransform: 'uppercase', color: 'var(--foundry-text-subtle)', marginBottom: 10 }}>Ingredients</div>
+                    <ul style={{ margin: 0, padding: '0 0 0 16px', marginBottom: 20 }}>
+                      {dinner?.ingredients.map((ing, i) => (
+                        <li key={i} style={{ fontSize: 14, color: 'var(--foundry-text)', marginBottom: 6, fontFamily: 'var(--foundry-font-body)', lineHeight: 1.5 }}>{ing}</li>
+                      ))}
+                    </ul>
+                    <div style={{ fontFamily: 'var(--foundry-font-mono)', fontSize: 10, letterSpacing: '0.15em', textTransform: 'uppercase', color: 'var(--foundry-text-subtle)', marginBottom: 10 }}>Steps</div>
+                    {dinner?.steps.map((step, i) => (
+                      <div key={i} style={{ display: 'flex', gap: 12, marginBottom: 14 }}>
+                        <div style={{ width: 24, height: 24, borderRadius: '50%', background: 'var(--foundry-ember)', color: 'var(--foundry-bg)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 11, fontWeight: 700, fontFamily: 'var(--foundry-font-mono)', flexShrink: 0 }}>{i + 1}</div>
+                        <div style={{ fontSize: 14, color: 'var(--foundry-text)', fontFamily: 'var(--foundry-font-body)', lineHeight: 1.6, paddingTop: 3 }}>{step}</div>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              </div>
+            )}
           </div>
+        </div>
+      )}
+
+      {mainTab === 'grocery' && (
+        <div style={{ padding: 16 }}>
+          <div style={{ background: 'var(--foundry-surface)', border: '1px solid var(--foundry-border)', borderRadius: 'var(--foundry-radius-md)', padding: '10px 14px', marginBottom: 16, fontSize: 12, color: 'var(--foundry-text-muted)', fontFamily: 'var(--foundry-font-body)', lineHeight: 1.5 }}>
+            Estimated spend: $40-55. Proteins are covered. Mostly produce, dairy, and TTC boosts.
+          </div>
+          {grocerySections.map(section => (
+            <div key={section.title} style={{ marginBottom: 20 }}>
+              <div style={{ fontFamily: 'var(--foundry-font-mono)', fontSize: 10, letterSpacing: '0.15em', textTransform: 'uppercase', color: 'var(--foundry-text-subtle)', marginBottom: 8 }}>{section.title}</div>
+              {section.items.map(item => {
+                const key = `${section.title}-${item}`;
+                return (
+                  <div key={key} onClick={() => toggle(key)} style={{
+                    display: 'flex', alignItems: 'center', gap: 10,
+                    padding: '10px 12px', marginBottom: 5,
+                    background: checked[key] ? 'var(--foundry-surface)' : 'var(--foundry-card)',
+                    borderRadius: 'var(--foundry-radius-sm)',
+                    border: `1px solid ${checked[key] ? 'var(--foundry-ember)' : 'var(--foundry-border)'}`,
+                    cursor: 'pointer',
+                  }}>
+                    <div style={{ width: 18, height: 18, borderRadius: 4, border: `2px solid ${checked[key] ? 'var(--foundry-ember)' : 'var(--foundry-border)'}`, background: checked[key] ? 'var(--foundry-ember)' : 'transparent', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
+                      {checked[key] && <span style={{ color: 'var(--foundry-bg)', fontSize: 11, fontWeight: 700 }}>✓</span>}
+                    </div>
+                    <span style={{ fontSize: 13, fontFamily: 'var(--foundry-font-body)', color: checked[key] ? 'var(--foundry-text-muted)' : 'var(--foundry-text)', textDecoration: checked[key] ? 'line-through' : 'none' }}>{item}</span>
+                  </div>
+                );
+              })}
+            </div>
+          ))}
+          <div style={{ height: 40 }} />
         </div>
       )}
     </div>
