@@ -22,7 +22,7 @@ export const APP_REGISTRY: RegisteredApp[] = [
       icon: "🛒",
       route: "grocery-list",
       needsPersistence: true,
-      status: "active",
+      status: "archived",
     },
     load: () => import("./grocery-list"),
   },
