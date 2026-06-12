@@ -41,8 +41,8 @@ export const APP_REGISTRY: RegisteredApp[] = [
   {
     meta: {
       id: "hyrox-trainer",
-      name: "Hyrox Trainer",
-      description: "Training tracker and sim pacer for HYROX race prep",
+      name: "HYROX Trainer",
+      description: "Andre's HYROX race prep trainer -- workouts, sim pacer, session history.",
       icon: "hyrox",
       route: "hyrox-trainer",
       needsPersistence: true,
