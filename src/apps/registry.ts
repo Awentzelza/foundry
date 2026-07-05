@@ -112,6 +112,18 @@ export const APP_REGISTRY: RegisteredApp[] = [
   },
   {
     meta: {
+      id: "weeknight-meal-plan",
+      name: "Weeknight Meal Plan",
+      description: "Sun-Mon-Tue dinners with shopping list and tap-through recipe cards",
+      icon: "meals",
+      route: "weeknight-meal-plan",
+      needsPersistence: true,
+      status: "active",
+    },
+    load: () => import("./weeknight-meal-plan"),
+  },
+  {
+    meta: {
       id: "workout-streak",
       name: "Workout Streak",
       description: "Tap to mark today done. Tracks current and longest streak.",
