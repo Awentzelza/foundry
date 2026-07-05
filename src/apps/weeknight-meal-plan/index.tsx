@@ -1,6 +1,5 @@
 import { useState } from 'react';
-import { IonButton, IonIcon, IonCheckbox } from '@ionic/react';
-import { chevronBackOutline, chevronForwardOutline } from 'ionicons/icons';
+import { IonButton, IonCheckbox } from '@ionic/react';
 import { useAppData } from '@/hooks/useAppData';
 
 interface Step { title: string; content: string; }
@@ -130,7 +129,7 @@ export default function WeeknightMealPlan() {
                   <div style={{ fontFamily: 'var(--foundry-font-display)', fontSize: 16, fontWeight: 700, color: 'var(--foundry-text)', marginBottom: 4 }}>{r.title}</div>
                   <div style={{ fontFamily: 'var(--foundry-font-body)', fontSize: 13, color: 'var(--foundry-text-muted)' }}>{r.note}</div>
                 </div>
-                <IonIcon icon={chevronForwardOutline} style={{ color: 'var(--foundry-text-subtle)', flexShrink: 0 }} />
+                <span style={{ color: 'var(--foundry-text-subtle)', flexShrink: 0, fontSize: 20 }}>{'>'}</span>
               </button>
             ))}
           </div>
@@ -170,8 +169,7 @@ export default function WeeknightMealPlan() {
       {activeRecipe && (
         <div>
           <IonButton fill="clear" onClick={() => setActiveId(null)} style={{ '--color': 'var(--foundry-ember)', marginLeft: -12 }}>
-            <IonIcon icon={chevronBackOutline} slot="start" />
-            All recipes
+            {'< All recipes'}
           </IonButton>
 
           <div style={{
@@ -236,14 +234,12 @@ export default function WeeknightMealPlan() {
               <div style={{ display: 'flex', gap: 10 }}>
                 <IonButton fill="outline" style={{ flex: 1, '--border-color': 'var(--foundry-border)', '--color': 'var(--foundry-text)' }}
                   disabled={stepIndex === 0} onClick={() => setStepIndex(Math.max(0, stepIndex - 1))}>
-                  <IonIcon icon={chevronBackOutline} slot="start" />
-                  Back
+                  {'< Back'}
                 </IonButton>
                 <IonButton style={{ flex: 1, '--background': 'var(--foundry-ember)', '--color': 'var(--foundry-bg)' }}
                   disabled={stepIndex === activeRecipe.steps.length - 1}
                   onClick={() => setStepIndex(Math.min(activeRecipe.steps.length - 1, stepIndex + 1))}>
-                  {stepIndex === activeRecipe.steps.length - 1 ? 'Done' : 'Next'}
-                  <IonIcon icon={chevronForwardOutline} slot="end" />
+                  {(stepIndex === activeRecipe.steps.length - 1 ? 'Done' : 'Next >')}
                 </IonButton>
               </div>
             </div>
