@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { IonButton, IonIcon, IonCheckbox } from '@ionic/react';
-import { chevronBack, chevronForward, chevronForwardOutline } from 'ionicons/icons';
+import { chevronBackOutline, chevronForwardOutline } from 'ionicons/icons';
 import { useAppData } from '@/hooks/useAppData';
 
 interface Step { title: string; content: string; }
@@ -130,7 +130,7 @@ export default function WeeknightMealPlan() {
                   <div style={{ fontFamily: 'var(--foundry-font-display)', fontSize: 16, fontWeight: 700, color: 'var(--foundry-text)', marginBottom: 4 }}>{r.title}</div>
                   <div style={{ fontFamily: 'var(--foundry-font-body)', fontSize: 13, color: 'var(--foundry-text-muted)' }}>{r.note}</div>
                 </div>
-                <IonIcon icon={chevronForward} style={{ color: 'var(--foundry-text-subtle)', flexShrink: 0 }} />
+                <IonIcon icon={chevronForwardOutline} style={{ color: 'var(--foundry-text-subtle)', flexShrink: 0 }} />
               </button>
             ))}
           </div>
@@ -170,7 +170,7 @@ export default function WeeknightMealPlan() {
       {activeRecipe && (
         <div>
           <IonButton fill="clear" onClick={() => setActiveId(null)} style={{ '--color': 'var(--foundry-ember)', marginLeft: -12 }}>
-            <IonIcon icon={chevronBack} slot="start" />
+            <IonIcon icon={chevronBackOutline} slot="start" />
             All recipes
           </IonButton>
 
@@ -236,7 +236,7 @@ export default function WeeknightMealPlan() {
               <div style={{ display: 'flex', gap: 10 }}>
                 <IonButton fill="outline" style={{ flex: 1, '--border-color': 'var(--foundry-border)', '--color': 'var(--foundry-text)' }}
                   disabled={stepIndex === 0} onClick={() => setStepIndex(Math.max(0, stepIndex - 1))}>
-                  <IonIcon icon={chevronBack} slot="start" />
+                  <IonIcon icon={chevronBackOutline} slot="start" />
                   Back
                 </IonButton>
                 <IonButton style={{ flex: 1, '--background': 'var(--foundry-ember)', '--color': 'var(--foundry-bg)' }}
