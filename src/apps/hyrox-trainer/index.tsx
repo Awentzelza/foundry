@@ -23,17 +23,47 @@ type GroupDef =
   | { type: 'round'; rounds: number; deloadRounds?: number; restNote: string; blocks: BlockDef[] };
 
 // DAY INDICES: 0=Mon 1=Tue 2=Wed 3=Thu 4=Fri 5=Sun
-// Mon = Engine/Zone 2 | Tue = Strength | Wed = Skill/Stations | Thu = Sim/Race Effort | Fri = Active Recovery | Sun = Rest
 
 const WORKOUTS: Record<string, GroupDef[][]> = {
+  RESET: [
+    [
+      { type:'single', block:{ id:'reset-mon-run', name:'Easy Run', detail:'20 min @ 5.5-5.8 mph. Conversational pace. No sled, no threshold work -- pure re-entry.' }},
+      { type:'round', rounds:2, restNote:'90s rest then Round',
+        blocks:[
+          { id:'reset-mon-ski', name:'SkiErg 250m', detail:'Resistance 5-6. Hip-hinge drive, no rush.' },
+          { id:'reset-mon-carry', name:'Farmers Carry 50m', detail:'35-40 lb per hand.' },
+          { id:'reset-mon-wb', name:'Wall Balls', detail:'12 reps @ 10 lb.' },
+        ]},
+      { type:'single', block:{ id:'reset-mon-mob', name:'Mobility', detail:'Foam roll quads, couch stretch, leg swings, hip circles, IT band roll, hamstring, pigeon stretch. Pre and post session.' }},
+    ],
+    [
+      { type:'single', block:{ id:'reset-tue-soccer', name:'Soccer / Field Session', detail:'Bonus aerobic and agility work, not a forced rest or HYROX day. Log duration and RPE. Watch the knee on cuts and pivots -- the load pattern differs from running.' }},
+    ],
+    [
+      { type:'single', block:{ id:'reset-wed-run', name:'Light Run', detail:'15-20 min easy pace. Technique focus, not fitness.' }},
+      { type:'single', block:{ id:'reset-wed-ski', name:'SkiErg Volume', sets:3, detail:'300m @ resistance 5-6. Rest 90s between sets.' }},
+      { type:'single', block:{ id:'reset-wed-carry', name:'Light Farmers Carry', detail:'50m @ 30-35 lb per hand.' }},
+      { type:'single', block:{ id:'reset-wed-wb', name:'Light Wall Balls', detail:'12 reps @ 10 lb.' }},
+    ],
+    [
+      { type:'single', block:{ id:'reset-thu-wu', name:'Warm-Up', detail:'10-12 min easy jog @ 5.5 mph.' }},
+      { type:'single', block:{ id:'reset-thu-t1', name:'Short Threshold Interval', detail:'8 min @ 6.5-6.8 mph. Controlled, not race effort.' }},
+      { type:'single', block:{ id:'reset-thu-station', name:'One Easy Station', detail:'SkiErg 300m or Wall Balls 20 reps @ 10 lb. Pick one, technique focus.' }},
+    ],
+    [
+      { type:'single', block:{ id:'reset-fri-run', name:'Easy Walk or Jog', detail:'20 min. HR never above 130. Truly conversational.' }},
+      { type:'single', block:{ id:'reset-fri-mob', name:'Mobility', detail:'15-20 min. Foam roll quads, IT band, hamstring, pigeon stretch, couch stretch.' }},
+    ],
+    [
+      { type:'single', block:{ id:'reset-sun-rest', name:'Full Rest', detail:'No training. Light walk optional.' }},
+    ],
+  ],
   BASE: [
-    // MON -- Engine / Zone 2
     [
       { type:'single', block:{ id:'base-mon-z2', name:'Zone 2 Run', detail:'30-40 min treadmill @ 5.8-6.2 mph. Conversational pace. HR 130-145. All distances in miles.' }},
       { type:'single', block:{ id:'base-mon-ski', name:'SkiErg Intervals', sets:6, detail:'2 min on / 1 min off. Moderate effort. Damper 5. Hip-hinge drive.' }},
       { type:'single', block:{ id:'base-mon-mob', name:'Core + Hip Mobility', detail:'10 min. Clamshells 10/side, dead bugs 3x10, hip circles, couch stretch 60s each side.' }},
     ],
-    // TUE -- Strength
     [
       { type:'single', block:{ id:'base-tue-sq', name:'Back Squat', sets:4, detail:'5 reps @ 255-265 lb. Watch knee tracking.' }},
       { type:'single', block:{ id:'base-tue-rdl', name:'Romanian Deadlift', sets:3, detail:'8 reps @ 185-205 lb. Controlled descent.' }},
@@ -45,7 +75,6 @@ const WORKOUTS: Record<string, GroupDef[][]> = {
           { id:'base-tue-ski', name:'SkiErg 500m', detail:'Target sub-2:10.' },
         ]},
     ],
-    // WED -- Skill / Stations
     [
       { type:'single', block:{ id:'base-wed-z2', name:'Z2 Run', detail:'35 min @ 5.8-6.2 mph. HR 130-145.' }},
       { type:'superset', label:'Superset A: Push / Pull', blocks:[
@@ -58,7 +87,6 @@ const WORKOUTS: Record<string, GroupDef[][]> = {
       ]},
       { type:'single', block:{ id:'base-wed-ski2', name:'SkiErg Volume', sets:4, detail:'500m @ sub-2:15. Rest 90s. Build lat endurance -- focus on rounds 3-4.' }},
     ],
-    // THU -- Sim / Race Effort
     [
       { type:'single', block:{ id:'base-thu-wu', name:'Warm-Up Run', detail:'15 min easy Z2. 5.5-5.8 mph.' }},
       { type:'single', block:{ id:'base-thu-t1', name:'Threshold Interval 1', detail:'10 min @ 7.0-7.1 mph. RPE 7-8.' }},
@@ -67,25 +95,21 @@ const WORKOUTS: Record<string, GroupDef[][]> = {
       { type:'single', block:{ id:'base-thu-sled', name:'Sled Push: Technique', sets:4, detail:'25m @ race weight 335 lb / 5 plates. Technique only.' }},
       { type:'single', block:{ id:'base-thu-wb', name:'Wall Balls: Technique', sets:3, detail:'25 reps @ 6 kg unbroken.' }},
     ],
-    // FRI -- Active Recovery
     [
       { type:'single', block:{ id:'base-fri-run', name:'Easy Run', detail:'20-30 min @ 5.5 mph. HR never above 130. Truly conversational.' }},
       { type:'single', block:{ id:'base-fri-mob', name:'Foam Roll + Mobility', detail:'20 min. IT band 90s, quads 60s, hamstring 60s, pigeon stretch 90s each side, couch stretch 60s each side.' }},
       { type:'single', block:{ id:'base-fri-clam', name:'Clamshells (if knee flagged)', detail:'10 reps/side. Left side focus. Bodyweight only.' }},
     ],
-    // SUN -- Rest
     [
       { type:'single', block:{ id:'base-sun-rest', name:'Full Rest', detail:'No training. Foam roll 10-15 min. 20 min walk optional.' }},
     ],
   ],
   BUILD: [
-    // MON -- Engine / Zone 2
     [
       { type:'single', block:{ id:'build-mon-z2', name:'Zone 2 Run', detail:'35-40 min treadmill @ 5.8-6.2 mph. HR 130-148. Stay aerobic.' }},
       { type:'single', block:{ id:'build-mon-ski', name:'SkiErg Intervals', sets:6, detail:'2 min on / 1 min off. Build damper to 7. Hip-hinge, not arms.' }},
       { type:'single', block:{ id:'build-mon-mob', name:'Core + Hip Mobility', detail:'10 min. Clamshells, dead bugs, hip circles, couch stretch.' }},
     ],
-    // TUE -- Strength + Compromised Brick
     [
       { type:'round', rounds:4, deloadRounds:2, restNote:'60s rest then Round',
         blocks:[
@@ -95,7 +119,6 @@ const WORKOUTS: Record<string, GroupDef[][]> = {
           { id:'build-tue-carry', name:'Farmers Carry 100m', detail:'@ 2x24 kg. End of round.' },
         ]},
     ],
-    // WED -- Z2 + Upper Strength
     [
       { type:'single', block:{ id:'build-wed-z2', name:'Z2 Run', detail:'30 min @ 5.8-6.2 mph.' }},
       { type:'superset', label:'Superset A: Push / Pull', blocks:[
@@ -105,7 +128,6 @@ const WORKOUTS: Record<string, GroupDef[][]> = {
       { type:'single', block:{ id:'build-wed-bss', name:'Bulgarian Split Squat', sets:3, detail:'8 reps/side @ 60 lb DBs.' }},
       { type:'single', block:{ id:'build-wed-hlr', name:'Hanging Leg Raise', sets:3, detail:'12 reps. Controlled.' }},
     ],
-    // THU -- Threshold + Stations
     [
       { type:'single', block:{ id:'build-thu-wu', name:'Warm-Up', detail:'15 min easy Z2. 5.5 mph.' }},
       { type:'single', block:{ id:'build-thu-t1', name:'Threshold Interval 1', detail:'15 min @ 7.0-7.1 mph.' }},
@@ -114,25 +136,21 @@ const WORKOUTS: Record<string, GroupDef[][]> = {
       { type:'single', block:{ id:'build-thu-slp', name:'Sled Pull', sets:4, detail:'25m @ 2 plates. Deadlift stance, hip-snap.' }},
       { type:'single', block:{ id:'build-thu-wb', name:'Wall Balls', sets:3, detail:'25 reps @ 6 kg unbroken.' }},
     ],
-    // FRI -- Active Recovery
     [
       { type:'single', block:{ id:'build-fri-run', name:'Easy Run or Row', detail:'20-30 min @ 5.5 mph or easy row rate 18-20. HR under 130.' }},
       { type:'single', block:{ id:'build-fri-mob', name:'Foam Roll + Mobility', detail:'20 min. IT band 90s, quads 60s, hamstring 60s, pigeon stretch 90s each side, couch stretch 60s each side.' }},
       { type:'single', block:{ id:'build-fri-clam', name:'Clamshells (if knee flagged)', detail:'10 reps/side. Left side focus.' }},
     ],
-    // SUN -- Rest
     [
       { type:'single', block:{ id:'build-sun-rest', name:'Full Rest', detail:'Full rest. HRV check.' }},
     ],
   ],
   PEAK: [
-    // MON -- Engine / Zone 2
     [
       { type:'single', block:{ id:'peak-mon-z2', name:'Zone 2 Run', detail:'40 min @ 5.8-6.2 mph. HR under 148. Pure aerobic base.' }},
       { type:'single', block:{ id:'peak-mon-ski', name:'SkiErg Intervals', sets:6, detail:'2 min on / 1 min off. Damper 7. Sub-2:05 per interval target.' }},
       { type:'single', block:{ id:'peak-mon-mob', name:'Mobility', detail:'10 min. Emphasis on hip flexors and IT band. Couch stretch mandatory.' }},
     ],
-    // TUE -- Race-Specific Brick
     [
       { type:'round', rounds:4, restNote:'60s rest then Round',
         blocks:[
@@ -142,7 +160,6 @@ const WORKOUTS: Record<string, GroupDef[][]> = {
           { id:'peak-tue-carry', name:'Farmers Carry 100m', detail:'@ 2x24 kg.' },
         ]},
     ],
-    // WED -- Keystone Run + Light Upper
     [
       { type:'single', block:{ id:'peak-wed-wu', name:'Warm-Up + Drills', detail:'15 min easy Z2 + drills. 5.5 mph.' }},
       { type:'single', block:{ id:'peak-wed-1k', name:'Keystone: 1 mi @ Race Pace', sets:6, detail:'1 mi @ 6.5-7.0 mph. 90s standing rest between sets.' }},
@@ -152,7 +169,6 @@ const WORKOUTS: Record<string, GroupDef[][]> = {
         { id:'peak-wed-fp', name:'Face Pulls', sets:3, detail:'15 reps.' },
       ]},
     ],
-    // THU -- Threshold + Stations
     [
       { type:'single', block:{ id:'peak-thu-wu', name:'Warm-Up', detail:'15 min easy Z2. 5.5 mph.' }},
       { type:'single', block:{ id:'peak-thu-t1', name:'Threshold Interval 1', detail:'15 min @ 7.0-7.1 mph.' }},
@@ -161,25 +177,21 @@ const WORKOUTS: Record<string, GroupDef[][]> = {
       { type:'single', block:{ id:'peak-thu-sled', name:'Sled Push', sets:4, detail:'25m @ race weight 335 lb / 5 plates.' }},
       { type:'single', block:{ id:'peak-thu-sb', name:'Sandbag Lunges', sets:2, detail:'100m @ 20 kg. Attack the distance.' }},
     ],
-    // FRI -- Active Recovery
     [
       { type:'single', block:{ id:'peak-fri-run', name:'Easy Run', detail:'20-30 min @ 5.5 mph. HR under 130. No exceptions on intensity.' }},
       { type:'single', block:{ id:'peak-fri-mob', name:'Foam Roll + Mobility', detail:'20 min. IT band, quads, hamstring, pigeon, couch stretch.' }},
       { type:'single', block:{ id:'peak-fri-clam', name:'Clamshells (if knee flagged)', detail:'10 reps/side.' }},
     ],
-    // SUN -- Rest
     [
       { type:'single', block:{ id:'peak-sun-rest', name:'Full Rest', detail:'Full rest. HRV check. Sleep 8-9 hrs.' }},
     ],
   ],
   TAPER: [
-    // MON -- Light Technique
     [
       { type:'single', block:{ id:'taper-mon-z2', name:'Easy Zone 2 Run', detail:'25 min @ 5.5-5.8 mph. HR under 135. Feel the legs fresh.' }},
       { type:'single', block:{ id:'taper-mon-ski', name:'SkiErg Easy', sets:3, detail:'500m @ easy effort. Technique only. No chasing splits.' }},
       { type:'single', block:{ id:'taper-mon-mob', name:'Mobility', detail:'10 min. Couch stretch, hip circles, IT band.' }},
     ],
-    // TUE -- Light Brick
     [
       { type:'single', block:{ id:'taper-mon-sq', name:'Squat', sets:3, detail:'3 reps @ 60% (~195 lb). Feel only.' }},
       { type:'single', block:{ id:'taper-mon-dl', name:'Deadlift', sets:3, detail:'3 reps @ 60% (~240 lb).' }},
@@ -191,20 +203,16 @@ const WORKOUTS: Record<string, GroupDef[][]> = {
           { id:'taper-tue-row', name:'Row 200m', detail:'Moderate effort. End of round.' },
         ]},
     ],
-    // WED -- Easy Shakeout
     [
       { type:'single', block:{ id:'taper-wed-z2', name:'Easy Z2 Run', detail:'25 min easy. 5.5-5.8 mph. HR under 135.' }},
     ],
-    // THU -- Light Sim
     [
       { type:'single', block:{ id:'taper-thu-sim', name:'3-Station Light Sim', detail:'3 stations @ 70% effort. ~25 min total. No PRs today.' }},
     ],
-    // FRI -- Active Recovery
     [
       { type:'single', block:{ id:'taper-fri-run', name:'Easy Z2', detail:'20 min @ 5.5 mph. HR under 130. Last hard work is done.' }},
       { type:'single', block:{ id:'taper-fri-mob', name:'Foam Roll + Mobility', detail:'20 min full body. Emphasis on legs and hips.' }},
     ],
-    // SUN -- Rest
     [
       { type:'single', block:{ id:'taper-sun-rest', name:'Full Rest', detail:'Full rest. Begin 5-day hydration ramp: +500 ml water + sodium.' }},
     ],
@@ -218,7 +226,7 @@ const DELOAD_OVERRIDES: Record<string, string> = {
   'build-thu-t2': 'Deload: skip second interval. 1x15 min @ 7.0 mph only.',
 };
 
-const DELOAD_WEEKS = [4, 7, 11, 14];
+const DELOAD_WEEKS = [5];
 
 const SIM_SEGMENTS = [
   { name:'Run 1',          type:'run',     target:285, note:'0.62 mi - restraint, 6.5 mph' },
@@ -239,9 +247,9 @@ const SIM_SEGMENTS = [
   { name:'Wall Balls',     type:'station', target:435, note:'100 reps @ 6 kg - 30/25/20/15/10' },
 ];
 
-// 6 days: Mon Tue Wed Thu Fri Sun (no Sat)
 const DAY_NAMES = ['Mon','Tue','Wed','Thu','Fri','Sun'];
 const SESSION_TITLES: Record<string, string[]> = {
+  RESET: ['Re-Entry Engine','Soccer / Field Session','Re-Entry Skill','Threshold-Lite + Brick','Active Recovery','Rest'],
   BASE:  ['Engine / Zone 2','Strength + Brick','Skill + Upper Strength','Threshold + Station Skill','Active Recovery','Rest'],
   BUILD: ['Engine / Zone 2','Compromised Race Brick','Z2 + Upper Strength','Threshold + Stations','Active Recovery','Rest'],
   PEAK:  ['Engine / Zone 2','Race-Specific Brick','Keystone 6x1 mi','Threshold + Stations','Active Recovery','Rest'],
@@ -249,13 +257,13 @@ const SESSION_TITLES: Record<string, string[]> = {
 };
 
 function getCurrentWeek(): number {
-  const start = new Date('2026-04-27T00:00:00');
+  const start = new Date('2026-07-20T00:00:00');
   const now = new Date();
   const elapsed = Math.floor((now.getTime() - start.getTime()) / (7 * 24 * 3600 * 1000));
-  return Math.min(Math.max(elapsed + 1, 1), 20);
+  return Math.min(Math.max(elapsed + 1, 1), 9);
 }
 function getPhase(w: number): string {
-  return w <= 7 ? 'BASE' : w <= 14 ? 'BUILD' : w <= 18 ? 'PEAK' : 'TAPER';
+  return w <= 2 ? 'RESET' : w <= 6 ? 'BUILD' : w <= 7 ? 'PEAK' : 'TAPER';
 }
 function formatTime(s: number): string {
   const h = Math.floor(s / 3600), m = Math.floor((s % 3600) / 60), sec = s % 60;
@@ -264,12 +272,11 @@ function formatTime(s: number): string {
     : `${m}:${String(sec).padStart(2,'0')}`;
 }
 
-// Map JS day-of-week (0=Sun) to app day index (0=Mon...4=Fri, 5=Sun)
 function getTodayIdx(): number {
   const d = new Date().getDay();
-  if (d === 0) return 5; // Sun
-  if (d >= 1 && d <= 5) return d - 1; // Mon-Fri -> 0-4
-  return 0; // Sat -> default Mon (Sat removed)
+  if (d === 0) return 5;
+  if (d >= 1 && d <= 5) return d - 1;
+  return 0;
 }
 
 const INITIAL: AppState = { workoutLogs: [], simHistory: [], lastWeight: '' };
