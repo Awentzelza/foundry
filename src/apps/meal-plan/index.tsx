@@ -5,9 +5,9 @@ interface Lunch { day: string; name: string; items: string[]; note: string; }
 interface Dinner { id: number; day: string; name: string; tag: string; protein: string; note: string; ingredients: string[]; steps: string[]; }
 
 const breakfasts: Breakfast[] = [
-  { day: 'Monday', name: 'Overnight Oats', items: ['Oats soaked in whole milk overnight', 'Full fat Greek yogurt stirred in', 'Walnuts and berries on top'], note: 'Prepped Sunday night — grab and go before work.' },
-  { day: 'Tuesday', name: 'Overnight Oats', items: ['Oats soaked in whole milk overnight', 'Full fat Greek yogurt stirred in', 'Walnuts and berries on top'], note: 'Same batch prep as Monday. Consistency over novelty here.' },
-  { day: 'Wednesday', name: 'Overnight Oats', items: ['Oats soaked in whole milk overnight', 'Full fat Greek yogurt stirred in', 'Walnuts and berries on top'], note: 'Batch this with Sunday night prep so all three mornings are covered.' },
+  { day: 'Monday', name: 'Mush', items: ['Mush'], note: 'Ready to eat, no prep needed.' },
+  { day: 'Tuesday', name: 'Mush', items: ['Mush'], note: 'Ready to eat, no prep needed.' },
+  { day: 'Wednesday', name: 'Mush', items: ['Mush'], note: 'Ready to eat, no prep needed.' },
 ];
 
 const lunches: Lunch[] = [
@@ -26,8 +26,8 @@ const DAYS = ['Sunday', 'Monday', 'Tuesday', 'Wednesday'];
 
 const grocerySections = [
   { title: 'Proteins', items: ['Bone-in chicken thighs', 'Ground beef (1-1.5 lbs)', 'Steak of choice'] },
-  { title: 'Produce', items: ['Baby spinach', 'Lemons', 'Garlic', 'Lettuce or mixed greens', 'Tomato', 'Onion', 'Asparagus', 'Avocado', 'Berries'] },
-  { title: 'Pantry and Dairy', items: ['Chickpeas', 'Black beans', 'Quinoa', 'Oats', 'Whole milk', 'Full fat Greek yogurt', 'Walnuts', 'Feta (optional)', 'Taco seasoning', 'Tortillas', 'Shredded cheese', 'Salsa'] },
+  { title: 'Produce', items: ['Baby spinach', 'Lemons', 'Garlic', 'Lettuce or mixed greens', 'Tomato', 'Onion', 'Asparagus', 'Avocado'] },
+  { title: 'Pantry and Dairy', items: ['Chickpeas', 'Black beans', 'Quinoa', 'Feta (optional)', 'Taco seasoning', 'Tortillas', 'Shredded cheese', 'Salsa'] },
   { title: 'Already Have — Confirm Before Buying', items: ['Olive oil', 'Butter', 'Chicken stock', 'Dried oregano', 'Salt, pepper, and Maldon', 'Lime'] },
 ];
 
