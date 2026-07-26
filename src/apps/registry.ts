@@ -114,7 +114,7 @@ export const APP_REGISTRY: RegisteredApp[] = [
     meta: {
       id: "weeknight-meal-plan",
       name: "Weeknight Meal Plan",
-      description: "Sun-Mon-Tue dinners with shopping list and tap-through recipe cards",
+      description: "Sun-Wed meals with shopping list and tap-through recipe cards",
       icon: "meals",
       route: "weeknight-meal-plan",
       needsPersistence: true,
