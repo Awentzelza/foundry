@@ -11,68 +11,101 @@ interface Checked { [key: string]: boolean; }
 
 const recipes: Recipe[] = [
   {
-    id: 'sun', day: 'Sunday', title: 'Seared Salmon, Lemon-Butter Pan Sauce, Herbed Quinoa',
-    tag: 'Guest night', note: 'Same plate for everyone. Hits the omega-3 target from the fertility plan.',
+    id: 'sun-dinner', day: 'Sunday', title: 'Mediterranean Herb-Roasted Chicken Thighs', tag: 'Dinner',
+    note: 'Cook extra thighs. Shredded leftovers cover lunch salads through Wednesday.',
     ingredients: [
-      '3 salmon fillets, skin-on', '1 cup quinoa', '2 cups chicken or vegetable stock',
-      '4 tbsp unsalted butter', '1 lemon, juiced and zested', '2 garlic cloves, minced',
-      '1 tbsp capers', '2 tbsp fresh parsley, chopped', '2 tbsp olive oil',
-      '5 oz arugula', '1 fennel bulb, shaved thin', '1 tsp salt', '1/2 tsp black pepper',
+      '8 bone-in, skin-on chicken thighs', '2 lemons, juiced', '6 garlic cloves, minced',
+      '2 tbsp dried oregano', '3 tbsp olive oil', '1 cup chicken stock', '2 tbsp unsalted butter',
+      '5 oz baby spinach', '1 can chickpeas, drained', '1 tsp salt', '1/2 tsp black pepper',
     ],
     steps: [
-      { title: 'Cook quinoa', content: 'Rinse the quinoa, combine with stock in a pot, bring to a boil, cover, and simmer until absorbed, about 15 min.' },
-      { title: 'Dry and season salmon', content: 'Pat salmon completely dry. Season both sides with salt and pepper. Let sit 10 min at room temp.' },
-      { title: 'Sear skin-side down', content: 'Heat cast iron over medium-high with olive oil. Lay salmon skin-side down, press flat for the first 30 sec. Cook undisturbed until crisp, about 5 min.' },
-      { title: 'Flip and finish', content: 'Flip salmon, cook 2-3 more minutes until just cooked through. Remove to a plate.' },
-      { title: 'Build pan sauce', content: 'Lower heat, add butter to the pan. Once foaming, add garlic, cook 30 sec, then capers, lemon juice and zest. Swirl to combine.' },
-      { title: 'Finish quinoa', content: 'Fluff quinoa, stir in parsley and remaining olive oil.' },
-      { title: 'Toss salad', content: 'Toss arugula and shaved fennel with olive oil, lemon, and salt.' },
-      { title: 'Plate', content: 'Spoon pan sauce over salmon, serve with quinoa and salad.' },
+      { title: 'Season', content: 'Pat thighs completely dry. Season both sides with salt, pepper, and half the oregano.' },
+      { title: 'Sear', content: 'Heat olive oil in cast iron over medium-high. Place thighs skin-side down, render until crisp, about 8 min.' },
+      { title: 'Oven finish', content: 'Flip thighs, transfer skillet to a 400F oven. Roast 15-18 min until internal temp hits 175F.' },
+      { title: 'Pan sauce', content: 'Remove chicken to rest. Deglaze the pan with stock, lemon juice, and garlic. Reduce, then swirl in butter.' },
+      { title: 'Wilt spinach', content: 'Quick saute the spinach in the same pan, 1-2 min, until just wilted.' },
+      { title: 'Plate and reserve', content: 'Serve chicken over spinach and chickpeas with sauce spooned on top. Shred and refrigerate 4-5 extra thighs for the week.' },
     ],
   },
   {
-    id: 'mon', day: 'Monday', title: 'Pan-Seared Chicken Thighs, White Wine Pan Sauce, French Lentils',
-    tag: 'Weeknight', note: 'Lentils replace rice, more fiber and protein.',
+    id: 'oats-batch', day: 'Mon - Tue - Wed', title: 'Overnight Oats', tag: 'Breakfast',
+    note: 'One batch Sunday night covers all three mornings.',
     ingredients: [
-      '6 bone-in, skin-on chicken thighs', '1/2 cup dry white wine', '1/2 cup chicken stock',
-      '3 tbsp unsalted butter', '1 shallot, minced', '2 garlic cloves, minced', '3 sprigs fresh thyme',
-      '1 cup green or French lentils', '1 lb broccoli florets', '3 tbsp olive oil',
-      '1 1/2 tsp salt', '1/2 tsp black pepper',
+      '3 cups rolled oats', '3 cups whole milk', '1 1/2 cups Greek yogurt',
+      '3/4 cup walnuts, chopped', '1 1/2 cups mixed berries', '3 tbsp honey, optional', 'Pinch of salt',
     ],
     steps: [
-      { title: 'Cook lentils', content: 'Simmer lentils in salted water until tender but not mushy, about 25 min, then drain.' },
-      { title: 'Roast broccoli', content: 'Toss broccoli with olive oil, salt, pepper. Roast at 425F until charred at the edges, about 20 min.' },
-      { title: 'Sear chicken skin-side down', content: 'Pat thighs dry, season. Place skin-side down in a cold cast iron pan, turn heat to medium. Render slowly until crisp, about 10 min.' },
-      { title: 'Flip and finish', content: 'Flip thighs, cook until internal temp hits 175F, about 8 min. Remove, tent with foil.' },
-      { title: 'Build pan sauce', content: 'Pour off excess fat, leaving a thin layer. Add shallot, cook until soft, then garlic and thyme. Deglaze with wine, reduce by half.' },
-      { title: 'Finish sauce', content: 'Add stock, simmer to reduce slightly, then swirl in butter off heat until glossy.' },
-      { title: 'Plate', content: 'Serve chicken over lentils with broccoli, spoon pan sauce over the top.' },
+      { title: 'Combine', content: 'Sunday night, whisk oats, milk, yogurt, and salt together in a large container.' },
+      { title: 'Divide', content: 'Split the mixture evenly into three jars or containers.' },
+      { title: 'Top', content: 'Add walnuts and berries to each. Drizzle with honey if using. Refrigerate overnight.' },
+      { title: 'Serve', content: 'Grab and go each morning. Stir before eating.' },
     ],
   },
   {
-    id: 'tue', day: 'Tuesday', title: 'Beef and Black Bean Skillet with Lime Crema',
-    tag: 'Weeknight', note: 'Beans cut the saturated fat load per serving.',
+    id: 'mon-lunch', day: 'Monday', title: 'Chicken and Chickpea Salad', tag: 'Lunch',
+    note: 'Built on Sunday leftovers.',
     ingredients: [
-      '1 lb ground beef (85/15)', '1 cup black beans, drained and rinsed', '1 yellow onion, diced',
-      '1 bell pepper, diced', '3 garlic cloves, minced', '1 tbsp cumin', '1 tsp smoked paprika',
-      '1 tsp chili powder', '1 lime, juiced', '1/3 cup plain full-fat Greek yogurt',
-      '6 corn tortillas', '1 tbsp olive oil', '1 tsp salt', '2 tbsp fresh cilantro, chopped',
+      'Reserved chicken from Sunday', '1/2 cup chickpeas', '4 cups mixed greens',
+      '1/4 cup crumbled feta', '1/2 cucumber, diced', '2 tbsp olive oil', '1 lemon, juiced',
     ],
     steps: [
-      { title: 'Saute aromatics', content: 'Heat olive oil in cast iron over medium. Add onion and bell pepper, cook until softened, about 5 min.' },
-      { title: 'Brown beef', content: 'Add ground beef, breaking it up, cook until browned, about 7 min. Drain excess fat if needed.' },
-      { title: 'Season and add beans', content: 'Stir in garlic, cumin, smoked paprika, chili powder, salt. Add black beans, cook until warmed through and slightly thickened.' },
-      { title: 'Make lime crema', content: 'Whisk Greek yogurt with lime juice and a pinch of salt.' },
-      { title: 'Warm tortillas', content: 'Char tortillas directly over a burner flame or in a dry skillet.' },
-      { title: 'Serve', content: 'Spoon beef and bean mixture over tortillas, top with lime crema and cilantro.' },
+      { title: 'Assemble', content: 'Combine greens, chicken, chickpeas, cucumber, and feta in a bowl.' },
+      { title: 'Dress', content: 'Toss with olive oil and lemon juice. Season to taste.' },
+    ],
+  },
+  {
+    id: 'tue-lunch', day: 'Tuesday', title: 'Chicken Avocado Salad', tag: 'Lunch',
+    note: 'Still working through Sunday leftovers.',
+    ingredients: [
+      'Reserved chicken from Sunday', '1 avocado, sliced', '4 cups mixed greens',
+      '1 cup cherry tomatoes, halved', '2 tbsp olive oil', '1 tbsp red wine vinegar',
+    ],
+    steps: [
+      { title: 'Assemble', content: 'Combine greens, chicken, avocado, and tomatoes in a bowl.' },
+      { title: 'Dress', content: 'Toss with olive oil and red wine vinegar.' },
+    ],
+  },
+  {
+    id: 'tue-dinner', day: 'Tuesday', title: 'Seared Steak with Quinoa and Asparagus', tag: 'Dinner',
+    note: 'Keeps the ground beef and steak count on pace for the week.',
+    ingredients: [
+      '2 steaks (ribeye or sirloin)', '1 cup quinoa', '2 cups chicken stock', '1 bunch asparagus, trimmed',
+      '2 tbsp olive oil', '2 tbsp unsalted butter', '2 garlic cloves', '1 tsp salt', '1/2 tsp black pepper',
+    ],
+    steps: [
+      { title: 'Cook quinoa', content: 'Rinse quinoa, combine with stock in a pot, bring to a boil, cover, and simmer until absorbed, about 15 min.' },
+      { title: 'Season steak', content: 'Pat steaks dry, season generously with salt and pepper. Rest at room temperature 15 min.' },
+      { title: 'Sear', content: 'Heat cast iron until ripping hot. Sear steaks 3-4 min per side for medium-rare, basting with butter and garlic in the final minute.' },
+      { title: 'Roast asparagus', content: 'Toss asparagus with olive oil, salt, and pepper. Roast at 425F for 10-12 min, or sear in the same pan after the steak rests.' },
+      { title: 'Rest and plate', content: 'Rest steak 5 min, slice against the grain, and serve over quinoa with asparagus.' },
+    ],
+  },
+  {
+    id: 'wed-lunch', day: 'Wednesday', title: 'Chicken Caesar-Style Salad', tag: 'Lunch',
+    note: 'Closes out the Sunday chicken batch.',
+    ingredients: [
+      'Reserved chicken from Sunday', '1 head romaine, chopped', '1/3 cup shaved parmesan',
+      '3 tbsp olive oil', '1 lemon, juiced', '1 tsp dijon mustard', '1 garlic clove, minced',
+    ],
+    steps: [
+      { title: 'Assemble', content: 'Combine chopped romaine, chicken, and parmesan in a bowl.' },
+      { title: 'Dress', content: 'Whisk olive oil, lemon juice, dijon, and garlic. Toss with the salad.' },
     ],
   },
 ];
 
 const shoppingList: { [category: string]: string[] } = {
-  Produce: ['1 lemon', '1 lime', '1 fennel bulb', 'Fresh parsley', 'Fresh thyme', 'Fresh cilantro', '5 oz arugula', '1 shallot', '1 yellow onion', '1 bell pepper', '1 head garlic', '1 lb broccoli florets'],
-  Protein: ['3 salmon fillets, skin-on', '6 bone-in, skin-on chicken thighs', '1 lb ground beef (85/15)'],
-  'Pantry and Dairy': ['1 cup quinoa', '1 cup green or French lentils', '1 can black beans', 'Corn tortillas', 'Unsalted butter', 'Olive oil', 'Capers', 'Dry white wine', 'Chicken or vegetable stock', 'Cumin', 'Smoked paprika', 'Chili powder', 'Salt', 'Black pepper', 'Plain full-fat Greek yogurt'],
+  Produce: [
+    '2 lemons', '1 head garlic', '5 oz baby spinach', '8 cups mixed greens', '1/2 cucumber',
+    '1 avocado', '1 cup cherry tomatoes', '1 head romaine', '1 bunch asparagus', '1 1/2 cups mixed berries',
+  ],
+  Protein: ['8 bone-in, skin-on chicken thighs', '2 steaks (ribeye or sirloin)'],
+  'Pantry and Dairy': [
+    '3 cups rolled oats', '3 cups whole milk', '1 1/2 cups Greek yogurt', '3/4 cup walnuts',
+    'Honey', '1 can chickpeas', '1/4 cup feta', '1/3 cup parmesan', '1 cup quinoa',
+    '3 cups chicken stock', 'Unsalted butter', 'Olive oil', 'Red wine vinegar', 'Dijon mustard',
+    'Dried oregano', 'Salt', 'Black pepper',
+  ],
 };
 
 interface PlanState { checked: Checked; }
@@ -102,11 +135,11 @@ export default function WeeknightMealPlan() {
       <div style={{
         fontFamily: 'var(--foundry-font-mono)', fontSize: 10, letterSpacing: '0.18em',
         textTransform: 'uppercase', color: 'var(--foundry-text-subtle)', marginBottom: 4,
-      }}>Dinners this week</div>
+      }}>Meals this week</div>
       <div style={{
         fontFamily: 'var(--foundry-font-display)', fontSize: 26, fontWeight: 700,
         color: 'var(--foundry-text)', letterSpacing: '-0.01em', marginBottom: 20,
-      }}>Sunday, Monday, Tuesday</div>
+      }}>Sunday through Wednesday</div>
 
       {activeRecipe === null && (
         <div>
@@ -169,7 +202,7 @@ export default function WeeknightMealPlan() {
       {activeRecipe && (
         <div>
           <IonButton fill="clear" onClick={() => setActiveId(null)} style={{ '--color': 'var(--foundry-ember)', marginLeft: -12 }}>
-            {'< All recipes'}
+            {'< All meals'}
           </IonButton>
 
           <div style={{
@@ -177,7 +210,7 @@ export default function WeeknightMealPlan() {
             borderRadius: 'var(--foundry-radius-md)', padding: 18, marginBottom: 16,
           }}>
             <div style={{ fontFamily: 'var(--foundry-font-mono)', fontSize: 10, letterSpacing: '0.14em', textTransform: 'uppercase', color: 'var(--foundry-ember)', marginBottom: 6 }}>
-              {activeRecipe.day}
+              {activeRecipe.day} - {activeRecipe.tag}
             </div>
             <div style={{ fontFamily: 'var(--foundry-font-display)', fontSize: 18, fontWeight: 700, color: 'var(--foundry-text)' }}>
               {activeRecipe.title}
