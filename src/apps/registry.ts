@@ -54,7 +54,7 @@ export const APP_REGISTRY: RegisteredApp[] = [
     meta: {
       id: "meal-plan",
       name: "Meal Plan",
-      description: "Mediterranean TTC-aligned meals — breakfast, lunch, and dinner for the week.",
+      description: "This week's meals — breakfast, lunch, and dinner, Sunday through Wednesday.",
       icon: "meal",
       route: "meal-plan",
       needsPersistence: false,
