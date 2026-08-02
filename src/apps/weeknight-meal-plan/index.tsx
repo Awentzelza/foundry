@@ -11,100 +11,106 @@ interface Checked { [key: string]: boolean; }
 
 const recipes: Recipe[] = [
   {
-    id: 'sun-dinner', day: 'Sunday', title: 'Mediterranean Herb-Roasted Chicken Thighs', tag: 'Dinner',
-    note: 'Cook extra thighs. Shredded leftovers cover lunch salads through Wednesday.',
+    id: 'sun-dinner', day: 'Sunday', title: 'Greek Chicken Bowls', tag: 'Dinner',
+    note: 'Marinated chicken over rice with a full Greek spread. Cook extra chicken for Monday lunch.',
     ingredients: [
-      '8 bone-in, skin-on chicken thighs', '2 lemons, juiced', '6 garlic cloves, minced',
-      '2 tbsp dried oregano', '3 tbsp olive oil', '1 cup chicken stock', '2 tbsp unsalted butter',
-      '5 oz baby spinach', '1 can chickpeas, drained', '1 tsp salt', '1/2 tsp black pepper',
+      '2 lb boneless chicken thighs or breasts', '3 tbsp olive oil', '2 lemons, juiced',
+      '4 garlic cloves, minced', '1 tbsp dried oregano', '1 tsp salt', '1/2 tsp black pepper',
+      '2 cups cooked rice or quinoa', '1 cucumber, diced', '1 cup cherry tomatoes, halved',
+      '1/2 red onion, sliced thin', '1/2 cup kalamata olives', '3/4 cup feta, crumbled',
+      '1 cup tzatziki',
     ],
     steps: [
-      { title: 'Season', content: 'Pat thighs completely dry. Season both sides with salt, pepper, and half the oregano.' },
-      { title: 'Sear', content: 'Heat olive oil in cast iron over medium-high. Place thighs skin-side down, render until crisp, about 8 min.' },
-      { title: 'Oven finish', content: 'Flip thighs, transfer skillet to a 400F oven. Roast 15-18 min until internal temp hits 175F.' },
-      { title: 'Pan sauce', content: 'Remove chicken to rest. Deglaze the pan with stock, lemon juice, and garlic. Reduce, then swirl in butter.' },
-      { title: 'Wilt spinach', content: 'Quick saute the spinach in the same pan, 1-2 min, until just wilted.' },
-      { title: 'Plate and reserve', content: 'Serve chicken over spinach and chickpeas with sauce spooned on top. Shred and refrigerate 4-5 extra thighs for the week.' },
+      { title: 'Marinate', content: 'Whisk olive oil, lemon juice, garlic, oregano, salt, and pepper. Coat chicken and marinate 20 min minimum.' },
+      { title: 'Cook chicken', content: 'Grill or sear over medium-high heat until internal temp hits 165F, about 6-7 min per side depending on thickness.' },
+      { title: 'Rest and slice', content: 'Rest chicken 5 min, then slice. Set aside a portion for tomorrow lunch.' },
+      { title: 'Build bowls', content: 'Layer rice, sliced chicken, cucumber, tomatoes, red onion, and olives.' },
+      { title: 'Finish', content: 'Top with feta and a generous spoon of tzatziki.' },
     ],
   },
   {
-    id: 'oats-batch', day: 'Mon - Tue - Wed', title: 'Overnight Oats', tag: 'Breakfast',
-    note: 'One batch Sunday night covers all three mornings.',
-    ingredients: [
-      '3 cups rolled oats', '3 cups whole milk', '1 1/2 cups Greek yogurt',
-      '3/4 cup walnuts, chopped', '1 1/2 cups mixed berries', '3 tbsp honey, optional', 'Pinch of salt',
-    ],
+    id: 'mush-mon-tue', day: 'Monday - Tuesday', title: 'Mush', tag: 'Breakfast',
+    note: 'Ready-to-eat, zero prep. Grab and go both mornings.',
+    ingredients: ['2 servings Mush'],
     steps: [
-      { title: 'Combine', content: 'Sunday night, whisk oats, milk, yogurt, and salt together in a large container.' },
-      { title: 'Divide', content: 'Split the mixture evenly into three jars or containers.' },
-      { title: 'Top', content: 'Add walnuts and berries to each. Drizzle with honey if using. Refrigerate overnight.' },
-      { title: 'Serve', content: 'Grab and go each morning. Stir before eating.' },
+      { title: 'Serve', content: 'No prep needed. Grab a Mush pouch each morning.' },
     ],
   },
   {
-    id: 'mon-lunch', day: 'Monday', title: 'Chicken and Chickpea Salad', tag: 'Lunch',
-    note: 'Built on Sunday leftovers.',
+    id: 'mon-lunch', day: 'Monday', title: 'Spinach Salad with Chicken', tag: 'Lunch',
+    note: 'Built on Sunday leftover chicken.',
     ingredients: [
-      'Reserved chicken from Sunday', '1/2 cup chickpeas', '4 cups mixed greens',
-      '1/4 cup crumbled feta', '1/2 cucumber, diced', '2 tbsp olive oil', '1 lemon, juiced',
+      'Reserved chicken from Sunday', '5 oz baby spinach', '1/4 cup walnuts',
+      '2 tbsp pumpkin seeds', '1/3 cup feta, crumbled', '3 tbsp olive oil', '1 lemon, juiced',
     ],
     steps: [
-      { title: 'Assemble', content: 'Combine greens, chicken, chickpeas, cucumber, and feta in a bowl.' },
+      { title: 'Assemble', content: 'Combine spinach, sliced chicken, walnuts, pumpkin seeds, and feta in a bowl.' },
       { title: 'Dress', content: 'Toss with olive oil and lemon juice. Season to taste.' },
     ],
   },
   {
-    id: 'tue-lunch', day: 'Tuesday', title: 'Chicken Avocado Salad', tag: 'Lunch',
-    note: 'Still working through Sunday leftovers.',
+    id: 'mon-dinner', day: 'Monday', title: 'Reverse-Seared Steak with Chimichurri', tag: 'Dinner',
+    note: 'Sweet potato and sauteed kale on the side.',
     ingredients: [
-      'Reserved chicken from Sunday', '1 avocado, sliced', '4 cups mixed greens',
-      '1 cup cherry tomatoes, halved', '2 tbsp olive oil', '1 tbsp red wine vinegar',
+      '2 steaks (ribeye or sirloin)', '2 sweet potatoes', '1 bunch kale, stemmed and chopped',
+      '1 cup parsley, finely chopped', '3 garlic cloves, minced', '2 tbsp red wine vinegar',
+      '1/2 cup olive oil', '1/2 tsp red pepper flakes', '1 tsp salt', '1/2 tsp black pepper',
     ],
     steps: [
-      { title: 'Assemble', content: 'Combine greens, chicken, avocado, and tomatoes in a bowl.' },
-      { title: 'Dress', content: 'Toss with olive oil and red wine vinegar.' },
+      { title: 'Roast sweet potatoes', content: 'Cube sweet potatoes, toss with olive oil and salt, roast at 425F for 25-30 min.' },
+      { title: 'Reverse sear', content: 'Season steaks, place in a 250F oven until internal temp hits 115F, about 25-30 min.' },
+      { title: 'Sear', content: 'Heat cast iron until ripping hot, sear steaks 60-90 sec per side for a deep crust.' },
+      { title: 'Make chimichurri', content: 'Combine parsley, garlic, red wine vinegar, olive oil, red pepper flakes, salt, and pepper.' },
+      { title: 'Saute kale', content: 'Quick saute kale in the steak pan drippings, 2-3 min, until just wilted.' },
+      { title: 'Plate', content: 'Rest steak 5 min, slice against the grain, top with chimichurri, serve with sweet potato and kale.' },
     ],
   },
   {
-    id: 'tue-dinner', day: 'Tuesday', title: 'Seared Steak with Quinoa and Asparagus', tag: 'Dinner',
-    note: 'Keeps the ground beef and steak count on pace for the week.',
+    id: 'tue-lunch', day: 'Tuesday', title: 'Lentil Arugula Salad', tag: 'Lunch',
+    note: 'Light, protein-forward, no cooking required if using pre-cooked lentils.',
     ingredients: [
-      '2 steaks (ribeye or sirloin)', '1 cup quinoa', '2 cups chicken stock', '1 bunch asparagus, trimmed',
-      '2 tbsp olive oil', '2 tbsp unsalted butter', '2 garlic cloves', '1 tsp salt', '1/2 tsp black pepper',
+      '1.5 cups cooked lentils', '4 cups arugula', '1/2 cup chickpeas',
+      '1 cup cherry tomatoes, halved', '1/3 cup goat cheese, crumbled', '3 tbsp balsamic vinaigrette',
     ],
     steps: [
-      { title: 'Cook quinoa', content: 'Rinse quinoa, combine with stock in a pot, bring to a boil, cover, and simmer until absorbed, about 15 min.' },
-      { title: 'Season steak', content: 'Pat steaks dry, season generously with salt and pepper. Rest at room temperature 15 min.' },
-      { title: 'Sear', content: 'Heat cast iron until ripping hot. Sear steaks 3-4 min per side for medium-rare, basting with butter and garlic in the final minute.' },
-      { title: 'Roast asparagus', content: 'Toss asparagus with olive oil, salt, and pepper. Roast at 425F for 10-12 min, or sear in the same pan after the steak rests.' },
-      { title: 'Rest and plate', content: 'Rest steak 5 min, slice against the grain, and serve over quinoa with asparagus.' },
+      { title: 'Assemble', content: 'Combine arugula, lentils, chickpeas, tomatoes, and goat cheese in a bowl.' },
+      { title: 'Dress', content: 'Toss with balsamic vinaigrette right before eating.' },
     ],
   },
   {
-    id: 'wed-lunch', day: 'Wednesday', title: 'Chicken Caesar-Style Salad', tag: 'Lunch',
-    note: 'Closes out the Sunday chicken batch.',
+    id: 'tue-dinner', day: 'Tuesday', title: 'Chicken Thighs with Mustard-Herb Pan Sauce', tag: 'Dinner',
+    note: 'Different prep from Sunday to keep the week from feeling repetitive.',
     ingredients: [
-      'Reserved chicken from Sunday', '1 head romaine, chopped', '1/3 cup shaved parmesan',
-      '3 tbsp olive oil', '1 lemon, juiced', '1 tsp dijon mustard', '1 garlic clove, minced',
+      '6 bone-in, skin-on chicken thighs', '2 tbsp dijon mustard', '3/4 cup chicken stock',
+      '2 tbsp unsalted butter', '2 garlic cloves, minced', '1 tbsp fresh thyme or 1 tsp dried',
+      '1 tsp salt', '1/2 tsp black pepper', '1 lb green beans or asparagus',
     ],
     steps: [
-      { title: 'Assemble', content: 'Combine chopped romaine, chicken, and parmesan in a bowl.' },
-      { title: 'Dress', content: 'Whisk olive oil, lemon juice, dijon, and garlic. Toss with the salad.' },
+      { title: 'Season and sear', content: 'Pat thighs dry, season with salt and pepper. Sear skin-side down in cast iron over medium-high until crisp, about 8 min.' },
+      { title: 'Oven finish', content: 'Flip thighs, transfer skillet to a 400F oven. Roast 15-18 min until internal temp hits 175F.' },
+      { title: 'Pan sauce', content: 'Remove chicken to rest. Deglaze pan with stock and garlic, whisk in dijon and thyme, reduce slightly, finish with butter.' },
+      { title: 'Cook vegetable', content: 'Saute or roast green beans or asparagus while the sauce reduces.' },
+      { title: 'Plate', content: 'Serve chicken with pan sauce spooned over, alongside the vegetable.' },
     ],
   },
 ];
 
 const shoppingList: { [category: string]: string[] } = {
   Produce: [
-    '2 lemons', '1 head garlic', '5 oz baby spinach', '8 cups mixed greens', '1/2 cucumber',
-    '1 avocado', '1 cup cherry tomatoes', '1 head romaine', '1 bunch asparagus', '1 1/2 cups mixed berries',
+    '2 lemons', '5 garlic cloves', '1 cucumber', '2 cups cherry tomatoes', '1/2 red onion',
+    '5 oz baby spinach', '2 sweet potatoes', '1 bunch kale', '1 cup parsley', '4 cups arugula',
+    '1 lb green beans or asparagus',
   ],
-  Protein: ['8 bone-in, skin-on chicken thighs', '2 steaks (ribeye or sirloin)'],
+  Protein: [
+    '2 lb boneless chicken thighs or breasts', '2 steaks (ribeye or sirloin)',
+    '6 bone-in, skin-on chicken thighs',
+  ],
   'Pantry and Dairy': [
-    '3 cups rolled oats', '3 cups whole milk', '1 1/2 cups Greek yogurt', '3/4 cup walnuts',
-    'Honey', '1 can chickpeas', '1/4 cup feta', '1/3 cup parmesan', '1 cup quinoa',
-    '3 cups chicken stock', 'Unsalted butter', 'Olive oil', 'Red wine vinegar', 'Dijon mustard',
-    'Dried oregano', 'Salt', 'Black pepper',
+    '2 cups rice or quinoa', '1/2 cup kalamata olives', '1 cup feta', '1 cup tzatziki',
+    '1/4 cup walnuts', '2 tbsp pumpkin seeds', '1.5 cups cooked lentils', '1 can chickpeas',
+    '1/3 cup goat cheese', 'Balsamic vinaigrette', 'Dijon mustard', 'Chicken stock',
+    'Unsalted butter', 'Olive oil', 'Red wine vinegar', 'Dried oregano', 'Fresh or dried thyme',
+    'Salt', 'Black pepper', 'Red pepper flakes', '2 servings Mush',
   ],
 };
 
@@ -139,7 +145,7 @@ export default function WeeknightMealPlan() {
       <div style={{
         fontFamily: 'var(--foundry-font-display)', fontSize: 26, fontWeight: 700,
         color: 'var(--foundry-text)', letterSpacing: '-0.01em', marginBottom: 20,
-      }}>Sunday through Wednesday</div>
+      }}>Sunday through Tuesday</div>
 
       {activeRecipe === null && (
         <div>
