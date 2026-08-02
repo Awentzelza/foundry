@@ -12,7 +12,7 @@ interface Checked { [key: string]: boolean; }
 const recipes: Recipe[] = [
   {
     id: 'sun-dinner', day: 'Sunday', title: 'Greek Chicken Bowls', tag: 'Dinner',
-    note: 'Marinated chicken over rice with a full Greek spread. Cook extra chicken for Monday lunch.',
+    note: 'Marinated chicken over rice with a full Greek spread. Cook extra chicken for snacking.',
     ingredients: [
       '2 lb boneless chicken thighs or breasts', '3 tbsp olive oil', '2 lemons, juiced',
       '4 garlic cloves, minced', '1 tbsp dried oregano', '1 tsp salt', '1/2 tsp black pepper',
@@ -23,7 +23,7 @@ const recipes: Recipe[] = [
     steps: [
       { title: 'Marinate', content: 'Whisk olive oil, lemon juice, garlic, oregano, salt, and pepper. Coat chicken and marinate 20 min minimum.' },
       { title: 'Cook chicken', content: 'Grill or sear over medium-high heat until internal temp hits 165F, about 6-7 min per side depending on thickness.' },
-      { title: 'Rest and slice', content: 'Rest chicken 5 min, then slice. Set aside a portion for tomorrow lunch.' },
+      { title: 'Rest and slice', content: 'Rest chicken 5 min, then slice.' },
       { title: 'Build bowls', content: 'Layer rice, sliced chicken, cucumber, tomatoes, red onion, and olives.' },
       { title: 'Finish', content: 'Top with feta and a generous spoon of tzatziki.' },
     ],
@@ -37,15 +37,11 @@ const recipes: Recipe[] = [
     ],
   },
   {
-    id: 'mon-lunch', day: 'Monday', title: 'Spinach Salad with Chicken', tag: 'Lunch',
-    note: 'Built on Sunday leftover chicken.',
-    ingredients: [
-      'Reserved chicken from Sunday', '5 oz baby spinach', '1/4 cup walnuts',
-      '2 tbsp pumpkin seeds', '1/3 cup feta, crumbled', '3 tbsp olive oil', '1 lemon, juiced',
-    ],
+    id: 'mon-lunch', day: 'Monday', title: 'Co-op Salad Kit + Protein', tag: 'Lunch',
+    note: 'Grab a salad kit from the Boise co-op, add leftover chicken or another protein on hand. No prep, no recipe needed.',
+    ingredients: ['1 salad kit (Boise co-op)', 'Leftover chicken or protein of choice'],
     steps: [
-      { title: 'Assemble', content: 'Combine spinach, sliced chicken, walnuts, pumpkin seeds, and feta in a bowl.' },
-      { title: 'Dress', content: 'Toss with olive oil and lemon juice. Season to taste.' },
+      { title: 'Assemble', content: 'Toss the salad kit as directed on the package, add sliced protein on top.' },
     ],
   },
   {
@@ -66,15 +62,11 @@ const recipes: Recipe[] = [
     ],
   },
   {
-    id: 'tue-lunch', day: 'Tuesday', title: 'Lentil Arugula Salad', tag: 'Lunch',
-    note: 'Light, protein-forward, no cooking required if using pre-cooked lentils.',
-    ingredients: [
-      '1.5 cups cooked lentils', '4 cups arugula', '1/2 cup chickpeas',
-      '1 cup cherry tomatoes, halved', '1/3 cup goat cheese, crumbled', '3 tbsp balsamic vinaigrette',
-    ],
+    id: 'tue-lunch', day: 'Tuesday', title: 'Co-op Salad Kit + Protein', tag: 'Lunch',
+    note: 'Same approach as Monday. Grab a different kit for variety, add leftover steak or chicken.',
+    ingredients: ['1 salad kit (Boise co-op)', 'Leftover steak or protein of choice'],
     steps: [
-      { title: 'Assemble', content: 'Combine arugula, lentils, chickpeas, tomatoes, and goat cheese in a bowl.' },
-      { title: 'Dress', content: 'Toss with balsamic vinaigrette right before eating.' },
+      { title: 'Assemble', content: 'Toss the salad kit as directed on the package, add sliced protein on top.' },
     ],
   },
   {
@@ -97,20 +89,21 @@ const recipes: Recipe[] = [
 
 const shoppingList: { [category: string]: string[] } = {
   Produce: [
-    '2 lemons', '5 garlic cloves', '1 cucumber', '2 cups cherry tomatoes', '1/2 red onion',
-    '5 oz baby spinach', '2 sweet potatoes', '1 bunch kale', '1 cup parsley', '4 cups arugula',
-    '1 lb green beans or asparagus',
+    '2 lemons', '5 garlic cloves', '1 cucumber', '1 cup cherry tomatoes', '1/2 red onion',
+    '2 sweet potatoes', '1 bunch kale', '1 cup parsley', '1 lb green beans or asparagus',
   ],
   Protein: [
     '2 lb boneless chicken thighs or breasts', '2 steaks (ribeye or sirloin)',
     '6 bone-in, skin-on chicken thighs',
   ],
+  'Boise Co-op': [
+    '2 salad kits (variety for Mon and Tue)',
+  ],
   'Pantry and Dairy': [
     '2 cups rice or quinoa', '1/2 cup kalamata olives', '1 cup feta', '1 cup tzatziki',
-    '1/4 cup walnuts', '2 tbsp pumpkin seeds', '1.5 cups cooked lentils', '1 can chickpeas',
-    '1/3 cup goat cheese', 'Balsamic vinaigrette', 'Dijon mustard', 'Chicken stock',
-    'Unsalted butter', 'Olive oil', 'Red wine vinegar', 'Dried oregano', 'Fresh or dried thyme',
-    'Salt', 'Black pepper', 'Red pepper flakes', '2 servings Mush',
+    'Dijon mustard', 'Chicken stock', 'Unsalted butter', 'Olive oil', 'Red wine vinegar',
+    'Dried oregano', 'Fresh or dried thyme', 'Salt', 'Black pepper', 'Red pepper flakes',
+    '2 servings Mush',
   ],
 };
 
